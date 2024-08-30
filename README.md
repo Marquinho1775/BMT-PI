@@ -2,6 +2,7 @@
 
 ## Integrantes
 
+    Marco Angulo Rodríguez     C10458
     Alejandro Barboza Taylor   C10886
     Brandon Trigueros Lara     C17899
     David González Villanueva  C13388
