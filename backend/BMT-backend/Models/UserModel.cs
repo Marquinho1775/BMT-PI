@@ -1,7 +1,10 @@
-﻿namespace BMT_backend.Models
+﻿using System.Text.Json.Serialization;
+
+namespace BMT_backend.Models
 {
     public class UserModel
     {
+        //[JsonIgnore]
         public string Id { get; set; }
         public string Name { get; set; }
         public string Username { get; set; }

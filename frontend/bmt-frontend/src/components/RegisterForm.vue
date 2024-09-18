@@ -7,27 +7,33 @@
             <form @submit.prevent="registerUser">
                 <div>
                     <label for="name">Nombre</label>
-                    <input type="text" id="name" name="name" required>
+                    <input v-model="datosFormulario.Name"
+                     type="text" id="name" name="name" required>
                 </div>
                 <div>
                     <label for="username">Nombre de usuario</label>
-                    <input type="text" id="username" name="username" required>
+                    <input v-model="datosFormulario.Username"
+                    type="text" id="username" name="username" required>
                 </div>
                 <div>
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <input v-model="datosFormulario.Email"
+                    type="email" id="email" name="email" required>
                 </div>
                 <div>
                     <label for="password">Contraseña</label>
-                    <input type="password" id="password" name="password" required>
+                    <input v-model="datosFormulario.Password"
+                    type="password" id="password" name="password" required>
                 </div>
                 <div>
                     <label for="isEntrepeneur">¿Quiere ser emprendedor?</label>
-                    <input type="checkbox" id="isEntrepeneur" name="isEntrepeneur">
+                    <input v-model="datosFormulario.IsEntrepeneur"
+                    type="checkbox" id="isEntrepeneur" name="isEntrepeneur">
                 </div>
                 <div>
                     <label for="identification">Cédula</label>
-                    <input type="text" id="identification" name="identification" required>
+                    <input v-model="datosFormulario.Identification"
+                    type="text" id="identification" name="identification" required>
                 </div>
                 <div>
                     <button type="submit" class="btn btn-success btn-block">Registrar</button>
@@ -46,9 +52,9 @@
                     Name: '',
                     Username: '',
                     Email: '',
-                    IsVerified: false,
+                    IsVerified: true,
                     Password: '',
-                    IsEntrepeneur: false,
+                    IsEntrepeneur: '',
                     Identification: ''
                 },
             };
@@ -58,13 +64,14 @@
                 console.log("Datos a guardar:",this.datosFormulario);
                 
                 axios.post('https://localhost:7189/api/User', {
-                    Name: this.Name,
-                    Username: this.Username,
-                    Email: this.Email,
-                    IsVerified: this.IsVerified,
-                    Password: this.Password,
-                    IsEntrepeneur: this.IsEntrepeneur,
-                    Identification: this.Identification
+                    Id: "",
+                    Name: this.datosFormulario.Name,
+                    Username: this.datosFormulario.Username,
+                    Email: this.datosFormulario.Email,
+                    IsVerified: this.datosFormulario.IsVerified,
+                    Password: this.datosFormulario.Password,
+                    IsEntrepeneur: this.datosFormulario.IsEntrepeneur,
+                    Identification: this.datosFormulario.Identification
                 }).then((response) => {
                     console.log(response);
                     window.location.href = "/";
