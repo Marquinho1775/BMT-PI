@@ -5,6 +5,12 @@ import HomePage from './components/HomePage.vue';
 import RegisterForm from './components/RegisterForm.vue';
 import LoginForm from './components/LoginForm.vue';
 
+// Import Bootstrap and BootstrapVue
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
+
+// Import BootstrapVue3
+import BootstrapVue3 from 'bootstrap-vue-3';
 
 const router = createRouter({
     history: createWebHistory(),
@@ -15,4 +21,13 @@ const router = createRouter({
     ]
 });
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App);
+
+// Use BootstrapVue3
+app.use(BootstrapVue3);
+
+// Use the router
+app.use(router);
+
+// Mount the app
+app.mount('#app');
