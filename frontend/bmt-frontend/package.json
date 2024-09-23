@@ -8,8 +8,16 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.6.11",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "bootstrap-vue-3": "^0.5.1",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "jsonwebtoken": "^9.0.2",
+    "portal-vue": "^3.0.0-beta.0",
+    "sweetalert2": "^11.14.0",
+    "vue": "^3.2.13",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
