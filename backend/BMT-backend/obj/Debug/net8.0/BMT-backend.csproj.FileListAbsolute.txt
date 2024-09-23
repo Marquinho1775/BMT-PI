@@ -37,3 +37,11 @@ C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backe
 C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\runtimes\win-x86\native\sni.dll
 C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
+C:\Users\david\OneDrive - Instituto Nacional de Aprendizaje\Desktop\BMT-PI\backend\BMT-backend\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll

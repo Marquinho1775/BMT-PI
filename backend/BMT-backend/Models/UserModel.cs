@@ -13,5 +13,6 @@ namespace BMT_backend.Models
         public string Password { get; set; }
         public bool IsEntrepeneur { get; set; }
         public string Identification { get; set; }
+
     }
 }

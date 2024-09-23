@@ -12,6 +12,9 @@ import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
 // Import BootstrapVue3
 import BootstrapVue3 from 'bootstrap-vue-3';
 
+// Import SweetAlert2
+import Swal from 'sweetalert2';
+
 const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -28,6 +31,9 @@ app.use(BootstrapVue3);
 
 // Use the router
 app.use(router);
+
+// Add SweetAlert2 globally
+app.config.globalProperties.$swal = Swal;
 
 // Mount the app
 app.mount('#app');

@@ -1,5 +1,21 @@
 [
   {
+    "ContainingType": "BMT_backend.Controllers.AccountController",
+    "Method": "Login",
+    "RelativePath": "api/Account/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "login",
+        "Type": "BMT_backend.Controllers.UserLoginDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "BMT_backend.Controllers.UserController",
     "Method": "GetUsers",
     "RelativePath": "api/User",
