@@ -43,12 +43,11 @@ namespace BMT_backend.Handlers
                 new UserModel
                 {
                     Name = Convert.ToString(columna["Name"]),
+                    LastName = Convert.ToString(columna["LastName"]),
                     Username = Convert.ToString(columna["Username"]),
                     Email = Convert.ToString(columna["Email"]),
                     IsVerified = Convert.ToBoolean(columna["IsVerified"]),
-                    Password = Convert.ToString(columna["Password"]),
-                    IsEntrepeneur = Convert.ToBoolean(columna["IsEntrepeneur"]),
-                    Identification = Convert.ToString(columna["Identification"])
+                    Password = Convert.ToString(columna["Password"])
 
                 });
             }
@@ -57,16 +56,15 @@ namespace BMT_backend.Handlers
 
         public bool CreateUser(UserModel user)
         {
-            var query = "INSERT INTO dbo.Users (Name, Identification, Username, Email, IsVerified, Password, IsEntrepeneur) VALUES (@Name, @Identification, @Username, @Email, @IsVerified, @Password, @IsEntrepeneur)";
+            var query = "INSERT INTO dbo.Users (Name, LastName, Username, Email, IsVerified, Password) VALUES (@Name, @LastName, @Username, @Email, @IsVerified, @Password)";
             var comandoParaConsulta = new SqlCommand(query, Connection);
 
             comandoParaConsulta.Parameters.AddWithValue("@Name", user.Name);
-            comandoParaConsulta.Parameters.AddWithValue("@Identification", user.Identification);
+            comandoParaConsulta.Parameters.AddWithValue("@LastName", user.LastName);
             comandoParaConsulta.Parameters.AddWithValue("@Username", user.Username);
             comandoParaConsulta.Parameters.AddWithValue("@Email", user.Email);
             comandoParaConsulta.Parameters.AddWithValue("@IsVerified", user.IsVerified);
             comandoParaConsulta.Parameters.AddWithValue("@Password", user.Password);
-            comandoParaConsulta.Parameters.AddWithValue("@IsEntrepeneur", user.IsEntrepeneur);
 
             Connection.Open();
             bool result = comandoParaConsulta.ExecuteNonQuery() >= 1;

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { login } from '../services/authService'; // Asegúrate de que la ruta esté correcta
+import axios from 'axios';
 
 export default {
   data() {
@@ -39,32 +39,20 @@ export default {
     };
   },
   methods: {
-    async loginUser() {
-      try {
-        const response = await login(this.loginForm.Email, this.loginForm.Password);
-
-        // Guardar el token y redirigir si el login fue exitoso
-        this.$swal.fire({
-          title: 'Inicio de sesión exitoso',
-          text: '¡Has iniciado sesión correctamente!',
-          icon: 'success',
-          confirmButtonText: 'Ok'
-        }).then(() => {
+    async loginUser(e) {
+      e.preventDefault();
+      axios.post('https://localhost:7189/api/User', {
+        Email: this.loginForm.Email,
+        Password: this.loginForm.Password
+      })
+        .then(response => {
           console.log(response);
-          window.location.href = "/"; // Redirige a la página de inicio
+        })
+        .catch(error => {
+          console.log(error);
         });
-      } catch (error) {
-        // Mostrar mensaje de error
-        this.$swal.fire({
-          title: 'Error',
-          text: 'Credenciales incorrectas. Inténtalo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        });
-        console.error(error);
-      }
-    }
-  }
+    },
+  },
 };
 </script>
 

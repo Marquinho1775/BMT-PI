@@ -1,58 +1,61 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card p-4 shadow" style="max-width: 400px; width: 100%">
 
-      <h3 class="text-center">
-        Registro de usuario
-      </h3>
+  <body>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+      <div id="form" class="card p-4 shadow" style="max-width: 400px; width: 100%">
 
-      <b-form @submit.prevent="registerUser" @reset="onReset">
+        <h3 id="titulo" class="bg-primary text-white p-3 rounded " style="max-width: 400px; width: 100%">
+          Registro de usuario
+        </h3>
 
-        <!-- Name -->
-        <b-form-group id="input-group-name" label="Nombre:">
-          <b-form-input id="name" v-model="datosFormulario.Name" placeholder="Ingresar nombre" required></b-form-input>
-        </b-form-group>
+        <b-form @submit.prevent="registerUser" @reset="onReset">
 
-        <!-- Username -->
-        <b-form-group id="input-group-username" label="Nombre de usuario:" label-for="username">
-          <b-form-input id="username" v-model="datosFormulario.Username" placeholder="Ingresar nombre de usuario"
-            required></b-form-input>
-        </b-form-group>
+          <!-- Name -->
+          <b-form-group id="input-group-name" label="Nombre:">
+            <b-form-input id="name" v-model="datosFormulario.Name" placeholder="Ingresar nombre"
+              required></b-form-input>
+          </b-form-group>
 
-        <!-- Email Address -->
-        <b-form-group id="input-group-email" label="Correo electronico:" label-for="email">
-          <b-form-input id="email" v-model="datosFormulario.Email" type="email"
-            placeholder="Ingresar correo electronico" required></b-form-input>
-        </b-form-group>
+          <!-- LastName -->
+          <b-form-group id="input-group-lastname" label="Apellidos:">
+            <b-form-input id="lastName" v-model="datosFormulario.LastName" placeholder="Ingresar apellidos"
+              required></b-form-input>
+          </b-form-group>
 
-        <!-- Password -->
-        <b-form-group id="input-group-password" label="Contraseña:" label-for="password">
-          <b-form-input id="password" v-model="datosFormulario.Password" type="password"
-            placeholder="Ingresar contraseña" required></b-form-input>
-        </b-form-group>
+          <!-- Username -->
+          <b-form-group id="input-group-username" label="Nombre de usuario:" label-for="username">
+            <b-form-input id="username" v-model="datosFormulario.Username" placeholder="Ingresar nombre de usuario"
+              required></b-form-input>
+          </b-form-group>
 
-        <!-- Entrepreneur Checkbox -->
-        <b-form-group id="input-group-isentrepeneur" label-for="Quieres ser emprendedor?">
-          <b-form-checkbox id="isEntrepeneur" v-model="datosFormulario.IsEntrepeneur" name="isEntrepeneur">
-            Quieres ser emprendedor?
-          </b-form-checkbox>
-        </b-form-group>
+          <!-- Email Address -->
+          <b-form-group id="input-group-email" label="Correo electronico:" label-for="email">
+            <b-form-input id="email" v-model="datosFormulario.Email" type="email"
+              placeholder="Ingresar correo electronico" required></b-form-input>
+          </b-form-group>
 
-        <!-- Identification -->
-        <b-form-group id="input-group-identification" label="Identificación:" label-for="identification">
-          <b-form-input id="input-identification" v-model="datosFormulario.Identification"
-            placeholder="Ingresar identificación" required></b-form-input>
-        </b-form-group>
+          <!-- Password -->
+          <b-form-group id="input-group-password" label="Contraseña:" label-for="password">
+            <b-form-input id="password" v-model="datosFormulario.Password" type="password"
+              placeholder="Ingresar contraseña" required></b-form-input>
+          </b-form-group>
 
-        <!-- Submit and Reset Buttons -->
-        <div class="d-flex justify-content-between">
-          <b-button variant="info" @click="Volver">Volver</b-button>
-          <b-button type="reset" variant="secondary">Reiniciar</b-button>
-          <b-button type="submit" variant="primary">Registrar</b-button>
-        </div>
-      </b-form>
+          <!-- Identification -->
+          <b-form-group id="input-group-identification" label="Identificación:" label-for="identification">
+            <b-form-input id="input-identification" v-model="datosFormulario.Identification"
+              placeholder="Ingresar identificación" required></b-form-input>
+          </b-form-group>
+
+          <!-- Submit and Reset Buttons -->
+          <div class="d-flex justify-content-between">
+            <b-button variant="info" @click="Volver">Volver</b-button>
+            <b-button type="reset" variant="secondary">Reiniciar</b-button>
+            <b-button type="submit" variant="primary">Registrar</b-button>
+          </div>
+        </b-form>
+      </div>
     </div>
-  </div>
+  </body>
 </template>
 
 <script>
@@ -63,12 +66,11 @@ export default {
     return {
       datosFormulario: {
         Name: '',
+        LastName: '',
         Username: '',
         Email: '',
         isVerified: true,
-        Password: '',
-        IsEntrepeneur: false,
-        Identification: ''
+        Password: ''
       }
     };
   },
@@ -77,16 +79,13 @@ export default {
       axios.post('https://localhost:7189/api/User', {
         Id: "",
         Name: this.datosFormulario.Name,
+        LastName: this.datosFormulario.LastName,
         Username: this.datosFormulario.Username,
         Email: this.datosFormulario.Email,
         isVerified: this.datosFormulario.isVerified,
         Password: this.datosFormulario.Password,
-        IsEntrepeneur: this.datosFormulario.IsEntrepeneur,
-        Identification: this.datosFormulario.Identification
 
       }).then((response) => {
-        // Success alert
-        console.log(this.registerUser.ProfilePicture);
 
         this.$swal.fire({
           title: 'Registro exitoso',
@@ -113,11 +112,11 @@ export default {
       event.preventDefault();
       // Reset form values
       this.datosFormulario.Name = '';
+      this.datosFormulario.LastName = '';
       this.datosFormulario.Username = '';
       this.datosFormulario.Email = '';
       this.datosFormulario.Password = '';
-      this.datosFormulario.IsEntrepeneur = false;
-      this.datosFormulario.Identification = '';
+
     },
     Volver() {
       window.location.href = "/";
@@ -126,9 +125,16 @@ export default {
 };
 </script>
 
-<style>
-.bg-color {
+<style scoped>
+body {
   background-color: #D1E4FF;
-  /* Aquí puedes cambiar el color al que desees */
+}
+
+#form {
+  background-color: #9FC9FC;
+}
+
+#titulo {
+  color: white;
 }
 </style>

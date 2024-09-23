@@ -15,6 +15,7 @@ import BootstrapVue3 from 'bootstrap-vue-3';
 // Import SweetAlert2
 import Swal from 'sweetalert2';
 
+
 const router = createRouter({
     history: createWebHistory(),
     routes: [
