@@ -69,7 +69,6 @@ namespace BMT_backend.Handlers
                     IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
                     Name = Convert.ToString(row["Name"]),
                     Description = Convert.ToString(row["Description"]),
-
                     Admininstrator = GetEnterpriseAdministrator(Convert.ToString(row["Id"])),
                     Staff = GetEnterpriseStaff(Convert.ToString(row["Id"])),
                 });
@@ -78,12 +77,19 @@ namespace BMT_backend.Handlers
         }
 
         public List<EntrepreneurModel> GetEnterpriseStaff(string enterpriseId)
-        {
+        {   
+            // Corregir DRY en fucnion de arriba
             List<EntrepreneurModel> staff = new List<EntrepreneurModel>();
             var queryCommand = new SqlCommand(getEnterpriseStaffQuery, _conection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
             queryCommand.Parameters.AddWithValue("@enterpriseId", enterpriseId);
-            DataTable resultTable = CreateQueryTable(getEnterpriseStaffQuery);
-            foreach (DataRow row in resultTable.Rows)
+
+            _conection.Open();
+            tableAdapter.Fill(tableFormatQuery);
+            _conection.Close();
+
+            foreach (DataRow row in tableFormatQuery.Rows)
             {   
                 staff.Add(
                 new EntrepreneurModel
@@ -99,14 +105,22 @@ namespace BMT_backend.Handlers
             return staff;
         }
 
-        // Several administrators?
         public EntrepreneurModel GetEnterpriseAdministrator(string enterpriseId)
         {
+        // Corregir DRY en fucnion de arriba
+            List<EntrepreneurModel> staff = new List<EntrepreneurModel>();
             string getAdminEntrpreneurQuery = getEnterpriseStaffQuery + " and ee.Administrator = 1;";
-            var queryCommand = new SqlCommand(getAdminEntrpreneurQuery, _conection);
+            var queryCommand = new SqlCommand(getEnterpriseStaffQuery, _conection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
             queryCommand.Parameters.AddWithValue("@enterpriseId", enterpriseId);
-            DataTable resultTable = CreateQueryTable(getAdminEntrpreneurQuery);
-            DataRow row = resultTable.Rows[0];
+
+            _conection.Open();
+            tableAdapter.Fill(tableFormatQuery);
+            _conection.Close();
+
+
+            DataRow row = tableFormatQuery.Rows[0];
             EntrepreneurModel administrator = new EntrepreneurModel
             {
                 Identification = Convert.ToString(row["Identification"]),
@@ -118,6 +132,5 @@ namespace BMT_backend.Handlers
             };
             return administrator;
         }
-
     }
 }

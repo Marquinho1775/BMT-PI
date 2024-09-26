@@ -19,27 +19,25 @@ namespace BMT_backend.Controllers
         [HttpGet]
         public List<EnterpriseModel> Get()
         {
-            var enterprises = _entrepeneurshipHandler.GetEnterprises();
-            return enterprises;
+            return _entrepeneurshipHandler.GetEnterprises();
         }
 
-        [HttpPost]
-        public async Task<ActionResult<bool>> CreateEnterprise(EnterpriseModel enterprise)
-        {
-            try
-            {
-                if (enterprise == null)
-                {
-                    return BadRequest();
-                }
-                var result = _entrepeneurshipHandler.CreateEnterprise(enterprise);
-                return new JsonResult(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error creando la empresa");
-            }
-        }
-
+        //[HttpPost]
+        //public async Task<ActionResult<bool>> CreateEnterprise(EnterpriseModel enterprise)
+        //{
+        //    try
+        //    {
+        //        if (enterprise == null)
+        //        {
+        //            return BadRequest();
+        //        }
+        //        var result = _entrepeneurshipHandler.CreateEnterprise(enterprise);
+        //        return new JsonResult(result);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error creando la empresa");
+        //    }
+        //}
     }
 }

@@ -37,10 +37,12 @@ namespace BMT_backend.Handlers
             // First we get the user id from the user table using the username inside the fronted provided entrepreneur object
             string getUserIdQuery = "select Id from Users where UserName = @UserName;";
             var getUserIdCommand = new SqlCommand(getUserIdQuery, _conection);
-            getUserIdCommand.Parameters.AddWithValue("@UserName", entrepreneur.UserName);
+            getUserIdCommand.Parameters.AddWithValue("@UserName", entrepreneur.Username);
             _conection.Open();
             var userId = getUserIdCommand.ExecuteScalar();
             _conection.Close();
+
+
 
             // Now we create the entrepreneur associated with the user id in the Entrepreneurs table
             string createEntrepreneurQuery = "insert into Entrepreneurs (UserId, Identification) " +
@@ -54,7 +56,7 @@ namespace BMT_backend.Handlers
             return exit;
         }
 
-        public List<EntrepreneurModel> getEntrepreneurs() {
+        public List<EntrepreneurModel> GetEntrepreneurs() {
             List<EntrepreneurModel> entrepreneurs = new List<EntrepreneurModel>();
             DataTable table = CreateQueryTable(getAllEntrepreneurInfo);
             foreach (DataRow row in table.Rows)
@@ -62,12 +64,12 @@ namespace BMT_backend.Handlers
                 entrepreneurs.Add(
                     new EntrepreneurModel
                     {
-                        Identification = Convert.ToString(row["Identification"]),
                         Name = Convert.ToString(row["Name"]),
                         LastName = Convert.ToString(row["LastName"]),
                         Username = Convert.ToString(row["Username"]),
                         Email = Convert.ToString(row["Email"]),
                         IsVerified = Convert.ToBoolean(row["IsVerified"]),
+                        Identification = Convert.ToString(row["Identification"]),
                     }
                 );
             }
