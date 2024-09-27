@@ -1,21 +1,5 @@
 [
   {
-    "ContainingType": "BMT_backend.Controllers.AccountController",
-    "Method": "Login",
-    "RelativePath": "api/Account/login",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "login",
-        "Type": "BMT_backend.Controllers.UserLoginDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
     "ContainingType": "BMT_backend.Controllers.UserController",
     "Method": "GetUsers",
     "RelativePath": "api/User",
@@ -60,5 +44,21 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "BMT_backend.Controllers.UserController",
+    "Method": "Login",
+    "RelativePath": "api/User/login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loginData",
+        "Type": "BMT_backend.Models.LoginModel",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

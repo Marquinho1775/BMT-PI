@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-center align-items-center vh-100">
       <div id="form" class="card p-4 shadow" style="max-width: 400px; width: 100%">
 
-        <h3 id="titulo" class="bg-primary text-white p-3 rounded " style="max-width: 400px; width: 100%">
+        <h3 id="titulo" class="text-center align-items-cente p-3 rounded">
           Registro de usuario
         </h3>
 
@@ -40,17 +40,11 @@
               placeholder="Ingresar contraseña" required></b-form-input>
           </b-form-group>
 
-          <!-- Identification -->
-          <b-form-group id="input-group-identification" label="Identificación:" label-for="identification">
-            <b-form-input id="input-identification" v-model="datosFormulario.Identification"
-              placeholder="Ingresar identificación" required></b-form-input>
-          </b-form-group>
-
           <!-- Submit and Reset Buttons -->
           <div class="d-flex justify-content-between">
-            <b-button variant="info" @click="Volver">Volver</b-button>
-            <b-button type="reset" variant="secondary">Reiniciar</b-button>
-            <b-button type="submit" variant="primary">Registrar</b-button>
+            <b-button variant="secondary" @click="Volver">Volver</b-button>
+            <b-button variant="secondary">Limpiar</b-button>
+            <b-button class="boton">Registrar</b-button>
           </div>
         </b-form>
       </div>
@@ -77,7 +71,6 @@ export default {
   methods: {
     registerUser() {
       axios.post('https://localhost:7189/api/User', {
-        Id: "",
         Name: this.datosFormulario.Name,
         LastName: this.datosFormulario.LastName,
         Username: this.datosFormulario.Username,
@@ -130,11 +123,40 @@ body {
   background-color: #D1E4FF;
 }
 
+.boton {
+  background-color: #39517B;
+}
+
+.boton:hover {
+  background-color: #02174B;
+}
+
 #form {
   background-color: #9FC9FC;
 }
 
 #titulo {
   color: white;
+  background-color: #39517B;
+}
+
+#name {
+  background-color: #D0EDA0;
+}
+
+#username {
+  background-color: #D0EDA0;
+}
+
+#lastName {
+  background-color: #D0EDA0;
+}
+
+#email {
+  background-color: #D0EDA0;
+}
+
+#password {
+  background-color: #D0EDA0;
 }
 </style>
