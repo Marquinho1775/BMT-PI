@@ -7,8 +7,8 @@
         public string IdentificationNumber { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public EntrepreneurModel Admininstrator { get; set; }
-        public List<EntrepreneurModel> Staff { get; set; }
+        public EntrepreneurViewModel? Admininstrator { get; set; }
+        public List<EntrepreneurViewModel>? Staff { get; set; }
 
         // public List<ProductModel> Catalog { get; set; }
 
