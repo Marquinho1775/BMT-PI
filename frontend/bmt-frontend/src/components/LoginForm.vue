@@ -1,94 +1,150 @@
 <template>
 
-    <body>
-        <div class="d-flex justify-content-center align-items-center vh-100">
-            <div id="formLogin" class="card p-4 shadow" style="max-width: 400px; width: 100%">
-                <h3 id="tituloLogin" class="text-center">Iniciar sesión</h3>
-                <b-form @submit.prevent="loginUser">
+  <body>
+    <div class="login-container">
+      <div class="d-flex justify-content-center align-items-center vh-100">
+        <div id="formLogin" class="card custom-card" style="max-width: 400px; width: 100%">
+          <h3 id="tituloLogin" class="text-center card-header-custom">Iniciar sesión</h3>
+          <div class="card-body">
+            <b-form @submit.prevent="loginUser">
 
-                    <!-- Email -->
-                    <b-form-group id="input-group-email" label="Correo electrónico:">
-                        <b-form-input id="email" v-model="loginForm.Email" type="email"
-                            placeholder="Ingresar correo electrónico" required></b-form-input>
-                    </b-form-group>
+              <!-- Correo -->
+              <b-form-group id="input-group-email" label="Correo electrónico:">
+                <b-form-input id="email" v-model="loginForm.Email" type="email"
+                  placeholder="Ingresar correo electrónico" required></b-form-input>
+              </b-form-group>
 
-                    <!-- Password -->
-                    <b-form-group id="input-group-password" label="Contraseña:">
-                        <b-form-input id="password" v-model="loginForm.Password" type="password"
-                            placeholder="Ingresar contraseña" required></b-form-input>
-                    </b-form-group>
+              <!-- Botones -->
+              <b-form-group id="input-group-password" label="Contraseña:">
+                <b-form-input id="password" v-model="loginForm.Password" type="password"
+                  placeholder="Ingresar contraseña" required></b-form-input>
+              </b-form-group>
 
-                    <!-- Submit Button -->
-                    <div class="d-flex justify-content-between">
-                        <b-button variant="secondary" @click="Volver">Volver</b-button>
-                        <b-button variant="primary" type="submit">Iniciar sesión</b-button>
+              <!-- Botones -->
+              <div class="d-flex justify-content-between">
+                <b-button variant="secondary" @click="Volver">Volver</b-button>
+                <b-button class="button" type="submit">Iniciar sesión</b-button>
 
-                    </div>
-                </b-form>
-            </div>
+              </div>
+            </b-form>
+          </div>
         </div>
-    </body>
+      </div>
+    </div>
+  </body>
 </template>
 
 <script>
 import axios from 'axios';
 
 export default {
-    data() {
-        return {
-            loginForm: {
-                Email: '',
-                Password: ''
+  data() {
+    return {
+      loginForm: {
+        Email: '',
+        Password: ''
+      }
+    };
+  },
+  methods: {
+    async loginUser() {
+      try {
+        const response = await axios.post('https://localhost:7189/api/User/login',
+          {
+            Email: this.loginForm.Email.trim(),
+            Password: this.loginForm.Password.trim()
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
             }
-        };
-    },
-    methods: {
-        async loginUser() {
-            try {
-                console.log({
-                    Email: this.loginForm.Email,
-                    Password: this.loginForm.Password
-                });
-                const response = await axios.post('https://localhost:7189/api/User/login',
-                    {
-                        Email: this.loginForm.Email.trim(),
-                        Password: this.loginForm.Password.trim()
-                    },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
+          }
+        );
 
-                // Store token and user information in local storage
-                localStorage.setItem('token', response.data.Token);
-                localStorage.setItem('user', JSON.stringify(response.data.User));
+        if (response && response.data) {
+          const { token, user } = response.data;
+          if (token && user) {
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
 
-                this.$swal.fire({
-                    title: 'Registro exitoso',
-                    text: '¡Haz iniciado sesión correctamente!',
-                    icon: 'success',
-                    confirmButtonText: 'Ok'
-                }).then(() => {
-
-                    window.location.href = "/";
-                });
-            } catch (error) {
-                console.error(error);
-                this.$swal.fire({
-                    title: 'Error',
-                    text: 'Hubo un error al iniciar sesión. Inténtalo de nuevo.',
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                });
-            }
-        },
-        Volver() {
-            window.location.href = "/";
+            this.$swal.fire({
+              title: 'Registro exitoso',
+              text: '¡Haz iniciado sesión correctamente!',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              if (user.isVerified) {
+                window.location.href = "/";
+              } else {
+                window.location.href = "/email-verification";
+              }
+            });
+          } else {
+            throw new Error('Token o User no están presentes en la respuesta.');
+          }
+        } else {
+          throw new Error('Respuesta no válida del servidor.');
         }
+      } catch (error) {
+        console.error(error);
+        this.$swal.fire({
+          title: 'Error',
+          text: 'Hubo un error al iniciar sesión. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      }
     },
+    Volver() {
+      window.location.href = "/";
+    }
+  },
 };
 </script>
 
-<style></style>
+<style>
+.login-container {
+  background-color: #D1E4FF;
+}
+
+div.custom-card {
+  width: 650px;
+  background-color: #9FC9FC;
+  border-radius: 20px;
+  margin: 0px;
+}
+
+.card-header-custom {
+  background-color: #36618E;
+  color: white;
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  height: 100%;
+}
+
+.button {
+  background-color: #39517B;
+}
+
+.button:hover {
+  background-color: #02174B;
+}
+
+#form {
+  background-color: #9FC9FC;
+}
+
+#titulo {
+  color: white;
+  background-color: #39517B;
+}
+
+#email {
+  background-color: #D0EDA0;
+}
+
+#password {
+  background-color: #D0EDA0;
+}
+</style>

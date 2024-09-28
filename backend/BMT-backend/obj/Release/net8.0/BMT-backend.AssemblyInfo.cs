@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BMT-backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+67fee028648a75d1a92069cdd0f0d338f3fbc533")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+54a26e2c57e55c15d16b274647f86e9b8e650252")]
 [assembly: System.Reflection.AssemblyProductAttribute("BMT-backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BMT-backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

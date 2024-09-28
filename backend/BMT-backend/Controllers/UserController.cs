@@ -27,9 +27,7 @@ namespace BMT_backend.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception message (you may replace this with proper logging)
                 Console.WriteLine($"Error retrieving users: {ex.Message}");
-                // Optionally, you can return a 500 status code with a detailed message
                 Response.StatusCode = 500;
                 return new List<UserModel>();
             }

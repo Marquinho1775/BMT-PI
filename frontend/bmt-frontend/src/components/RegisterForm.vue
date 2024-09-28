@@ -2,51 +2,54 @@
 
   <body>
     <div class="d-flex justify-content-center align-items-center vh-100">
-      <div id="form" class="card p-4 shadow" style="max-width: 400px; width: 100%">
+      <div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
 
-        <h3 id="titulo" class="text-center align-items-cente p-3 rounded">
+        <h3 id="titulo" class="text-center card-header-custom">
           Registro de usuario
         </h3>
 
-        <b-form @submit.prevent="registerUser" @reset="onReset">
+        <div class="card-body">
 
-          <!-- Name -->
-          <b-form-group id="input-group-name" label="Nombre:">
-            <b-form-input id="name" v-model="datosFormulario.Name" placeholder="Ingresar nombre"
-              required></b-form-input>
-          </b-form-group>
+          <b-form @submit.prevent="registerUser" @reset="onReset">
 
-          <!-- LastName -->
-          <b-form-group id="input-group-lastname" label="Apellidos:">
-            <b-form-input id="lastName" v-model="datosFormulario.LastName" placeholder="Ingresar apellidos"
-              required></b-form-input>
-          </b-form-group>
+            <!-- Nombre -->
+            <b-form-group id="input-group-name" label="Nombre:">
+              <b-form-input id="name" v-model="datosFormulario.Name" placeholder="Ingresar nombre"
+                required></b-form-input>
+            </b-form-group>
 
-          <!-- Username -->
-          <b-form-group id="input-group-username" label="Nombre de usuario:" label-for="username">
-            <b-form-input id="username" v-model="datosFormulario.Username" placeholder="Ingresar nombre de usuario"
-              required></b-form-input>
-          </b-form-group>
+            <!-- Apellidos -->
+            <b-form-group id="input-group-lastname" label="Apellidos:">
+              <b-form-input id="lastName" v-model="datosFormulario.LastName" placeholder="Ingresar apellidos"
+                required></b-form-input>
+            </b-form-group>
 
-          <!-- Email Address -->
-          <b-form-group id="input-group-email" label="Correo electronico:" label-for="email">
-            <b-form-input id="email" v-model="datosFormulario.Email" type="email"
-              placeholder="Ingresar correo electronico" required></b-form-input>
-          </b-form-group>
+            <!-- Nombre de usuario -->
+            <b-form-group id="input-group-username" label="Nombre de usuario:" label-for="username">
+              <b-form-input id="username" v-model="datosFormulario.Username" placeholder="Ingresar nombre de usuario"
+                required></b-form-input>
+            </b-form-group>
 
-          <!-- Password -->
-          <b-form-group id="input-group-password" label="Contraseña:" label-for="password">
-            <b-form-input id="password" v-model="datosFormulario.Password" type="password"
-              placeholder="Ingresar contraseña" required></b-form-input>
-          </b-form-group>
+            <!-- Correo -->
+            <b-form-group id="input-group-email" label="Correo electronico:" label-for="email">
+              <b-form-input id="email" v-model="datosFormulario.Email" type="email"
+                placeholder="Ingresar correo electronico" required></b-form-input>
+            </b-form-group>
 
-          <!-- Submit and Reset Buttons -->
-          <div class="d-flex justify-content-between">
-            <b-button variant="secondary" @click="Volver">Volver</b-button>
-            <b-button variant="secondary">Limpiar</b-button>
-            <b-button class="boton">Registrar</b-button>
-          </div>
-        </b-form>
+            <!-- Botones -->
+            <b-form-group id="input-group-password" label="Contraseña:" label-for="password">
+              <b-form-input id="password" v-model="datosFormulario.Password" type="password"
+                placeholder="Ingresar contraseña" required></b-form-input>
+            </b-form-group>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-between">
+              <b-button variant="secondary" @click="Volver">Volver</b-button>
+              <b-button variant="secondary">Limpiar</b-button>
+              <b-button class="button">Registrar</b-button>
+            </div>
+          </b-form>
+        </div>
       </div>
     </div>
   </body>
@@ -91,7 +94,6 @@ export default {
           window.location.href = "/";
         });
       }).catch((error) => {
-        // Error alert
         this.$swal.fire({
           title: 'Error',
           text: 'Hubo un error al registrar el usuario. Inténtalo de nuevo.',
@@ -103,7 +105,7 @@ export default {
     },
     onReset(event) {
       event.preventDefault();
-      // Reset form values
+
       this.datosFormulario.Name = '';
       this.datosFormulario.LastName = '';
       this.datosFormulario.Username = '';
@@ -123,11 +125,27 @@ body {
   background-color: #D1E4FF;
 }
 
-.boton {
+.custom-card {
+  width: 650px;
+  background-color: #9FC9FC;
+  border-radius: 20px;
+  margin: 0px;
+}
+
+.card-header-custom {
+  background-color: #36618E;
+  color: white;
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  height: 100%;
+}
+
+.button {
   background-color: #39517B;
 }
 
-.boton:hover {
+.button:hover {
   background-color: #02174B;
 }
 

@@ -3,24 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\handlers\\userhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:handlers\\userhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\models\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:models\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\handlers\\userhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:handlers\\userhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:models\\usermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|c:\\users\\david\\onedrive - instituto nacional de aprendizaje\\desktop\\bmt-pi\\backend\\bmt-backend\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{5A2AE99B-85B3-428B-9023-461BB979132D}|BMT-backend.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,8 +38,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 186,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 6,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UserModel.cs",
+              "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Models\\UserModel.cs",
+              "RelativeDocumentMoniker": "Models\\UserModel.cs",
+              "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Models\\UserModel.cs",
+              "RelativeToolTip": "Models\\UserModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-28T16:14:49.198Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADkAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-28T16:13:33.95Z"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 1,
@@ -40,27 +72,25 @@
               "RelativeDocumentMoniker": "Models\\LoginModel.cs",
               "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Models\\LoginModel.cs",
               "RelativeToolTip": "Models\\LoginModel.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-27T20:45:53.98Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-27T20:45:53.98Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "UserController.cs",
               "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Controllers\\UserController.cs",
               "RelativeDocumentMoniker": "Controllers\\UserController.cs",
               "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Controllers\\UserController.cs",
               "RelativeToolTip": "Controllers\\UserController.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAgwEgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAowDUAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-25T16:34:30.677Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-25T16:34:30.677Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 6,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -72,27 +102,28 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "TokenService.cs",
               "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Services\\TokenService.cs",
               "RelativeDocumentMoniker": "Services\\TokenService.cs",
               "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Services\\TokenService.cs",
               "RelativeToolTip": "Services\\TokenService.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAA1wB4AAAAvAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-26T19:23:58.706Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "UserHandler.cs",
               "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Handlers\\UserHandler.cs",
               "RelativeDocumentMoniker": "Handlers\\UserHandler.cs",
               "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\backend\\BMT-backend\\Handlers\\UserHandler.cs",
               "RelativeToolTip": "Handlers\\UserHandler.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-26T18:55:50.506Z"
+              "WhenOpened": "2024-09-26T18:55:50.506Z",
+              "EditorCaption": ""
             }
           ]
         }
