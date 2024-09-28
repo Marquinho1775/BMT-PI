@@ -1,0 +1,30 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/slnx.sqlite
+
+# Ignore Visual Studio temporary files, build results, and
+# user-specific files
+.vs/
+*.user
+*.suo
+
+# Ignore build results
+bin/
+obj/
+
+# Ignore specific build artifacts
+backend/BMT-backend/obj/
+backend/BMT-backend/bin/
+*.cache
+
+# Ignore debug and release directories
+backend/BMT-backend/obj/Debug/
+backend/BMT-backend/obj/Release/
+
+# Ignore MSBuild-generated files
+*.AssemblyInfo.cs
+*.AssemblyReference.cache
+*.GeneratedMSBuildEditorConfig.editorconfig
+*.assets.cache
