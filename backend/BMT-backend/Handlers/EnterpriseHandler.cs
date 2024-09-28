@@ -49,13 +49,9 @@ namespace BMT_backend.Handlers
             queryCommand.Parameters.AddWithValue("@Name", enterprise.Name);
             queryCommand.Parameters.AddWithValue("@Description", enterprise.Description);
 
-            Console.WriteLine("llego antes open");
             _conection.Open();
-            Console.WriteLine("llego despues open");
             bool exit = queryCommand.ExecuteNonQuery() >= 1;
-            Console.WriteLine("llego antes open");
             _conection.Close();
-            Console.WriteLine("llego despues open");
             return exit;
         }
 
@@ -72,7 +68,7 @@ namespace BMT_backend.Handlers
                     IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
                     Name = Convert.ToString(row["Name"]),
                     Description = Convert.ToString(row["Description"]),
-                    Admininstrator = GetEnterpriseAdministrator(Convert.ToString(row["Id"])),
+                    Administrator = GetEnterpriseAdministrator(Convert.ToString(row["Id"])),
                     Staff = GetEnterpriseStaff(Convert.ToString(row["Id"])),
                 });
             }

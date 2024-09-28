@@ -56,9 +56,7 @@ namespace BMT_backend.Handlers
 
 
             _conection.Open();
-            Console.WriteLine("Llego despues de open");
             bool exit = addEntrepreneurToEnterpriseCommand.ExecuteNonQuery() >= 1;
-            Console.WriteLine("Llego antes de close");
             _conection.Close();
             return exit;
         }
