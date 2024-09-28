@@ -23,6 +23,11 @@
             Logout
           </button>
         </div>
+          <router-link to="/enterprise-register">
+              <button type="button" class="btn btn-outline-secondary float-right">
+                Register enterprise
+             </button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -50,6 +55,29 @@
       </tbody>
     </table>
   </div>
+
+  <div class="container mt-5">
+    <h1 class="display-4 text-center">Lista de emprendimientos</h1>
+    <table class="table is-bordered is-striped is-narrow is-hoverable
+      is-fullwidth">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Administrador</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(enterprise, index) of enterprises" :key="index">
+          <td>{{ enterprise.name }}</td>
+          <td>{{ enterprise.description }}</td>
+          <td>{{ enterprise.administrator ? enterprise.administrator.name : 'Sin administrador' }}</td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
 </template>
 
 <script>
@@ -59,6 +87,7 @@ export default {
   data() {
     return {
       users: [],
+      enterprises: [],
       isLoggedIn: false // Nuevo estado para verificar si el usuario ha iniciado sesión
     };
   },
@@ -81,6 +110,15 @@ export default {
         confirmButtonText: 'Ok'
       });
     }
+    getEnteprises() {
+      axios.get("https://localhost:7189/api/Enterprise").then(
+        (response) => {
+          this.enterprises = response.data;
+          console.log(this.enterprises);
+        });
+    },
+    
+
   },
   created() {
     this.obtenerTareas();
@@ -88,6 +126,7 @@ export default {
     // Comprobar si el token existe en el localStorage para saber si el usuario ha iniciado sesión
     const token = localStorage.getItem('token');
     this.isLoggedIn = !!token; // Establece isLoggedIn como true si el token existe
+    this.getEnteprises();
   },
 };
 </script>

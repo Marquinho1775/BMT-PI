@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from './components/HomePage.vue';
 import RegisterForm from './components/RegisterForm.vue';
 import LoginForm from './components/LoginForm.vue';
+import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 
 // Import Bootstrap and BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css';
@@ -35,7 +36,8 @@ const router = createRouter({
     routes: [
         { path: '/', name: "Home", component: HomePage },
         { path: '/register', name: "Register", component: RegisterForm },
-        { path: '/login', name: "Login", component: LoginForm }
+        { path: '/login', name: "Login", component: LoginForm },
+        { path: '/enterprise-register', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
     ]
 });
 
