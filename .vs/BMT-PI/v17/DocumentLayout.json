@@ -1,12 +1,75 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\src\\components\\HomePage.vue||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\bmt-frontend\\src\\components\\HomePage.vue||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\src\\components\\LoginForm.vue||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\bmt-frontend\\src\\components\\LoginForm.vue||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\bmt-frontend\\package.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 186,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HomePage.vue",
+              "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\src\\components\\HomePage.vue",
+              "RelativeDocumentMoniker": "frontend\\bmt-frontend\\src\\components\\HomePage.vue",
+              "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\src\\components\\HomePage.vue",
+              "RelativeToolTip": "frontend\\bmt-frontend\\src\\components\\HomePage.vue",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003491|",
+              "WhenOpened": "2024-09-28T19:46:21.268Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginForm.vue",
+              "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\src\\components\\LoginForm.vue",
+              "RelativeDocumentMoniker": "frontend\\bmt-frontend\\src\\components\\LoginForm.vue",
+              "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\src\\components\\LoginForm.vue",
+              "RelativeToolTip": "frontend\\bmt-frontend\\src\\components\\LoginForm.vue",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003491|",
+              "WhenOpened": "2024-09-28T19:46:19.201Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "package.json",
+              "DocumentMoniker": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\package.json",
+              "RelativeDocumentMoniker": "frontend\\bmt-frontend\\package.json",
+              "ToolTip": "C:\\Users\\david\\OneDrive - Instituto Nacional de Aprendizaje\\Desktop\\BMT-PI\\frontend\\bmt-frontend\\package.json",
+              "RelativeToolTip": "frontend\\bmt-frontend\\package.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-09-28T19:46:13.277Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

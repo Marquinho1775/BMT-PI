@@ -2,8 +2,6 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/slnx.sqlite
-
 # Ignore Visual Studio temporary files, build results, and
 # user-specific files
 .vs/
