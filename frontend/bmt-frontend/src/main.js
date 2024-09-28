@@ -16,6 +16,20 @@ import BootstrapVue3 from 'bootstrap-vue-3';
 // Import SweetAlert2
 import Swal from 'sweetalert2';
 
+// Import the authentication utilities
+import { getToken } from './helpers/auth';
+import axios from 'axios';
+
+// Set up Axios interceptors
+axios.interceptors.request.use(config => {
+    const token = getToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, error => {
+    return Promise.reject(error);
+});
 
 const router = createRouter({
     history: createWebHistory(),
@@ -25,6 +39,18 @@ const router = createRouter({
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/enterprise-register', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
     ]
+});
+
+// Add route guard to protect routes that require authentication
+router.beforeEach((to, from, next) => {
+    const token = getToken();
+
+    // Redirect to login if the route requires authentication and no token is found
+    if (to.meta.requiresAuth && !token) {
+        next('/login');
+    } else {
+        next();
+    }
 });
 
 const app = createApp(App);
