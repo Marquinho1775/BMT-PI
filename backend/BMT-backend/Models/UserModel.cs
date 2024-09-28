@@ -4,7 +4,6 @@ namespace BMT_backend.Models
 {
     public class UserModel
     {
-        //[JsonIgnore]
         public string Id { get; set; } = null!;
         public string Name { get; set; }
         public string LastName { get; set; }
