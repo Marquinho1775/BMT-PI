@@ -1,70 +1,69 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100">
-    <div id="form" class="card p-4 shadow" style="max-width: 400px; width: 100%">
-      <h3 id="title" class="text-center align-items-cente p-3 rounded">
-        Registro de usuario
-      </h3>
-      <b-form @submit.prevent="registerEnterprise" @reset="onReset">
-        <!--Identificaton type-->
-        <b-form-group 
-          id="selection-group-id-type" 
-          label="Seleccione el tipo de identificación de su negocio"
-          label-for="select-id-type">
-          <b-form-select 
-            id="select-id-type"
-            class="form-input"
-            v-model="enterpriseData.identificationType"
-            required
-            :options="idTypeOptions">
-          </b-form-select>
-        </b-form-group>
-        <!-- Identification number -->
-        <b-form-group 
-          id="input-group-identification-number" 
-          label="Número de identificación" 
-          label-for="identification-number">
-          <b-form-input 
-            id="identification-number" 
-            class="form-input"
-            v-model="enterpriseData.identificationNumber" 
-            placeholder="Ingresar número de identificación" required>
-          </b-form-input> 
-        </b-form-group>
-        <!-- Name -->
-        <b-form-group 
-          id="input-group-name"
-          label="Nombre:" 
-          label-for="name">
-          <b-form-input 
-            id="name" 
-            class="form-input"
-            v-model="enterpriseData.name" 
-            placeholder="Ingresar el nombre de su emprendimiento" 
-            required>
-          </b-form-input>
-        </b-form-group>
-        <!-- Description in textarea-->
-        <b-form-group 
-          id="input-group-description" 
-          label="Descripción:" 
-          label-for="description">
-          <b-form-textarea 
-            id="description" 
-            class="form-input"
-            v-model="enterpriseData.description" 
-            placeholder="Ingresar una descripción de su emprendimiento" 
-            rows="3">
-          </b-form-textarea>
-        </b-form-group>
-        <!-- Submit and Reset Buttons -->
-        <div class="d-flex justify-content-between">
-          <b-button variant="secondary" @click="goBack">Volver</b-button>
-          <b-button variant="secondary" @click="onReset">Limpiar</b-button>
-          <b-button type="submit" class="button">Registrar</b-button>
+  <div class="enterprise-register-container">
+    <div class="d-flex justify-content-center align-items-center vh-100">
+      <div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
+        <h3 id="title" class="text-center card-header-custom">Registro de empresa</h3>
+        <div class="card-body">
+          <b-form @submit.prevent="registerEnterprise" @reset="onReset">
+            <!--Identificaton type-->
+            <b-form-group 
+              id="selection-group-id-type" 
+              label="Seleccione el tipo de identificación de su negocio"
+              label-for="select-id-type">
+              <b-form-select 
+                id="select-id-type"
+                v-model="enterpriseData.identificationType"
+                required
+                :options="idTypeOptions">
+              </b-form-select>
+            </b-form-group>
+            <!-- Identification number -->
+            <b-form-group 
+              id="input-group-identification-number" 
+              label="Número de identificación" 
+              label-for="identification-number">
+              <b-form-input 
+                id="identification-number" 
+                v-model="enterpriseData.identificationNumber" 
+                placeholder="Ingresar número de identificación" required>
+              </b-form-input> 
+            </b-form-group>
+            <!-- Name -->
+            <b-form-group 
+              id="input-group-name"
+              label="Nombre:" 
+              label-for="name">
+              <b-form-input 
+                id="name" 
+                v-model="enterpriseData.name" 
+                placeholder="Ingresar el nombre de su emprendimiento" 
+                required>
+              </b-form-input>
+            </b-form-group>
+          <!-- Description in textarea-->
+            <b-form-group 
+              id="input-group-description" 
+              label="Descripción:" 
+              label-for="description">
+              <b-form-textarea 
+                id="description" 
+                v-model="enterpriseData.description" 
+                placeholder="Ingresar una descripción de su emprendimiento" 
+                rows="3">
+              </b-form-textarea>
+            </b-form-group>
+          <!-- Submit and Reset Buttons -->
+            <div class="d-flex justify-content-between">
+              <b-button variant="secondary" @click="goBack">Volver</b-button>
+              <b-button variant="secondary" @click="onReset">Limpiar</b-button>
+              <b-button type="submit" class="button">Registrar</b-button>
+            </div>
+          </b-form>
         </div>
-      </b-form>
+      </div>
     </div>
   </div>
+  
 </template>
   
 <script>
@@ -144,9 +143,25 @@
   };
 </script>
   
-<style scoped>
-  body {
+<style >
+  .enterprise-register-container {
     background-color: #D1E4FF;
+  }
+
+  div.custom-card {
+  width: 650px;
+  background-color: #9FC9FC;
+  border-radius: 20px;
+  margin: 0px;
+  }
+
+  .card-header-custom {
+    background-color: #36618E;
+    color: white;
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    height: 100%;
   }
   
   .button {
@@ -167,6 +182,22 @@
   }
 
   .form-input {
+    background-color: #D0EDA0;
+  }
+
+  #select-id-type {
+    background-color: #D0EDA0;
+  }
+
+  #identification-number {
+    background-color: #D0EDA0;
+  }
+
+  #name {
+    background-color: #D0EDA0;
+  }
+
+  #description {
     background-color: #D0EDA0;
   }
 </style>

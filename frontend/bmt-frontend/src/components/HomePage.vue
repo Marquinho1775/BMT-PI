@@ -109,7 +109,7 @@ export default {
         icon: 'success',
         confirmButtonText: 'Ok'
       });
-    }
+    },
     getEnteprises() {
       axios.get("https://localhost:7189/api/Enterprise").then(
         (response) => {
