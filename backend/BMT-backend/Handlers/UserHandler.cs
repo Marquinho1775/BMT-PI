@@ -20,34 +20,34 @@ namespace BMT_backend.Handlers
 
         public SqlConnection Connection { get => _connection; set => _connection = value; }
 
-        private DataTable CrearTablaConsulta(string query)
+        private DataTable CreateQuerryTable(string query)
         {
-            SqlCommand comandoParaConsulta = new SqlCommand(query, Connection);
-            SqlDataAdapter adaptadorParaTabla = new SqlDataAdapter(comandoParaConsulta);
-            DataTable consultaFormatoTabla = new DataTable();
+            SqlCommand queryCommand = new SqlCommand(query, Connection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
             Connection.Open();
-            adaptadorParaTabla.Fill(consultaFormatoTabla);
+            tableAdapter.Fill(tableFormatQuery);
             Connection.Close();
-            return consultaFormatoTabla;
+            return tableFormatQuery;
         }
 
         public List<UserModel> GetUsers()
         {
             List<UserModel> users = new List<UserModel>();
-            string consulta = "SELECT * FROM dbo.Users ";
-            DataTable tablaResultado =
-            CrearTablaConsulta(consulta);
-            foreach (DataRow columna in tablaResultado.Rows)
+            string query = "SELECT * FROM dbo.Users ";
+            DataTable resultTable =
+            CreateQuerryTable(query);
+            foreach (DataRow column in resultTable.Rows)
             {
                 users.Add(
                 new UserModel
                 {
-                    Name = Convert.ToString(columna["Name"]),
-                    LastName = Convert.ToString(columna["LastName"]),
-                    Username = Convert.ToString(columna["Username"]),
-                    Email = Convert.ToString(columna["Email"]),
-                    IsVerified = Convert.ToBoolean(columna["IsVerified"]),
-                    Password = Convert.ToString(columna["Password"])
+                    Name = Convert.ToString(column["Name"]),
+                    LastName = Convert.ToString(column["LastName"]),
+                    Username = Convert.ToString(column["Username"]),
+                    Email = Convert.ToString(column["Email"]),
+                    IsVerified = Convert.ToBoolean(column["IsVerified"]),
+                    Password = Convert.ToString(column["Password"])
 
                 });
             }
@@ -57,21 +57,20 @@ namespace BMT_backend.Handlers
         public bool CreateUser(UserModel user)
         {
             var query = "INSERT INTO dbo.Users (Name, LastName, Username, Email, IsVerified, Password) VALUES (@Name, @LastName, @Username, @Email, @IsVerified, @Password)";
-            var comandoParaConsulta = new SqlCommand(query, Connection);
+            var querryCommand = new SqlCommand(query, Connection);
 
-            comandoParaConsulta.Parameters.AddWithValue("@Name", user.Name);
-            comandoParaConsulta.Parameters.AddWithValue("@LastName", user.LastName);
-            comandoParaConsulta.Parameters.AddWithValue("@Username", user.Username);
-            comandoParaConsulta.Parameters.AddWithValue("@Email", user.Email);
-            comandoParaConsulta.Parameters.AddWithValue("@IsVerified", user.IsVerified);
-            comandoParaConsulta.Parameters.AddWithValue("@Password", user.Password);
+            querryCommand.Parameters.AddWithValue("@Name", user.Name);
+            querryCommand.Parameters.AddWithValue("@LastName", user.LastName);
+            querryCommand.Parameters.AddWithValue("@Username", user.Username);
+            querryCommand.Parameters.AddWithValue("@Email", user.Email);
+            querryCommand.Parameters.AddWithValue("@IsVerified", user.IsVerified);
+            querryCommand.Parameters.AddWithValue("@Password", user.Password);
 
             Connection.Open();
-            bool result = comandoParaConsulta.ExecuteNonQuery() >= 1;
+            bool result = querryCommand.ExecuteNonQuery() >= 1;
             Connection.Close();
 
             return result;
-
         }
 
         public void VerifyAccount(string Id)
