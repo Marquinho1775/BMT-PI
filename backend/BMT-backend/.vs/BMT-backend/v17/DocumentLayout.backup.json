@@ -33,6 +33,10 @@
           "SelectedChildIndex": 4,
           "Children": [
             {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
               "$type": "Document",
               "DocumentIndex": 2,
               "Title": "CodeHandler.cs",
@@ -42,8 +46,7 @@
               "RelativeToolTip": "Handlers\\CodeHandler.cs",
               "ViewState": "AgIAACYAAAAAAAAAAAAwwDwAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-29T05:49:16.768Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-29T05:49:16.768Z"
             },
             {
               "$type": "Document",
@@ -55,12 +58,7 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2024-09-29T05:07:12.602Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+              "WhenOpened": "2024-09-29T05:07:12.602Z"
             },
             {
               "$type": "Document",
@@ -72,8 +70,7 @@
               "RelativeToolTip": "Controllers\\AccountController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-29T04:18:50.953Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-29T04:18:50.953Z"
             },
             {
               "$type": "Document",
@@ -83,7 +80,7 @@
               "RelativeDocumentMoniker": "Handlers\\UserHandler.cs",
               "ToolTip": "C:\\Users\\josem\\Documents\\Labs\\BMT-PI\\backend\\BMT-backend\\Handlers\\UserHandler.cs",
               "RelativeToolTip": "Handlers\\UserHandler.cs",
-              "ViewState": "AgIAACYAAAAAAAAAAAAIwDUAAAAZAAAAAAAAAA==",
+              "ViewState": "AgIAACUAAAAAAAAAAAAIwC4AAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-29T05:47:55.421Z",
               "EditorCaption": ""
@@ -102,7 +99,7 @@
               "RelativeDocumentMoniker": "Controllers\\MailController.cs",
               "ToolTip": "C:\\Users\\josem\\Documents\\Labs\\BMT-PI\\backend\\BMT-backend\\Controllers\\MailController.cs",
               "RelativeToolTip": "Controllers\\MailController.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAADwvxAAAAAmAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAADwvx0AAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-09-29T03:04:33.953Z",
               "EditorCaption": ""

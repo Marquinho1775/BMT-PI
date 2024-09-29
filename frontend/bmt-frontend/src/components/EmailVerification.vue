@@ -25,7 +25,7 @@
 </template>
 
 <script>
-// import { getUser } from '@/helpers/auth';
+import { getUser } from '@/helpers/auth';
 import axios from 'axios';
 
 export default {
@@ -36,6 +36,9 @@ export default {
       isLoading: false
     };
   },
+  mounted() {
+    this.resendCode();
+  },
   methods: {
     async verifyCode() {
       this.isLoading = true;
@@ -43,7 +46,7 @@ export default {
       try {
         const codeTaken = {
           Code: this.verificationCode,
-          Id: '187DCFD4-B5C3-44F7-976D-6C8B99D8095C'
+          Id: getUser().id
         };
         await axios.post('https://localhost:7189/api/Email/verifycode', codeTaken)
           .then(() => {
@@ -71,22 +74,20 @@ export default {
     },
     async resendCode() {
       try {
-        // Call the backend API to resend the code
         const correo = {
-          Email: "jose.menadiaz@ucr.ac.cr",
-          Id: "187DCFD4-B5C3-44F7-976D-6C8B99D8095C"
+          Email: getUser().email,
+          Id: getUser().id
         };
-        // Call the backend API for verification
         axios.post('https:/localhost:7189/api/Email/sendemail', correo)
         .then(response => {
             console.log('Reenvío con exito:', response);
-            alert('Se ha enviado otro correo con el código de verificación.');
+            alert('Se ha enviado un correo con el código de verificación.');
         })
         .catch(error => {
             console.error('Error en la verificación:', error);
         });
       } catch (error) {
-        this.message = 'Error en el reenvío del código.';
+        this.message = 'Error en el envío del código.';
       } finally {
         this.isLoading = false;
       }
