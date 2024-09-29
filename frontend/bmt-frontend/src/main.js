@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import HomePage from './components/HomePage.vue';
+// import HomePage from './components/HomePage.vue';
 import HomePageUserClient from './components/HomePageUserClient.vue';
 import HomePageEntrepeneur from './components/HomePageEntrepeneur.vue';
 import RegisterForm from './components/RegisterForm.vue';
@@ -36,7 +36,7 @@ axios.interceptors.request.use(config => {
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        { path: '/', name: "Home", component: HomePage },
+        // { path: '/', name: "Home", component: HomePage },
         { path: '/clienthome', name: "ClientHome", component: HomePageUserClient},
         { path: '/entrepeneurhome', name: "entrepeneurhome", component: HomePageEntrepeneur },
         { path: '/register', name: "Register", component: RegisterForm },
