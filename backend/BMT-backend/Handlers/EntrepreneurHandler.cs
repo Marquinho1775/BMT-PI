@@ -82,5 +82,38 @@ namespace BMT_backend.Handlers
             }
             return entrepreneurs;
         }
+
+        public List<EnterpriseModel> GetEnterprisesOfEntrepreneur(EntrepreneurModel entrepreneur)
+        {
+            List<EnterpriseModel> enterprises = new List<EnterpriseModel>();
+
+            string query = "select en.Name as EnterpriseName, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
+                                 "from Entrepreneurs_Enterprises ee " +
+                                 "join Enterprises en on ee.EnterpriseId = en.Id " +
+                                 "join Users u on (select UserId from Entrepreneurs where Identification = '" + entrepreneur.Identification + "') = u.Id " +
+                                 "where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = '" + entrepreneur.Identification + "');";
+
+            DataTable tableOfEnterprises = CreateQueryTable(query);
+
+            foreach (DataRow row in tableOfEnterprises.Rows)
+            {
+                enterprises.Add(new EnterpriseModel
+                {
+                    Name = Convert.ToString(row["Name"]),
+                    IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
+                    Description = Convert.ToString(row["Description"]),
+                    Administrator = new EntrepreneurViewModel
+                    {
+                        Name = Convert.ToString(row["UserName"]),
+                        LastName = Convert.ToString(row["LastName"])
+                    }
+                });
+            }
+
+            return enterprises;
+        }
+
+
     }
 }
+
