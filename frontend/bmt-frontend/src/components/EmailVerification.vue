@@ -41,10 +41,31 @@ export default {
       this.isLoading = true;
       this.message = '';
       try {
-        console.log('PLACEHOLDER');
+        const codeTaken = {
+          Code: this.verificationCode,
+          Id: '187DCFD4-B5C3-44F7-976D-6C8B99D8095C'
+        };
+        await axios.post('https://localhost:7189/api/Email/verifycode', codeTaken)
+          .then(() => {
+            this.$swal.fire({
+              title: 'Verificación exitosa',
+              text: '¡La cuenta ha sido verificada correctamente!',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            })
+          }).then(response => {
+            console.log('Verificación exitosa:', response);
+            axios.post('https://localhost:7189/api/Email/verifyaccount', codeTaken)
+            .then(() => {
+              console.log('Cuenta verificada:', response);
+              window.location.href = "/";
+            })
+          }).catch(error => {
+            console.error('Error en la verificación:', error);
+          });
       } catch (error) {
         this.message = 'Error en la verificación. Inténtalo de nuevo más tarde.';
-      } finally {
+      } finally {         
         this.isLoading = false;
       }
     },
@@ -53,11 +74,12 @@ export default {
         // Call the backend API to resend the code
         const correo = {
           Email: "jose.menadiaz@ucr.ac.cr",
+          Id: "187DCFD4-B5C3-44F7-976D-6C8B99D8095C"
         };
         // Call the backend API for verification
         axios.post('https:/localhost:7189/api/Email/sendemail', correo)
         .then(response => {
-            console.log('Verificación exitosa:', response);
+            console.log('Reenvío con exito:', response);
             alert('Se ha enviado otro correo con el código de verificación.');
         })
         .catch(error => {

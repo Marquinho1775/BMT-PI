@@ -1,8 +1,8 @@
 ﻿namespace BMT_backend.Models
 {
-    public class MailModel
+    public class CodeModel
     {
-        public string Email { get; set; }
+        public string Code { get; set; }
         public string Id { get; set; }
     }
 }
