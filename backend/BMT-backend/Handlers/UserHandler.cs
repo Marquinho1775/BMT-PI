@@ -72,5 +72,17 @@ namespace BMT_backend.Handlers
 
             return result;
         }
+
+        public void VerifyAccount(string Id)
+        {
+            var query = "UPDATE dbo.Users SET IsVerified = 1 WHERE Id = @Id";
+            var sqlCommandForQuery = new SqlCommand(query, Connection);
+
+            sqlCommandForQuery.Parameters.AddWithValue("@Id", Id);
+
+            Connection.Open();
+            sqlCommandForQuery.ExecuteNonQuery();
+            Connection.Close();
+        }
     }
 }

@@ -67,7 +67,7 @@ export default {
         LastName: '',
         Username: '',
         Email: '',
-        isVerified: true,
+        isVerified: false,
         Password: ''
       }
     };
