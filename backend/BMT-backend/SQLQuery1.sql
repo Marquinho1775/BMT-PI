@@ -72,3 +72,12 @@ create table Entrepreneurs_Enterprises (
 	constraint PK_Entrepreneurs_Enterprises primary key (EntrepreneurId, EnterpriseId)
 );
 GO
+
+SELECT * FROM Entrepreneurs_Enterprises;
+SELECT * FROM Entrepreneurs;
+SELECT * FROM Enterprises;
+
+select en.Name as EnterpriseName, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description from Entrepreneurs_Enterprises ee 
+join Enterprises en on ee.EnterpriseId = en.Id 
+join Users u on (select UserId from Entrepreneurs where Identification = 555) = u.Id 
+where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = 555);
