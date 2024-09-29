@@ -9,18 +9,28 @@ namespace BMT_backend.Controllers
     [ApiController]
     public class UserController : Controller
     {
-
         private UserHandler _userHandler;
+        private readonly TokenService _tokenService;
 
-        public UserController()
+        public UserController(TokenService tokenService)
         {
             _userHandler = new UserHandler();
+            _tokenService = tokenService;
         }
 
         [HttpGet]
         public List<UserModel> GetUsers()
         {
-            return _userHandler.GetUsers();
+            try
+            {
+                return _userHandler.GetUsers();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving users: {ex.Message}");
+                Response.StatusCode = 500;
+                return new List<UserModel>();
+            }
         }
 
         [HttpPost]
@@ -33,14 +43,28 @@ namespace BMT_backend.Controllers
                     return BadRequest();
                 }
 
-                UserHandler userHandler = new UserHandler();
-                var result = userHandler.CreateUser(user);
+                var result = _userHandler.CreateUser(user);
                 return new JsonResult(result);
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creando al usuario");
             }
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginModel loginData)
+        {
+            var existingUser = _userHandler.GetUsers()
+                .FirstOrDefault(u => u.Email == loginData.Email && u.Password == loginData.Password);
+
+            if (existingUser != null)
+            {
+                var token = _tokenService.GenerateToken(existingUser);
+                return Ok(new { Token = token, User = existingUser });
+            }
+
+            return Unauthorized("Invalid email or password");
         }
     }
 }

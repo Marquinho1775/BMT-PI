@@ -25,6 +25,9 @@
 </template>
 
 <script>
+// import { getUser } from '@/helpers/auth';
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -38,21 +41,7 @@ export default {
       this.isLoading = true;
       this.message = '';
       try {
-        // Call the backend API for verification
-        const response = await fetch('/api/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ code: this.verificationCode })
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-          alert('Correo verificado correctamente');
-        } else {
-          this.message = 'Código incorrecto. Por favor, intenta de nuevo.';
-        }
+        console.log('PLACEHOLDER');
       } catch (error) {
         this.message = 'Error en la verificación. Inténtalo de nuevo más tarde.';
       } finally {
@@ -62,15 +51,22 @@ export default {
     async resendCode() {
       try {
         // Call the backend API to resend the code
-        const response = await fetch('/api/resend-code');
-        const result = await response.json();
-        if (result.success) {
-          alert('Código reenviado con éxito.');
-        } else {
-          this.message = 'No se pudo reenviar el código. Intenta más tarde.';
-        }
+        const correo = {
+          Email: "jose.menadiaz@ucr.ac.cr",
+        };
+        // Call the backend API for verification
+        axios.post('https:/localhost:7189/api/Email/sendemail', correo)
+        .then(response => {
+            console.log('Verificación exitosa:', response);
+            alert('Se ha enviado otro correo con el código de verificación.');
+        })
+        .catch(error => {
+            console.error('Error en la verificación:', error);
+        });
       } catch (error) {
         this.message = 'Error en el reenvío del código.';
+      } finally {
+        this.isLoading = false;
       }
     }
   }
