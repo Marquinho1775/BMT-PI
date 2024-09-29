@@ -24,9 +24,6 @@
           <ul class="navbar-nav  
             justify-content-end">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Página Principal</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="#">Información relevante</a>
             </li>
           </ul>
@@ -50,12 +47,10 @@
         Bootstrap();
       },
       handleLogin() {
-        // Navigate to login view
         console.log('Navigating to login view');
         this.$router.push('/login');
       },
       handleRegister() {
-        // Navigate to register view
         console.log('Navigating to register view');
         this.$router.push('/register');
       }

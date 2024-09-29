@@ -55,16 +55,26 @@
         mounted() {
           Bootstrap();
         },
+        logout() {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          this.isLoggedIn = false;
+          this.$swal.fire({
+            title: 'Sesión cerrada',
+            text: 'Has cerrado sesión exitosamente.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+        },
         handleLogout() {
-          // Navigate to logout view
           console.log('Navigating to logout view');
-          //this.$router.push('/Home');
+          this.logout();
+          this.$router.push('/');
         },
         handleRegisterAsEntrpeneur() {
-          // Navigate to  Entrepeneur register view
-          console.log('Navigating to Entrepenuer register view');
-          //this.$router.push('/Entregister');
-        }
+          console.log('Navigating to Enterprise register view');
+          this.$router.push('/enterpriseregister');
+        },
       }
     }
     </script>

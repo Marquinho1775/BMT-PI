@@ -11,7 +11,7 @@
       </div>
       <div>
         <div class="d-flex justify-content-end">
-          <button class="btn btn-secondary" @click="handleRegisterAsEntrpeneur">Registrar Colaborador</button>
+          <button class="btn btn-secondary" @click="handleCollaboratorRegister">Registrar Colaborador</button>
           <button class="btn btn-primary" @click="handleLogOut">Cerrar Sesión</button>
         </div>
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -61,15 +61,25 @@
         mounted() {
           Bootstrap();
         },
-        handleLogout() {
-          // Navigate to logout view
-          console.log('Navigating to logout view');
-          //this.$router.push('/Home');
+        logout() {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          this.isLoggedIn = false;
+          this.$swal.fire({
+            title: 'Sesión cerrada',
+            text: 'Has cerrado sesión exitosamente.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
         },
-        handleRegisterAsEntrpeneur() {
-          // Navigate to  Entrepeneur register view
-          console.log('Navigating to Entrepenuer register view');
-          //this.$router.push('/Entregister');
+        handleLogout() {
+          console.log('Navigating to logout view');
+          this.logout();
+          this.$router.push('/');
+        },
+        handleCollaboratorRegister() {
+          console.log('Navigating to Enterprise register view');
+          //this.$router.push('/collabregister');
         }
       }
     }

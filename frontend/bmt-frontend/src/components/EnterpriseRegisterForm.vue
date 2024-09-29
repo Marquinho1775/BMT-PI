@@ -116,7 +116,7 @@
           })
           .then(() => {
             console.log(response);
-            window.location.href = "/";
+            window.location.href = "/entrepeneurhome";
           });
         })
         .catch((error) => {
@@ -137,7 +137,7 @@
         this.enterpriseData.description = '';
       },
       goBack() {
-        window.location.href = "/";
+        window.location.href = "/entrepeneurhome";
       }
     }
   };
