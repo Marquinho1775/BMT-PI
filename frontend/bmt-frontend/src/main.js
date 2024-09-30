@@ -7,22 +7,18 @@ import HomePageEntrepeneur from './components/HomePageEntrepeneur.vue';
 import RegisterForm from './components/RegisterForm.vue';
 import LoginForm from './components/LoginForm.vue';
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
+import CollaboratorRegisterForm from './components/CollaboratorRegisterForm.vue';
 
-// Import Bootstrap and BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
-
-// Import BootstrapVue3
 import BootstrapVue3 from 'bootstrap-vue-3';
 
-// Import SweetAlert2
 import Swal from 'sweetalert2';
 
-// Import the authentication utilities
 import { getToken } from './helpers/auth';
 import axios from 'axios';
 
-// Set up Axios interceptors
+// Inicialización de interceptor axios
 axios.interceptors.request.use(config => {
     const token = getToken();
     if (token) {
@@ -38,18 +34,19 @@ const router = createRouter({
     routes: [
         { path: '/', name: "Home", component: HomePage },
         { path: '/clienthome', name: "ClientHome", component: HomePageUserClient},
-        { path: '/entrepeneurhome', name: "entrepeneurhome", component: HomePageEntrepeneur },
+        { path: '/entrepeneurhome', name: "Entrepeneurhome", component: HomePageEntrepeneur },
         { path: '/register', name: "Register", component: RegisterForm },
         { path: '/login', name: "Login", component: LoginForm },
-        { path: '/enterprise-register', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
+        { path: '/enterpriseregister', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
+        { path: '/collabregister', name: "CollabRegister", component: CollaboratorRegisterForm },
     ]
 });
 
-// Add route guard to protect routes that require authentication
+// Añadir ruta guardián a las que requieran autenticación
 router.beforeEach((to, from, next) => {
     const token = getToken();
 
-    // Redirect to login if the route requires authentication and no token is found
+    // Redirigir al login si no hay token y la ruta requiere autenticación
     if (to.meta.requiresAuth && !token) {
         next('/login');
     } else {
@@ -59,14 +56,10 @@ router.beforeEach((to, from, next) => {
 
 const app = createApp(App);
 
-// Use BootstrapVue3
 app.use(BootstrapVue3);
 
-// Use the router
 app.use(router);
 
-// Add SweetAlert2 globally
 app.config.globalProperties.$swal = Swal;
 
-// Mount the app
 app.mount('#app');

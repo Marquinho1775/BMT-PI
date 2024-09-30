@@ -18,7 +18,7 @@
         <div class="offcanvas-header" style="background-color: #02174B;">  
     
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Mi Perfil</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: #BCD6F3;"></button>
           </div>
           <div class="offcanvas-body" style="background-color: #BCD6F3;">
             <ul class="navbar-nav  
@@ -97,7 +97,7 @@
       font-weight: bold;
     }
     .title {
-      background-color: #D0EDA0; /* Color de fondo del título */
+      background-color: #D0EDA0;
       color: #02174B;
       padding: 50px;
       border-radius: 100px;
@@ -145,6 +145,11 @@
       background-color: #384D13;
       color: #D0EDA0;
     }
-  
+    .nav-link:hover {
+      background-color: #bcd6f31e;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
 </style>
   
