@@ -68,8 +68,8 @@ export default {
         Username: '',
         Email: '',
         isVerified: false,
-        Password: ''
-      }
+        Password: '',
+      },
     };
   },
   methods: {
@@ -81,29 +81,28 @@ export default {
         Username: this.datosFormulario.Username,
         Email: this.datosFormulario.Email,
         isVerified: this.datosFormulario.isVerified,
-        Password: this.datosFormulario.Password
-
-      }).then((response) => {
-
-        this.$swal.fire({
-          title: 'Registro exitoso',
-          text: '¡El usuario ha sido registrado correctamente!',
-          icon: 'success',
-          confirmButtonText: 'Ok'
-        }).then(() => {
-           
-          console.log(response);
-          window.history.back();
+        Password: this.datosFormulario.Password,
+      })
+        .then((response) => {
+          this.$swal.fire({
+            title: 'Registro exitoso',
+            text: '¡El usuario ha sido registrado correctamente!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            console.log(response);
+            window.history.back();
+          });
+        })
+        .catch((error) => {
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al registrar el usuario. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+          console.log(error);
         });
-      }).catch((error) => {
-        this.$swal.fire({
-          title: 'Error',
-          text: 'Hubo un error al registrar el usuario. Inténtalo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        });
-        console.log(error);
-      });
     },
     onReset(event) {
       event.preventDefault();
@@ -113,19 +112,17 @@ export default {
       this.datosFormulario.Username = '';
       this.datosFormulario.Email = '';
       this.datosFormulario.Password = '';
-
     },
     Volver() {
       window.location.href = "/";
-    }
-        }
-  create() {
-      if (localStorage.getItem('token')) {
-          window.history.back();
-      } 
-   }
+    },
+  },
+  created() {
+
+  }
 };
 </script>
+
 
 <style scoped>
 body {
