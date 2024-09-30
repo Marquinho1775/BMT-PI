@@ -38,3 +38,8 @@ create table Entrepreneurs_Enterprises (
 	constraint PK_Entrepreneurs_Enterprises primary key (EntrepreneurId, EnterpriseId)
 );
 GO
+
+Create table Codes (
+    Id uniqueidentifier NOT NULL PRIMARY KEY FOREIGN KEY REFERENCES Users(Id) ON DELETE CASCADE,
+    Code char(6),
+);

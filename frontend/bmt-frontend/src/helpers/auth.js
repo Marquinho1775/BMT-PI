@@ -9,11 +9,11 @@ export function getUser() {
             return JSON.parse(userData);
         } catch (error) {
             console.error("Failed to parse user data from local storage:", error);
-            localStorage.removeItem('user');
-            return null;
+          localStorage.removeItem('user'); // Optionally clear invalid data
+          return null; // Return null if parsing fails
         }
     }
-    return null;
+  return null; // Return null if no user data exists
 }
 
 export function logout() {

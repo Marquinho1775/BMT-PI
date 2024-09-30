@@ -11,14 +11,14 @@
       </div>
       <div>
         <div class="d-flex justify-content-end">
-          <button class="btn btn-secondary" @click="handleCollaboratorRegister">Registrar Colaborador</button>
+          <button class="btn btn-secondary" @click="handleRegisterAsEntrpeneur">Registrar Colaborador</button>
           <button class="btn btn-primary" @click="handleLogOut">Cerrar Sesión</button>
         </div>
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header" style="background-color: #02174B;">  
     
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Mi Perfil</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: #BCD6F3;"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div class="offcanvas-body" style="background-color: #BCD6F3;">
             <ul class="navbar-nav  
@@ -61,25 +61,15 @@
         mounted() {
           Bootstrap();
         },
-        logout() {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          this.isLoggedIn = false;
-          this.$swal.fire({
-            title: 'Sesión cerrada',
-            text: 'Has cerrado sesión exitosamente.',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
-        },
         handleLogout() {
+          // Navigate to logout view
           console.log('Navigating to logout view');
-          this.logout();
-          this.$router.push('/');
+          //this.$router.push('/Home');
         },
-        handleCollaboratorRegister() {
-          console.log('Navigating to Enterprise register view');
-          //this.$router.push('/collabregister');
+        handleRegisterAsEntrpeneur() {
+          // Navigate to  Entrepeneur register view
+          console.log('Navigating to Entrepenuer register view');
+          //this.$router.push('/Entregister');
         }
       }
     }
@@ -97,7 +87,7 @@
       font-weight: bold;
     }
     .title {
-      background-color: #D0EDA0;
+      background-color: #D0EDA0; /* Color de fondo del título */
       color: #02174B;
       padding: 50px;
       border-radius: 100px;
@@ -145,11 +135,6 @@
       background-color: #384D13;
       color: #D0EDA0;
     }
-    .nav-link:hover {
-      background-color: #bcd6f31e;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
+  
 </style>
   

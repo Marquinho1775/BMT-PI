@@ -66,7 +66,7 @@
 				console.log(this.enterpriseData.name);
 				console.log(this.enterpriseData.description);
 
-				axios.post('https://localhost:7189/api/Enterprise', {
+				axios.post('https://localhost:7189/api/Entrepeneur/add-to-enterprise', {
 					id: '',
 					identificationType: parseInt(this.enterpriseData.identificationType),
 					identificationNumber: this.enterpriseData.identificationNumber,
@@ -82,7 +82,7 @@
 					})
 					.then(() => {
 						console.log(response);
-						window.location.href = "/entrepeneurhome";
+						window.location.href = "/entrepeneur-home";
 					});
 				})
 				.catch((error) => {
@@ -103,7 +103,7 @@
 				this.enterpriseData.description = '';
 			},
 			goBack() {
-				window.location.href = "/entrepeneurhome";
+				window.location.href = "/entrepeneur-home";
 			}
 		}
 	};
