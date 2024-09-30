@@ -73,6 +73,7 @@ export default {
               confirmButtonText: 'Ok'
             }).then(() => {
               if (user.isVerified) {
+
                 window.location.href = "/clienthome";
               } else {
                 window.location.href = "/email-verification";

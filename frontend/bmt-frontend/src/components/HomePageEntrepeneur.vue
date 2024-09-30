@@ -61,6 +61,7 @@
 </template>
 
 <script>
+import { logout } from '@/helpers/auth';
 import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 export default {
   methods: {
@@ -70,7 +71,8 @@ export default {
     handleLogout() {
       // Navigate to logout view
       console.log('Navigating to logout view');
-      //this.$router.push('/Home');
+      logout();
+      this.$router.push('/');
     },
     handleRegisterAsEntrpeneur() {
       // Navigate to  Entrepeneur register view
