@@ -12,6 +12,7 @@
       <div>
         <div class="d-flex justify-content-end">
           <button class="btn btn-secondary" @click="handleCollaboratorRegister">Registrar Colaborador</button>
+          <button class="btn btn-secondary" @click="handleRegisterEnterprise">Registrar Emprendimiento</button>
           <button class="btn btn-primary" @click="handleLogOut">Cerrar Sesión</button>
         </div>
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -24,7 +25,7 @@
             <ul class="navbar-nav  
               justify-content-end">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Mis Datos</a>
+                <a class="nav-link active" aria-current="page" href="#" @click="handleProfileInfo">Mis Datos</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">Página Principal</a>
@@ -33,10 +34,7 @@
                 <a class="nav-link" href="#">Pedidos</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Información relevante</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Emprendimientos asociados</a>
+                <a class="nav-link" href="#" @click="handleAsociatedEnterprise">Emprendimientos asociados</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">Productos asociados</a>
@@ -77,9 +75,17 @@
           this.logout();
           this.$router.push('/');
         },
-        handleCollaboratorRegister() {
+        handleAsociatedEnterprise() {
           console.log('Navigating to Enterprise register view');
-          //this.$router.push('/collabregister');
+          this.$router.push('/enterprises');
+        },
+        handleProfileInfo() {
+          console.log('Navigating to profile info view');
+          this.$router.push('/profile');
+        },
+        handleCollaboratorRegister() {
+          console.log('Navigating to collaborator register view');
+          this.$router.push('/collab-register');
         }
       }
     }
@@ -146,8 +152,11 @@
       color: #D0EDA0;
     }
     .nav-link:hover {
-      background-color: #bcd6f31e;
+      transition: none;
+      background-color: #9ab0c9;
       border: none;
+      margin: none;
+      padding: none;
       cursor: pointer;
       font-weight: bold;
     }

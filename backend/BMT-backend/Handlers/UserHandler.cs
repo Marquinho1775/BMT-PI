@@ -42,6 +42,7 @@ namespace BMT_backend.Handlers
                 users.Add(
                 new UserModel
                 {
+                    Id = Convert.ToString(column["Id"]),
                     Name = Convert.ToString(column["Name"]),
                     LastName = Convert.ToString(column["LastName"]),
                     Username = Convert.ToString(column["Username"]),
@@ -71,6 +72,18 @@ namespace BMT_backend.Handlers
             Connection.Close();
 
             return result;
+        }
+
+        public void VerifyAccount(string Id)
+        {
+            var query = "UPDATE dbo.Users SET IsVerified = 1 WHERE Id = @Id";
+            var sqlCommandForQuery = new SqlCommand(query, Connection);
+
+            sqlCommandForQuery.Parameters.AddWithValue("@Id", Id);
+
+            Connection.Open();
+            sqlCommandForQuery.ExecuteNonQuery();
+            Connection.Close();
         }
     }
 }

@@ -17,7 +17,7 @@
 							</b-form-input> 
 						</b-form-group>
 						<!-- Identification number -->
-						<b-form-group 
+						<b-form-group
 							id="input-group-identification-number" 
 							label="Número de identificación del colaborador" 
 							label-for="identification-number">
@@ -70,8 +70,7 @@
 					id: '',
 					identificationType: parseInt(this.enterpriseData.identificationType),
 					identificationNumber: this.enterpriseData.identificationNumber,
-					name: this.enterpriseData.name,
-					description: this.enterpriseData.description,
+					name: this.enterpriseData.name
 				})
 				.then((response) => {
 					this.$swal.fire({
@@ -82,13 +81,13 @@
 					})
 					.then(() => {
 						console.log(response);
-						window.location.href = "/entrepeneurhome";
+						window.location.href = "/entrepeneur-home";
 					});
 				})
 				.catch((error) => {
 					this.$swal.fire({
 						title: 'Error',
-						text: 'Hubo un error al registrar su empresa. Inténtalo de nuevo.',
+						text: 'Hubo un error al registrar al colaborador. Inténtalo de nuevo.',
 						icon: 'error',
 						confirmButtonText: 'Ok'
 					});
@@ -100,10 +99,9 @@
 				this.enterpriseData.identificationType = null;
 				this.enterpriseData.identificationNumber = '';
 				this.enterpriseData.name = '';
-				this.enterpriseData.description = '';
 			},
 			goBack() {
-				window.location.href = "/entrepeneurhome";
+				window.location.href = "/entrepeneur-home";
 			}
 		}
 	};

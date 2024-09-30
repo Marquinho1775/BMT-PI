@@ -24,16 +24,13 @@
           <ul class="navbar-nav  
             justify-content-end">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Mis Datos</a>
+              <a class="nav-link active" aria-current="page" href="#" @click="handleProfileInfo">Mis Datos</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Página Principal</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Pedidos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Información relevante</a>
             </li>
           </ul>
         </div>
@@ -73,8 +70,12 @@ export default {
     },
     handleRegisterAsEntrpeneur() {
       console.log('Navigating to Enterprise register view');
-      this.$router.push('/enterpriseregister');
+      this.$router.push('/enterprise-register');
     },
+    handleProfileInfo() {
+      console.log('Navigating to profile info view');
+      this.$router.push('/profile');
+    }
   }
 }
 </script>
@@ -92,7 +93,7 @@ export default {
     font-weight: bold;
   }
   .title {
-    background-color: #D0EDA0; /* Color de fondo del título */
+    background-color: #D0EDA0;
     color: #02174B;
     padding: 50px;
     border-radius: 100px;
@@ -141,10 +142,13 @@ export default {
     color: #D0EDA0;
   }
   .nav-link:hover {
-  background-color: #bcd6f31e;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
+    transition: none;
+    background-color: #9ab0c9;
+    border: none;
+    margin: none;
+    padding: none;
+    cursor: pointer;
+    font-weight: bold;
   }
 </style>
     

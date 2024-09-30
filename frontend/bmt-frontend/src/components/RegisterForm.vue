@@ -117,8 +117,8 @@ export default {
     },
     Volver() {
       window.location.href = "/";
-    }
-        }
+    },
+        },
   create() {
       if (localStorage.getItem('token')) {
           window.history.back();
