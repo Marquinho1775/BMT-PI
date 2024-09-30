@@ -7,6 +7,7 @@ import HomePageEntrepeneur from './components/HomePageEntrepeneur.vue';
 import RegisterForm from './components/RegisterForm.vue';
 import LoginForm from './components/LoginForm.vue';
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
+import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 import EmailVerification from './components/EmailVerification.vue';
 
 // Import Bootstrap and BootstrapVue
@@ -43,6 +44,7 @@ const router = createRouter({
         { path: '/register', name: "Register", component: RegisterForm },
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/enterprise-register', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
+        { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises},
         { path: '/email-verification', name: "VerifyEmail", component: EmailVerification }
     ]
 });
