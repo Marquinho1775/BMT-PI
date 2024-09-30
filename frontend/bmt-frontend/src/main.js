@@ -1,13 +1,14 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import HomePage from './components/HomePage.vue';
+// import HomePage from './components/HomePage.vue';
 import HomePageUserClient from './components/HomePageUserClient.vue';
 import HomePageEntrepeneur from './components/HomePageEntrepeneur.vue';
 import RegisterForm from './components/RegisterForm.vue';
 import LoginForm from './components/LoginForm.vue';
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
+import EmailVerification from './components/EmailVerification.vue';
 
 // Import Bootstrap and BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css';
@@ -37,13 +38,14 @@ axios.interceptors.request.use(config => {
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        { path: '/', name: "Home", component: HomePage },
+        // { path: '/', name: "Home", component: HomePage },
         { path: '/clienthome', name: "ClientHome", component: HomePageUserClient},
         { path: '/entrepeneurhome', name: "entrepeneurhome", component: HomePageEntrepeneur },
         { path: '/register', name: "Register", component: RegisterForm },
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/enterprise-register', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
         { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises},
+        { path: '/email-verification', name: "VerifyEmail", component: EmailVerification }
     ]
 });
 
