@@ -136,5 +136,31 @@ namespace BMT_backend.Handlers
             };
             return administrator;
         }
+
+        public List<DevEnterpriseModel> GetDevEnterprises() {
+            List<DevEnterpriseModel> devEnterprises = new List<DevEnterpriseModel>();
+            string query = "SELECT e.Name, " +
+                           "(SELECT COUNT(*) FROM Entrepreneurs_Enterprises ee WHERE ee.EnterpriseId = e.Id) AS EmployeeQuantity, " +
+                           "(SELECT COUNT(*) FROM Products p WHERE p.EnterpriseId = e.Id) AS ProductQuantity " +
+                           "FROM Enterprises e";
+
+            var queryCommand = new SqlCommand(query, _conection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable resultTable = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(resultTable);
+            _conection.Close();
+            foreach (DataRow row in resultTable.Rows)
+            {
+                devEnterprises.Add(
+                    new DevEnterpriseModel
+                    {
+                        Name = Convert.ToString(row["Name"]),
+                        EmployeeQuantity = Convert.ToString(row["EmployeeQuantity"]),
+                        ProductQuantity = Convert.ToString(row["ProductQuantity"]),
+                    });
+            }
+            return devEnterprises;
+        }
     }
 }

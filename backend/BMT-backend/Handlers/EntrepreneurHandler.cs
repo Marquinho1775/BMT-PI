@@ -54,7 +54,6 @@ namespace BMT_backend.Handlers
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@EnterpriseIdentification", request.EnterpriseIdentification);
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@IsAdmin", request.IsAdmin ? 1 : 0);
 
-
             _conection.Open();
             bool exit = addEntrepreneurToEnterpriseCommand.ExecuteNonQuery() >= 1;
             _conection.Close();
