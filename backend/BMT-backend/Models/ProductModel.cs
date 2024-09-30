@@ -24,9 +24,8 @@
     public class PerishableProductModel
     {
         public string ProductId { get; set; } = null!;  // first post response
-        public int Stock { get; set; }  // form
-        public int WeekDaysAvailable { get; set; }  // form
-        public int DayLimitAvailable { get; set; }  // form
+        public int Limit { get; set; }  // form
+        public string WeekDaysAvailable { get; set; }  // form
     }
     public class ProductViewModel
     {

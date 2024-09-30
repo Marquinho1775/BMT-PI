@@ -32,11 +32,10 @@ namespace BMT_backend.Handlers
         {
             string createProductQuery = "insert into Products (EnterpriseId, Name, Description, Price, Weight) " +
                 "output Inserted.Id " +
-                "values((select Id from Enterprises where IdentificationNumber = @EnterpriseIdentification), " +
-                "@Name, @Description, @Price, @Weight);";
+                "values(@EnterpriseId, @Name, @Description, @Price, @Weight);";
 
             var createProductCommand = new SqlCommand(createProductQuery, _conection);
-            createProductCommand.Parameters.AddWithValue("@EnterpriseIdentification", GetEnterpriseIdByUsername(product.Username));
+            createProductCommand.Parameters.AddWithValue("@EnterpriseId", GetEnterpriseIdByUsername(product.Username));
             createProductCommand.Parameters.AddWithValue("@Name", product.Name);
             createProductCommand.Parameters.AddWithValue("@Description", product.Description);
             createProductCommand.Parameters.AddWithValue("@Price", product.Price);
@@ -80,13 +79,20 @@ namespace BMT_backend.Handlers
 
         public bool CreatePerishableProduct(PerishableProductModel product)
         {
-            string createPerishableProductQuery = "insert into PerishableProducts (ProductId, Stock, WeekDaysAvailable, DayLimitAvailable) " +
-                "values(@ProductId, @Stock, @WeekDaysAvailable, @DayLimitAvailable);";
+            string createPerishableProductQuery = "insert into PerishableProducts (ProductId, Limit, WeekDaysAvailable) " +
+                "values(@ProductId, @Limit, @WeekDaysAvailable);";
             var createPerishableProductCommand = new SqlCommand(createPerishableProductQuery, _conection);
             createPerishableProductCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
-            createPerishableProductCommand.Parameters.AddWithValue("@Stock", product.Stock);
+            createPerishableProductCommand.Parameters.AddWithValue("@Limit", product.Limit);
             createPerishableProductCommand.Parameters.AddWithValue("@WeekDaysAvailable", product.WeekDaysAvailable);
-            createPerishableProductCommand.Parameters.AddWithValue("@DayLimitAvailable", product.DayLimitAvailable);
+
+            string queryWithValues = createPerishableProductCommand.CommandText;
+            foreach (SqlParameter param in createPerishableProductCommand.Parameters)
+            {
+                queryWithValues = queryWithValues.Replace(param.ParameterName, param.Value.ToString());
+            }
+            Console.WriteLine(queryWithValues);
+
             _conection.Open();
             bool exit = createPerishableProductCommand.ExecuteNonQuery() >= 1;
             _conection.Close();
@@ -98,22 +104,30 @@ namespace BMT_backend.Handlers
             return exit;
         }
 
-        private bool CreateDateDisponibility(PerishableProductModel model) {            
+        private bool CreateDateDisponibility(PerishableProductModel model)
+        {
             string createDisponibilityQuery = "insert into DateDisponibility (ProductId, Date, Stock) " +
                 "values(@ProductId, @Date, (select Limit from PerishableProducts where ProductId = @ProductId));";
             var createDisponibilityCommand = new SqlCommand(createDisponibilityQuery, _conection);
             createDisponibilityCommand.Parameters.AddWithValue("@ProductId", model.ProductId);
+            createDisponibilityCommand.Parameters.Add("@Date", SqlDbType.Date);
+
             int[] dispatchDays = model.WeekDaysAvailable.ToString().ToCharArray().Select(c => int.Parse(c.ToString())).ToArray();
             List<DateTime> dispatchDates = GetDispatchDates(dispatchDays);
+            foreach (DateTime date in dispatchDates)
+            {
+                Console.WriteLine(date.ToString("dd-MM-yyyy"));
+            }
             _conection.Open();
             foreach (DateTime date in dispatchDates)
             {
-                createDisponibilityCommand.Parameters.AddWithValue("@Date", date);
+                createDisponibilityCommand.Parameters["@Date"].Value = date;
                 createDisponibilityCommand.ExecuteNonQuery();
             }
             _conection.Close();
             return true;
         }
+
 
         private static List<DateTime> GetDispatchDates(int[] dispatchDays)
         {
@@ -136,20 +150,23 @@ namespace BMT_backend.Handlers
                 "values(@ProductId, (select Id from Tags where Name = @TagName));";
             var addTagsCommand = new SqlCommand(addTagsQuery, _conection);
             addTagsCommand.Parameters.AddWithValue("@ProductId", request.ProductId);
+            addTagsCommand.Parameters.Add("@TagName", SqlDbType.VarChar);
+
             _conection.Open();
             foreach (string tag in request.Tags)
             {
-                addTagsCommand.Parameters.AddWithValue("@TagName", tag);
+                addTagsCommand.Parameters["@TagName"].Value = tag;
                 addTagsCommand.ExecuteNonQuery();
             }
             _conection.Close();
             return true;
         }
 
+
         public List<ProductViewModel> GetProducts()
         {
             List<ProductViewModel> products = new List<ProductViewModel>();
-            var query = "select p.Id, p.Name, p.Description, p.Weight, p.Price, p.Type, e.Name as EnterpriseName " +
+            var query = "select p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
                 "from Products p " +
                 "join Enterprises e on p.EnterpriseId = e.Id;";
             DataTable table = CreateQueryTable(query);
@@ -162,7 +179,6 @@ namespace BMT_backend.Handlers
                         Description = Convert.ToString(row["Description"]),
                         Weight = Convert.ToDouble(row["Weight"]),
                         Price = Convert.ToDouble(row["Price"]),
-                        Type = Convert.ToBoolean(row["Type"]),
                         EnterpriseName = Convert.ToString(row["EnterpriseName"]),
                         Tags = GetProductTags(Convert.ToString(row["Id"])),
                         ImagesURLs = GetProductImages(Convert.ToString(row["Id"]))
@@ -197,8 +213,8 @@ namespace BMT_backend.Handlers
             List<string> images = new List<string>();
             string getImagesQuery = "select i.URL " +
                 "from Images i " +
-                "join Product_Images pi on i.Id = pi.ImageId " +
-                "where pi.ProductId = @ProductId;";
+                "join Products p on i.OwnerId = p.Id " +
+                "where p.Id = @ProductId;";
             var getImagesCommand = new SqlCommand(getImagesQuery, _conection);
             getImagesCommand.Parameters.AddWithValue("@ProductId", productId);
             SqlDataAdapter tableAdapter = new SqlDataAdapter(getImagesCommand);
