@@ -17,6 +17,7 @@ import DeveloperUsers from './components/DeveloperUsers.vue';
 import ProfilePage from './components/ProfilePage.vue';
 import HomePageGuest from './components/HomePageGuest.vue';
 import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
+import RegisterAddressForm from './components/RegisterAddress.vue';
 
 // Import Bootstrap and BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css';
@@ -62,7 +63,8 @@ const router = createRouter({
         { path: '/email-verification', name: "VerifyEmail", component: EmailVerification },
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/profile', name: "Profile", component: ProfilePage },
-        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage }
+        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
+        { path: '/register-address', name: "RegisterAddress", component: RegisterAddressForm }
     ]
 });
 
