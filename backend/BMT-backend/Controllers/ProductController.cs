@@ -77,6 +77,8 @@ namespace BMT_backend.Controllers
 
         [HttpPost("add-tags")]
         public async Task<ActionResult<bool>> AddTagsToProduct(AddTagsToProductRequest request)
+        [HttpGet]
+        public List<DevProductModel> GetDevProducts()
         {
             try
             {
@@ -91,7 +93,7 @@ namespace BMT_backend.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating the product");
             }
-        }
+            }
 
         [HttpGet]
         public List<ProductViewModel> GetProducts()
@@ -99,5 +101,20 @@ namespace BMT_backend.Controllers
             var products = _productHandler.GetProducts();
             return products;
         }
+        [HttpGet("dev-products")]
+        public List<DevProductModel> GetDevProducts()
+        {
+            try
+            {
+                return _productHandler.GetDevProducts();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving products: {ex.Message}");
+                Response.StatusCode = 500;
+                return new List<DevProductModel>();
+            }
+        }
+    }
     }
 }

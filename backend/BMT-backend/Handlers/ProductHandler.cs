@@ -164,7 +164,7 @@ namespace BMT_backend.Handlers
 
 
         public List<ProductViewModel> GetProducts()
-        {
+            {
             List<ProductViewModel> products = new List<ProductViewModel>();
             var query = "select p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
                 "from Products p " +
@@ -176,6 +176,8 @@ namespace BMT_backend.Handlers
                     new ProductViewModel
                     {
                         Name = Convert.ToString(row["Name"]),
+                        Enterprise = Convert.ToString(row["Enterprise"]),
+                        Price = Convert.ToString(row["Price"]),
                         Description = Convert.ToString(row["Description"]),
                         Weight = Convert.ToDouble(row["Weight"]),
                         Price = Convert.ToDouble(row["Price"]),
@@ -227,6 +229,32 @@ namespace BMT_backend.Handlers
                 images.Add(row["URL"].ToString());
             }
             return images;
+        }
+        public List<DevProductModel> GetDevProducts()
+        {
+            List<DevProductModel> devProducts = new List<DevProductModel>();
+            string query = "SELECT p.Name, p.Price, p.Description, e.Name AS Enterprise " +
+               "FROM Products p " +
+               "JOIN Enterprises e ON p.EnterpriseId = e.Id";
+
+            var queryCommand = new SqlCommand(query, _conection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable resultTable = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(resultTable);
+            _conection.Close();
+            foreach (DataRow row in resultTable.Rows)
+            {
+                devProducts.Add(
+                    new DevProductModel
+                    {
+                        Name = Convert.ToString(row["Name"]),
+                        Enterprise = Convert.ToString(row["Enterprise"]),
+                        Price = Convert.ToString(row["Price"]),
+                        Description = Convert.ToString(row["Description"]),
+                    });
+            }
+            return devProducts;
         }
     }
 }
