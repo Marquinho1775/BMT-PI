@@ -3,7 +3,7 @@
     public class DirectionModel
     {
         public string Username { get; set; }
-        public int NumDirection { get; set; }
+        public string NumDirection { get; set; }
         public string Province { get; set; }
         public string Canton { get; set; }
         public string District { get; set; }

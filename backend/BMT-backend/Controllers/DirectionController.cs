@@ -16,17 +16,17 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost("ObtainDirectionsFromUser")]
-        public async Task<ActionResult<bool>> getDirectionsFromUser(UserModel user)
+        public async Task<ActionResult<List<DirectionModel>>> getDirectionsFromUser([FromBody] UserModel user)
         {
             try
             {
-                if (Request == null)
+                if (user == null)
                 {
-                    BadRequest();
+                    return BadRequest("User data is required");
                 }
 
                 var result = _directionHandler.GetDirectionsFromUser(user);
-                return new JsonResult(result);
+                return Ok(result);
 
             }
             catch
@@ -34,6 +34,7 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las direcciones de un usuario");
             }
         }
+
 
         [HttpPost("CreateDirection")]
         public async Task<ActionResult<bool>> createDirection(DirectionModel direction)

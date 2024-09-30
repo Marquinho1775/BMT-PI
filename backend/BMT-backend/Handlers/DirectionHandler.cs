@@ -54,7 +54,7 @@ namespace BMT_backend.Handlers
                     new DirectionModel
                     {
                         Username = Convert.ToString(row["Username"]),
-                        NumDirection = Convert.ToInt32(row["NumDirection"]),
+                        NumDirection = Convert.ToString(row["NumDirection"]),
                         Province = Convert.ToString(row["Province"]),
                         Canton = Convert.ToString(row["Canton"]),
                         District = Convert.ToString(row["District"]),
