@@ -75,7 +75,13 @@ export default {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     }
-  }
+  },
+
+  create() {
+    if (!localStorage.getItem('token')) {
+         window.location.href = "/login";
+    } 
+ }
 };
 </script>
 
