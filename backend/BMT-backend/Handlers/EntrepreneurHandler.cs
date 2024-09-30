@@ -82,5 +82,60 @@ namespace BMT_backend.Handlers
             }
             return entrepreneurs;
         }
+
+        public List<EnterpriseViewModel> GetEnterprisesOfEntrepreneur(EntrepreneurModel entrepreneur)
+        {
+            List<EnterpriseViewModel> enterprises = new List<EnterpriseViewModel>();
+
+            string query = $"select en.Name as EnterpriseName, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
+                           $"from Entrepreneurs_Enterprises ee " +
+                           $"join Enterprises en on ee.EnterpriseId = en.Id " +
+                           $"join Users u on (select UserId from Entrepreneurs where Identification = '{entrepreneur.Identification}') = u.Id " +
+                           $"where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = '{entrepreneur.Identification}');";
+
+            // Llamada a la función que no se puede modificar
+            DataTable tableOfEnterprises = CreateQueryTable(query);
+
+            // Procesar los resultados
+            foreach (DataRow row in tableOfEnterprises.Rows)
+            {
+                enterprises.Add(new EnterpriseViewModel
+                {
+                    EnterpriseName = Convert.ToString(row["EnterpriseName"]),
+                    IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
+                    Description = Convert.ToString(row["Description"]),
+                    AdminName = Convert.ToString(row["UserName"]),
+                    AdminLastName = Convert.ToString(row["LastName"]),
+                });
+            }
+
+            return enterprises;
+        }
+
+        public EntrepreneurModel GetEntrepreneurBasedOnAUser(UserModel user)
+        {
+            EntrepreneurModel entrepreneur = new EntrepreneurModel();
+
+            string query = $"SELECT e.Id AS EntrepreneurId, e.Identification, u.Id AS UserId, " +
+                            $"u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
+                            $"FROM Entrepreneurs e " +
+                            $"JOIN Users u ON e.UserId = u.Id " +
+                            $"WHERE u.Id = '{user.Id}'";
+
+
+
+            DataTable tableOfEntrepreneurBasedOnUser = CreateQueryTable(query);
+
+            if (tableOfEntrepreneurBasedOnUser.Rows.Count > 0)
+            {
+                DataRow row = tableOfEntrepreneurBasedOnUser.Rows[0];
+                entrepreneur.Id = Convert.ToString(row["EntrepreneurId"]);
+                entrepreneur.Username = Convert.ToString(row["UserName"]);
+                entrepreneur.Identification = Convert.ToString(row["Identification"]);
+            }
+
+            return entrepreneur;
+        }
     }
 }
+

@@ -57,5 +57,46 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error añadiendo al emprendedor a la empresa");
             }
         }
+
+        [HttpPost("my-registered-enterprises")]
+        public async Task<ActionResult<bool>> ConsultRegisteredEnterprises(EntrepreneurModel entrepeneur)
+        {
+            try
+            {
+                if (Request == null)
+                {
+                    BadRequest();
+                }
+
+                var result = _entrepreneurHandler.GetEnterprisesOfEntrepreneur(entrepeneur);
+                return new JsonResult(result);
+
+            } catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las empresas registradas");
+            }
+        }
+
+        [HttpPost("ObtainEntrepreneurBasedOnUser")]
+        public async Task<ActionResult<bool>> EntrepreneurBasedOnUser(UserModel user)
+        {
+            try
+            {
+                if (Request == null)
+                {
+                    BadRequest();
+                }
+
+                var result = _entrepreneurHandler.GetEntrepreneurBasedOnAUser(user);
+                return new JsonResult(result);
+
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las empresas registradas");
+            }
+        }
+
+
     }
 }

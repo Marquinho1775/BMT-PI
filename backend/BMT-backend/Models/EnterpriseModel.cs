@@ -14,4 +14,13 @@ namespace BMT_backend.Models
         // public List<ProductModel> Catalog { get; set; }
 
     }
+
+    public class EnterpriseViewModel
+    {
+        public string EnterpriseName { get; set; }
+        public string IdentificationNumber { get; set; }
+        public string Description { get; set; }
+        public string AdminName { get; set; }
+        public string AdminLastName { get; set; }
+    }
 }
