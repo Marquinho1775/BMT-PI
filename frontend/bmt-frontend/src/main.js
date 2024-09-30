@@ -38,10 +38,10 @@ const router = createRouter({
     routes: [
         { path: '/', name: "Home", component: HomePage },
         { path: '/clienthome', name: "ClientHome", component: HomePageUserClient},
-        { path: '/entrepeneurhome', name: "Entrepeneurhome", component: HomePageEntrepeneur },
+        { path: '/entrepeneurhome', name: "entrepeneurhome", component: HomePageEntrepeneur },
         { path: '/register', name: "Register", component: RegisterForm },
         { path: '/login', name: "Login", component: LoginForm },
-        { path: '/enterpriseregister', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
+        { path: '/enterprise-register', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
     ]
 });
 
