@@ -81,7 +81,7 @@ export default {
         Username: this.datosFormulario.Username,
         Email: this.datosFormulario.Email,
         isVerified: this.datosFormulario.isVerified,
-        Password: this.datosFormulario.Password,
+        Password: this.datosFormulario.Password
 
       }).then((response) => {
 
@@ -91,9 +91,9 @@ export default {
           icon: 'success',
           confirmButtonText: 'Ok'
         }).then(() => {
-
+           
           console.log(response);
-          window.location.href = "/";
+          window.history.back();
         });
       }).catch((error) => {
         this.$swal.fire({
@@ -118,7 +118,12 @@ export default {
     Volver() {
       window.location.href = "/";
     }
-  }
+        }
+  create() {
+      if (localStorage.getItem('token')) {
+          window.history.back();
+      } 
+   }
 };
 </script>
 
