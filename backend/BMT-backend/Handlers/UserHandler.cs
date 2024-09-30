@@ -42,6 +42,7 @@ namespace BMT_backend.Handlers
                 users.Add(
                 new UserModel
                 {
+                    Id = Convert.ToString(column["Id"]),
                     Name = Convert.ToString(column["Name"]),
                     LastName = Convert.ToString(column["LastName"]),
                     Username = Convert.ToString(column["Username"]),
@@ -83,6 +84,53 @@ namespace BMT_backend.Handlers
             Connection.Open();
             sqlCommandForQuery.ExecuteNonQuery();
             Connection.Close();
+        }
+
+        public List<DevUserModel> GetDevUsers() {
+            List<DevUserModel> devUsers = new List<DevUserModel>();
+            string query = "SELECT u.Name, u.LastName, u.Email, e.Identification, en.Name AS Enterprise " +
+               "FROM Users u " +
+               "JOIN Entrepreneurs e ON u.Id = e.UserId " +
+               "LEFT JOIN Entrepreneurs_Enterprises ee ON e.Id = ee.EntrepreneurId " +
+               "LEFT JOIN Enterprises en ON ee.EnterpriseId = en.Id";
+            var queryCommand = new SqlCommand(query, Connection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable resultTable = new DataTable();
+            Connection.Open();
+            tableAdapter.Fill(resultTable);
+            Connection.Close();
+
+            var usersDictionary = new Dictionary<string, DevUserModel>();
+
+            foreach (DataRow row in resultTable.Rows)
+            {
+                string userEmail = Convert.ToString(row["Email"]);
+                string fullName = $"{Convert.ToString(row["Name"])} {Convert.ToString(row["LastName"])}"; // Concatenamos el nombre y apellido
+
+                if (!usersDictionary.ContainsKey(userEmail))
+                {
+                    // Crear un nuevo DevUserModel si aún no existe en el diccionario
+                    usersDictionary[userEmail] = new DevUserModel
+                    {
+                        Name = fullName,
+                        Email = userEmail,
+                        Identification = Convert.ToString(row["Identification"]),
+                        AssociatedCompanies = new List<string>().ToArray()
+                    };
+                }
+
+                // Añadir la empresa a la lista de empresas asociadas
+                string enterpriseName = Convert.ToString(row["Enterprise"]);
+                if (!string.IsNullOrEmpty(enterpriseName))
+                {
+                    var associatedCompanies = usersDictionary[userEmail].AssociatedCompanies.ToList();
+                    associatedCompanies.Add(enterpriseName);
+                    usersDictionary[userEmail].AssociatedCompanies = associatedCompanies.ToArray();
+                }
+            }
+            devUsers = usersDictionary.Values.ToList();
+
+            return devUsers;
         }
     }
 }
