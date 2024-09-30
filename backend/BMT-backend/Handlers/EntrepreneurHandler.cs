@@ -93,10 +93,8 @@ namespace BMT_backend.Handlers
                            $"join Users u on (select UserId from Entrepreneurs where Identification = '{entrepreneur.Identification}') = u.Id " +
                            $"where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = '{entrepreneur.Identification}');";
 
-            // Llamada a la función que no se puede modificar
             DataTable tableOfEnterprises = CreateQueryTable(query);
 
-            // Procesar los resultados
             foreach (DataRow row in tableOfEnterprises.Rows)
             {
                 enterprises.Add(new EnterpriseViewModel
