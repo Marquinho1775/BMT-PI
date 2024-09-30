@@ -76,5 +76,27 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las empresas registradas");
             }
         }
+
+        [HttpPost("ObtainEntrepreneurBasedOnUser")]
+        public async Task<ActionResult<bool>> EntrepreneurBasedOnUser(UserModel user)
+        {
+            try
+            {
+                if (Request == null)
+                {
+                    BadRequest();
+                }
+
+                var result = _entrepreneurHandler.GetEntrepreneurBasedOnAUser(user);
+                return new JsonResult(result);
+
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las empresas registradas");
+            }
+        }
+
+
     }
 }

@@ -28,6 +28,11 @@
                 Register enterprise
              </button>
         </router-link>
+        <router-link to="/enterprises">
+            <button type="button" class="btn btn-outline-primary float-right mr-2">
+              Mis emprendimientos
+            </button>
+          </router-link>
       </div>
     </div>
   </div>

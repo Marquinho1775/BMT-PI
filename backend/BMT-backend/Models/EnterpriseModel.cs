@@ -23,6 +23,4 @@ namespace BMT_backend.Models
         public string AdminName { get; set; }
         public string AdminLastName { get; set; }
     }
-
-
 }

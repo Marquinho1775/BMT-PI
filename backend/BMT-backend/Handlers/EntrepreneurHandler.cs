@@ -87,7 +87,6 @@ namespace BMT_backend.Handlers
         {
             List<EnterpriseViewModel> enterprises = new List<EnterpriseViewModel>();
 
-            // Crear consulta con la identificación directamente en el string (sin parámetros)
             string query = $"select en.Name as EnterpriseName, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
                            $"from Entrepreneurs_Enterprises ee " +
                            $"join Enterprises en on ee.EnterpriseId = en.Id " +
@@ -113,6 +112,30 @@ namespace BMT_backend.Handlers
             return enterprises;
         }
 
+        public EntrepreneurModel GetEntrepreneurBasedOnAUser(UserModel user)
+        {
+            EntrepreneurModel entrepreneur = new EntrepreneurModel();
+
+            string query = $"SELECT e.Id AS EntrepreneurId, e.Identification, u.Id AS UserId, " +
+                            $"u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
+                            $"FROM Entrepreneurs e " +
+                            $"JOIN Users u ON e.UserId = u.Id " +
+                            $"WHERE u.Id = '{user.Id}'";
+
+
+
+            DataTable tableOfEntrepreneurBasedOnUser = CreateQueryTable(query);
+
+            if (tableOfEntrepreneurBasedOnUser.Rows.Count > 0)
+            {
+                DataRow row = tableOfEntrepreneurBasedOnUser.Rows[0];
+                entrepreneur.Id = Convert.ToString(row["EntrepreneurId"]);
+                entrepreneur.Username = Convert.ToString(row["UserName"]);
+                entrepreneur.Identification = Convert.ToString(row["Identification"]);
+            }
+
+            return entrepreneur;
+        }
     }
 }
 

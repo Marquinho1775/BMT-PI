@@ -42,6 +42,7 @@ namespace BMT_backend.Handlers
                 users.Add(
                 new UserModel
                 {
+                    Id = Convert.ToString(column["Id"]),
                     Name = Convert.ToString(column["Name"]),
                     LastName = Convert.ToString(column["LastName"]),
                     Username = Convert.ToString(column["Username"]),
