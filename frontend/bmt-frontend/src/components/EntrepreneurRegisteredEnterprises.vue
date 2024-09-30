@@ -1,5 +1,7 @@
 <template>
+
   <head></head>
+
   <body>
     <div class="entrepreneur-enterprises">
       <div class="content">
@@ -26,10 +28,10 @@
                 <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
                 <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
                 <td>{{ enterprise.description }}</td>
-                
+
               </tr>
 
-              
+
               <!-- Botón posicionado en la esquina inferior izquierda -->
               <div class="button-container">
                 <button class="button" @click="goBack">Volver</button>
@@ -50,7 +52,7 @@
 
 <script>
 import axios from "axios";
-import {getToken } from '@/helpers/auth';
+import { getToken } from '@/helpers/auth';
 
 export default {
   data() {
@@ -59,7 +61,7 @@ export default {
       entrepreneur: {
         Id: '',
         Username: '',
-        Identification: '', 
+        Identification: '',
       }
     };
   },
@@ -115,7 +117,7 @@ export default {
 
         this.enterprises = enterprisesResponse.data; // Guardar la respuesta en enterprises
         console.log(this.enterprises);
-        
+
       } catch (error) {
         console.error('Error al obtener las empresas:', error);
         if (error.response) {
@@ -134,7 +136,7 @@ export default {
     },
 
     goBack() {
-      window.history.back();
+      this.$router.push('/entrepeneurhome');
     }
   }
 };
@@ -143,19 +145,19 @@ export default {
 <style scoped>
 .entrepreneur-enterprises {
   display: flex;
-  flex-direction: column; 
-  height: 100vh; 
-  background-color: #D1E4FF; 
-  justify-content: flex-start; 
-  align-items: center; 
-  padding-top: 20px; 
+  flex-direction: column;
+  height: 100vh;
+  background-color: #D1E4FF;
+  justify-content: flex-start;
+  align-items: center;
+  padding-top: 20px;
 }
 
 .content {
-  width: 80%; 
+  width: 80%;
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
 }
 
 .header {
@@ -165,8 +167,8 @@ export default {
 }
 
 h2 {
-  margin-bottom: 10px; 
-  margin-top: 0; 
+  margin-bottom: 10px;
+  margin-top: 0;
 }
 
 
@@ -177,7 +179,8 @@ h2 {
   width: 100%;
   min-height: 60vh;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  position: relative; /* Añadido para posicionar el botón de manera absoluta */
+  position: relative;
+  /* Añadido para posicionar el botón de manera absoluta */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -186,10 +189,11 @@ h2 {
 .enterprise-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 0 auto; 
+  margin: 0 auto;
 }
 
-.enterprise-table th, .enterprise-table td {
+.enterprise-table th,
+.enterprise-table td {
   padding: 10px;
   text-align: left;
 }
@@ -197,7 +201,7 @@ h2 {
 .enterprise-table th {
   background-color: #39517B;
   font-weight: bold;
-  color: white; 
+  color: white;
 }
 
 .enterprise-table td {
@@ -214,9 +218,12 @@ h2 {
 }
 
 .button-container {
-  position: absolute; /* Posicionamiento absoluto para moverlo dentro del contenedor relativo */
-  bottom: 20px; /* Espacio desde el fondo */
-  left: 20px; /* Espacio desde la izquierda */
+  position: absolute;
+  /* Posicionamiento absoluto para moverlo dentro del contenedor relativo */
+  bottom: 20px;
+  /* Espacio desde el fondo */
+  left: 20px;
+  /* Espacio desde la izquierda */
 }
 
 .button {
@@ -229,8 +236,7 @@ h2 {
 }
 
 .button:hover {
-  background-color: #2d3f5a; /* Color de fondo cuando se hace hover */
+  background-color: #2d3f5a;
+  /* Color de fondo cuando se hace hover */
 }
-
-
 </style>

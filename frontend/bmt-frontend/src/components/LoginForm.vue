@@ -73,7 +73,7 @@ export default {
               confirmButtonText: 'Ok'
             }).then(() => {
               if (user.isVerified) {
-                  window.history.back();
+                window.location.href = "/clienthome";
               } else {
                 window.location.href = "/email-verification";
               }
@@ -99,9 +99,6 @@ export default {
     }
   },
   created() {
-    if (localStorage.getItem('token')) {
-        window.history.back();
-    }
   }
 };
 </script>
