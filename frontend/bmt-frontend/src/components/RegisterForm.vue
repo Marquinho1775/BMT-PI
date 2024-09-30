@@ -46,7 +46,7 @@
             <div class="d-flex justify-content-between">
               <b-button variant="secondary" @click="Volver">Volver</b-button>
               <b-button variant="secondary">Limpiar</b-button>
-              <b-button class="button">Registrar</b-button>
+              <b-button type="submit" class="button">Registrar</b-button>
             </div>
           </b-form>
         </div>
@@ -62,11 +62,12 @@ export default {
   data() {
     return {
       datosFormulario: {
+        Id: '',
         Name: '',
         LastName: '',
         Username: '',
         Email: '',
-        isVerified: true,
+        isVerified: false,
         Password: ''
       }
     };
@@ -74,12 +75,13 @@ export default {
   methods: {
     registerUser() {
       axios.post('https://localhost:7189/api/User', {
+        Id: this.datosFormulario.Id,
         Name: this.datosFormulario.Name,
         LastName: this.datosFormulario.LastName,
         Username: this.datosFormulario.Username,
         Email: this.datosFormulario.Email,
         isVerified: this.datosFormulario.isVerified,
-        Password: this.datosFormulario.Password,
+        Password: this.datosFormulario.Password
 
       }).then((response) => {
 
@@ -89,9 +91,9 @@ export default {
           icon: 'success',
           confirmButtonText: 'Ok'
         }).then(() => {
-
+           
           console.log(response);
-          window.location.href = "/";
+          window.history.back();
         });
       }).catch((error) => {
         this.$swal.fire({
@@ -116,7 +118,12 @@ export default {
     Volver() {
       window.location.href = "/";
     }
-  }
+        }
+  create() {
+      if (localStorage.getItem('token')) {
+          window.history.back();
+      } 
+   }
 };
 </script>
 

@@ -36,7 +36,6 @@
 
 <script>
 import axios from 'axios';
-
 export default {
   data() {
     return {
@@ -74,7 +73,7 @@ export default {
               confirmButtonText: 'Ok'
             }).then(() => {
               if (user.isVerified) {
-                window.location.href = "/";
+                  window.history.back();
               } else {
                 window.location.href = "/email-verification";
               }
@@ -99,6 +98,11 @@ export default {
       window.location.href = "/";
     }
   },
+  created() {
+    if (localStorage.getItem('token')) {
+        window.history.back();
+    }
+  }
 };
 </script>
 
