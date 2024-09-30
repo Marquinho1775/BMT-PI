@@ -23,9 +23,6 @@
         <div class="offcanvas-body" style="background-color: #BCD6F3;">
           <ul class="navbar-nav  
             justify-content-end">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Información relevante</a>
-            </li>
           </ul>
         </div>
       </div>
