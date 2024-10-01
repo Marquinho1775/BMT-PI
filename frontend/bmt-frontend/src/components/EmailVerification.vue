@@ -57,16 +57,17 @@ export default {
               text: '¡La cuenta ha sido verificada correctamente!',
               icon: 'success',
               confirmButtonText: 'Ok'
-            })
-          }).then(response => {
-            console.log('Verificación exitosa:', response);
-            axios.post('https://localhost:7189/api/Email/verifyaccount', codeTaken)
-              .then(() => {
-                console.log('Cuenta verificada:', response);
-                window.location.href = "/client-home";
-              })
-          }).catch(error => {
+            }).then(() => {
+              console.log('Verificación exitosa');
+              return axios.post('https://localhost:7189/api/Email/verifyaccount', codeTaken);
+            }).then(() => {
+              console.log('Cuenta verificada');
+              this.$router.push('/client-home'); // Use this for navigation
+            });
+          })
+          .catch(error => {
             console.error('Error en la verificación:', error);
+            this.message = 'Error en la verificación. Inténtalo de nuevo más tarde.';
           });
       } catch (error) {
         this.message = 'Error en la verificación. Inténtalo de nuevo más tarde.';

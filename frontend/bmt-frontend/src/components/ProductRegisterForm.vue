@@ -6,151 +6,76 @@
         <b-form @submit.prevent="addNewProduct" @reset="onReset">
 
           <!-- Nombre del producto -->
-          <b-form-group
-            id="group-name"
-            label="Nombre del producto:" 
-            label-for="name">
-            <b-form-input 
-              id="name" 
-              class="form-input"
-              v-model="productData.name" 
-              placeholder="Ingresar el nombre del producto" 
-              required>
+          <b-form-group id="group-name" label="Nombre del producto:" label-for="name">
+            <b-form-input id="name" class="form-input" v-model="productData.name"
+              placeholder="Ingresar el nombre del producto" required>
             </b-form-input>
           </b-form-group>
 
           <!-- Descripción -->
-          <b-form-group
-            id="group-description"
-            label="Descripción:" 
-            label-for="description">
-            <b-form-input 
-              id="description" 
-              class="form-input"
-              v-model="productData.description" 
-              placeholder="Ingresar la descripción del producto" 
-              required>
+          <b-form-group id="group-description" label="Descripción:" label-for="description">
+            <b-form-input id="description" class="form-input" v-model="productData.description"
+              placeholder="Ingresar la descripción del producto" required>
             </b-form-input>
           </b-form-group>
 
           <!-- Tags -->
-          <b-form-group
-            id="group-tags"
-            label="Tags:"
-            label-for="tags">
-            <b-form-select
-              id="tags"
-              class="form-input"
-              v-model="productData.tags"
-              :options="tags"
-              multiple
+          <b-form-group id="group-tags" label="Tags:" label-for="tags">
+            <b-form-select id="tags" class="form-input" v-model="productData.tags" :options="tags" multiple
               placeholder="Seleccione los tags">
             </b-form-select>
           </b-form-group>
 
           <!-- Peso -->
-          <b-form-group
-            id="group-weight"
-            label="Peso (kg):"
-            label-for="weight">
-            <b-form-input
-              id="weight"
-              class="form-input"
-              v-model="productData.weight"
-              type="number"
-              placeholder="Ingrese el peso del producto"
-              required>
+          <b-form-group id="group-weight" label="Peso (kg):" label-for="weight">
+            <b-form-input id="weight" class="form-input" v-model="productData.weight" type="number"
+              placeholder="Ingrese el peso del producto" required>
             </b-form-input>
           </b-form-group>
 
           <!-- Precio -->
-          <b-form-group
-            id="group-price"
-            label="Precio:"
-            label-for="price">
-            <b-form-input
-              id="price"
-              class="form-input price-input-bt"
-              v-model="productData.price"
-              type="number"
-              placeholder="Ingrese el precio del producto"
-              required>
+          <b-form-group id="group-price" label="Precio:" label-for="price">
+            <b-form-input id="price" class="form-input price-input-bt" v-model="productData.price" type="number"
+              placeholder="Ingrese el precio del producto" required>
             </b-form-input>
           </b-form-group>
 
           <!-- Tipo de Producto -->
-          <b-form-group
-            id="group-type"
-            label="Tipo de producto:"
-            label-for="type">
-            <b-form-radio-group
-              id="type"
-              v-model="productData.type"
-              :options="['Perecedero', 'No perecedero']"
+          <b-form-group id="group-type" label="Tipo de producto:" label-for="type">
+            <b-form-radio-group id="type" v-model="productData.type" :options="['Perecedero', 'No perecedero']"
               name="type">
             </b-form-radio-group>
           </b-form-group>
 
           <!-- Campos adicionales según el tipo de producto -->
           <div v-if="productData.type === 'No perecedero'">
-            <b-form-group
-              id="group-stock"
-              label="Cantidad de stock:"
-              label-for="stock">
-              <b-form-input
-                id="stock"
-                class="form-input"
-                v-model="nonPerishable.stock"
-                type="number"
-                placeholder="Ingrese la cantidad de stock"
-                required>
+            <b-form-group id="group-stock" label="Cantidad de stock:" label-for="stock">
+              <b-form-input id="stock" class="form-input" v-model="nonPerishable.stock" type="number"
+                placeholder="Ingrese la cantidad de stock" required>
               </b-form-input>
             </b-form-group>
           </div>
 
           <div v-if="productData.type === 'Perecedero'">
             <!-- Días de la semana -->
-            <b-form-group
-              id="group-weekdays"
-              label="Días de disponibilidad:"
-              label-for="weekdays">
-              <b-form-checkbox-group
-                id="weekdays"
-                v-model="perishable.weekDaysAvailable"
-                :options="weekdays"
+            <b-form-group id="group-weekdays" label="Días de disponibilidad:" label-for="weekdays">
+              <b-form-checkbox-group id="weekdays" v-model="perishable.weekDaysAvailable" :options="weekdays"
                 name="weekdays">
               </b-form-checkbox-group>
             </b-form-group>
 
             <!-- Límite por día -->
-            <b-form-group
-              id="group-limit"
-              label="Límite por día:"
-              label-for="limit">
-              <b-form-input
-                id="limit"
-                class="form-input"
-                v-model="perishable.limit"
-                type="number"
-                placeholder="Ingrese el límite por día"
-                required>
+            <b-form-group id="group-limit" label="Límite por día:" label-for="limit">
+              <b-form-input id="limit" class="form-input" v-model="perishable.limit" type="number"
+                placeholder="Ingrese el límite por día" required>
               </b-form-input>
             </b-form-group>
           </div>
 
           <!-- Subir Imágenes -->
-          <b-form-group
-            id="group-images"
-            label="Subir imágenes:"
-            label-for="formFileMultiple">
+          <b-form-group id="group-images" label="Subir imágenes:" label-for="formFileMultiple">
             <label for="formFileMultiple" class="form-label">Seleccionar múltiples archivos</label>
-            <input 
-              class="form-control" 
-              type="file" 
-              id="formFileMultiple" 
-              multiple 
-              @change="handleFileChange" 
-            />
+            <input class="form-control" type="file" id="formFileMultiple" multiple @change="handleFileChange" />
           </b-form-group>
 
           <div class="d-flex justify-content-between mt-4">
@@ -244,14 +169,14 @@ export default {
         // Subir imágenes
         for (let image of this.productImages) {
           const formData = new FormData();
-            formData.append('image', image);  // Archivo de imagen
-            formData.append('ownerId', productId);  // ID del propietario
+          formData.append('image', image);  // Archivo de imagen
+          formData.append('ownerId', productId);  // ID del propietario
 
-            await axios.post('https://localhost:7189/api/ImageUpload/upload', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            });
+          await axios.post('https://localhost:7189/api/ImageUpload/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
         }
 
         // Mostrar éxito
@@ -260,6 +185,8 @@ export default {
           text: 'Producto agregado exitosamente.',
           icon: 'success',
           confirmButtonText: 'Ok'
+        }).then(() => {
+          this.$router.push('/entrepeneur-home');
         });
 
       } catch (error) {
@@ -277,7 +204,10 @@ export default {
       const files = event.target.files;
       this.productImages = Array.from(files); // Convertir el FileList a un array
       console.log(this.productImages); // Asegurarte de que los archivos se están cargando
-    }
+    },
+    goBack() {
+      this.$router.push('/entrepeneur-home');
+    },
 
   },
   async created() {
@@ -292,14 +222,14 @@ export default {
 </script>
 
 <style>
-
 .formFileMultiple {
   background-color: #D0EDA0
 }
-.form-control
-{
+
+.form-control {
   background-color: #D0EDA0;
 }
+
 .price-input-bt {
   background-color: #D0EDA0
 }
