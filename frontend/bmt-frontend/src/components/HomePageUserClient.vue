@@ -26,12 +26,6 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="#" @click="handleProfileInfo">Mis Datos</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Página Principal</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Pedidos</a>
-            </li>
           </ul>
         </div>
       </div>
