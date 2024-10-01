@@ -77,8 +77,6 @@ namespace BMT_backend.Controllers
 
         [HttpPost("add-tags")]
         public async Task<ActionResult<bool>> AddTagsToProduct(AddTagsToProductRequest request)
-        [HttpGet]
-        public List<DevProductModel> GetDevProducts()
         {
             try
             {
@@ -101,5 +99,13 @@ namespace BMT_backend.Controllers
             var products = _productHandler.GetProducts();
             return products;
         }
+
+        [HttpGet("get-tags")]
+        public List<string> GetTags()
+        {
+            var tags = _productHandler.GetTags();
+            return tags;
+        }
+
     }
 }

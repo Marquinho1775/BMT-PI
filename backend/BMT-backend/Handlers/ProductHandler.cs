@@ -49,13 +49,13 @@ namespace BMT_backend.Handlers
 
         private string GetEnterpriseIdByUsername(string username)
         {
-            string getEnterpriseIdFromUernameQuery = "SELECT e.Id " +
+            string getEnterpriseIdFromUsernameQuery = "SELECT e.Id " +
                 "FROM Enterprises e " +
                 "JOIN Entrepreneurs_Enterprises ee ON e.Id = ee.EnterpriseId " +
                 "JOIN Entrepreneurs en ON ee.EntrepreneurId = en.Id " +
                 "JOIN Users u ON en.UserId = u.Id " +
-                "WHERE u.UserName = @UserName;";
-            var getEnterpriseIdFromUernameCommand = new SqlCommand(getEnterpriseIdFromUernameQuery, _conection);
+                "WHERE u.UserName = @UserName and ee.Administrator = 1;";
+            var getEnterpriseIdFromUernameCommand = new SqlCommand(getEnterpriseIdFromUsernameQuery, _conection);
             getEnterpriseIdFromUernameCommand.Parameters.AddWithValue("@UserName", username);
             _conection.Open();
             var enterpriseIdentification = getEnterpriseIdFromUernameCommand.ExecuteScalar()?.ToString();
@@ -228,6 +228,20 @@ namespace BMT_backend.Handlers
             }
             return images;
         }
+        public List<string> GetTags()
+        {
+            List<string> tags = new List<string>();
+            var query = "select Name from Tags;";
+            DataTable table = CreateQueryTable(query);
+            foreach (DataRow row in table.Rows)
+            {
+                tags.Add(
+                    Convert.ToString(row["Name"])
+                );
+            }
+            return tags;
+        }
+
         public List<DevProductModel> GetDevProducts()
         {
             List<DevProductModel> devProducts = new List<DevProductModel>();

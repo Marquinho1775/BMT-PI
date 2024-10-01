@@ -15,8 +15,8 @@ import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
 import ProfilePage from './components/ProfilePage.vue';
-import HomePageGuest from './components/HomePageGuest.vue';
 import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
+import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 // Import Bootstrap and BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css';
@@ -57,12 +57,13 @@ const router = createRouter({
         { path: '/developerhome', name: "DeveloperHome", component: HomePageDeveloper},
         { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises},
         { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts},
-        { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers}
+        { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers},
         { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
         { path: '/email-verification', name: "VerifyEmail", component: EmailVerification },
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/profile', name: "Profile", component: ProfilePage },
-        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage }
+        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
+        {path: '/product-register', name: "ProductRegister", component: ProductRegisterForm}
     ]
 });
 
