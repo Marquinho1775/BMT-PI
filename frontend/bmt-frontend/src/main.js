@@ -9,15 +9,16 @@ import LoginForm from './components/LoginForm.vue';
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 import EmailVerification from './components/EmailVerification.vue';
-import HomePage from './components/HomePage.vue';
+import HomePageGuest from './components/HomePageGuest.vue';
 import HomePageDeveloper from './components/HomePageDeveloper.vue';
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
 import ProfilePage from './components/ProfilePage.vue';
 import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
-import CollaboratorRegisterForm from './components/CollaboratorRegisterForm.vue';
-import AcceptInvitation from './components/AcceptInvitation.vue';
+import RegisterAddressForm from './components/RegisterAddress.vue';
+import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
+
 // Import Bootstrap and BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -46,9 +47,9 @@ axios.interceptors.request.use(config => {
 const router = createRouter({
     history: createWebHistory(),
     routes: [
-        { path: '/', name: "Home", component: HomePage },
-        { path: '/client-home', name: "ClientHome", component: HomePageUserClient },
-        { path: '/entrepeneur-home', name: "entrepeneurhome", component: HomePageEntrepeneur },
+        { path: '/', name: "Home", component: HomePageGuest },
+        { path: '/clienthome', name: "ClientHome", component: HomePageUserClient },
+        { path: '/entrepeneurhome', name: "entrepeneurhome", component: HomePageEntrepeneur },
         { path: '/register', name: "Register", component: RegisterForm },
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/enterprise-register', name: "EnterpriseRegister", component: EnterpriseRegisterForm },
@@ -63,8 +64,10 @@ const router = createRouter({
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/profile', name: "Profile", component: ProfilePage },
         { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
-        { path: '/collab-register', name: "CollaboratorProfile", component: CollaboratorRegisterForm},
-        { path: '/accept-invitation', name: "AcceptInvitation", component: AcceptInvitation}
+        { path: '/register-address', name: "RegisterAddress", component: RegisterAddressForm },
+        { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard }
+
+        
     ]
 });
 

@@ -39,5 +39,26 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creando la empresa");
             }
         }
+
+
+        [HttpGet("{enterpriseId}")]
+        public ActionResult<EnterpriseModel> GetEnterpriseById(string enterpriseId)
+        {
+            try
+            {
+                var enterprise = _entrepeneurshipHandler.GetEnterpriseById(enterpriseId);
+
+                if (enterprise == null)
+                {
+                    return NotFound("Empresa no encontrada");
+                }
+
+                return Ok(enterprise);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener la empresa");
+            }
+        }
     }
 }
