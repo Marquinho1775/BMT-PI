@@ -86,7 +86,7 @@ namespace BMT_backend.Handlers
         {
             List<EnterpriseViewModel> enterprises = new List<EnterpriseViewModel>();
 
-            string query = $"select en.Name as EnterpriseName, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
+            string query = $"select en.Name as EnterpriseName , en.Id, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
                            $"from Entrepreneurs_Enterprises ee " +
                            $"join Enterprises en on ee.EnterpriseId = en.Id " +
                            $"join Users u on (select UserId from Entrepreneurs where Identification = '{entrepreneur.Identification}') = u.Id " +
@@ -98,6 +98,7 @@ namespace BMT_backend.Handlers
             {
                 enterprises.Add(new EnterpriseViewModel
                 {
+                    Id = Convert.ToString(row["Id"]),
                     EnterpriseName = Convert.ToString(row["EnterpriseName"]),
                     IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
                     Description = Convert.ToString(row["Description"]),
@@ -118,9 +119,6 @@ namespace BMT_backend.Handlers
                             $"FROM Entrepreneurs e " +
                             $"JOIN Users u ON e.UserId = u.Id " +
                             $"WHERE u.Id = '{user.Id}'";
-
-
-
             DataTable tableOfEntrepreneurBasedOnUser = CreateQueryTable(query);
 
             if (tableOfEntrepreneurBasedOnUser.Rows.Count > 0)
