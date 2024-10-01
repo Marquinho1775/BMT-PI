@@ -1,7 +1,5 @@
 <template>
 
-  <head></head>
-
   <body>
     <div class="entrepreneur-enterprises">
       <div class="content">
@@ -10,8 +8,6 @@
             <h2 class="title">Emprendimientos asociados</h2>
           </div>
         </div>
-
-        <!-- Cuadro contenedor para la tabla -->
         <div class="table-container">
           <table class="enterprise-table">
             <thead>
@@ -28,28 +24,17 @@
                 <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
                 <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
                 <td>{{ enterprise.description }}</td>
-                <td>{{ console.log(enterprise) }}</td>
               </tr>
-
-
-
-              <!-- Botón posicionado en la esquina inferior izquierda -->
-              <div class="button-container">
-                <button class="button" @click="goBack">Volver</button>
-              </div>
-
-
             </tbody>
           </table>
-
-
+          <div class="button-container">
+            <button class="button" @click="goBack">Volver</button>
+          </div>
         </div>
       </div>
     </div>
   </body>
 </template>
-
-
 
 <script>
 import axios from "axios";
@@ -58,7 +43,7 @@ import { getToken } from '@/helpers/auth';
 export default {
   data() {
     return {
-      enterprises: [], // Aquí se almacenarán las empresas obtenidas
+      enterprises: [],
       entrepreneur: {
         Id: '',
         Username: '',
@@ -66,29 +51,23 @@ export default {
       }
     };
   },
-
   mounted() {
-    // Llamar a la función cuando el componente esté montado
     this.GetEnterprisesOfEntrepreneur();
   },
-
   methods: {
     async GetEnterprisesOfEntrepreneur() {
       try {
-        const token = getToken(); 
-        const user = JSON.parse(localStorage.getItem('user')); 
+        const token = getToken();
+        const user = JSON.parse(localStorage.getItem('user'));
 
-
+        // Verificar si el usuario está presente y tiene todos los campos requeridos
         if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
           console.error('Faltan datos del usuario');
           return;
         }
-
-        // Solicitar al backend el entrepreneur basado en el usuario
         const obtainEntrepreneurResponse = await axios.post(
           'https://localhost:7189/api/Entrepreneur/ObtainEntrepreneurBasedOnUser',
           {
-            
             Id: user.id,
             Name: user.name,
             LastName: user.lastName,
@@ -99,15 +78,11 @@ export default {
           },
           {
             headers: {
-              Authorization: `Bearer ${token}` // Incluye el token si es necesario
+              Authorization: `Bearer ${token}`
             }
           }
         );
-
         const entrepreneur = obtainEntrepreneurResponse.data;
-        console.log(user.id);
-
-        
         const enterprisesResponse = await axios.post(
           'https://localhost:7189/api/Entrepreneur/my-registered-enterprises',
           entrepreneur,
@@ -117,10 +92,8 @@ export default {
             }
           }
         );
-
-        this.enterprises = enterprisesResponse.data; // Guardar la respuesta en enterprises
+        this.enterprises = enterprisesResponse.data;
         console.log(this.enterprises);
-
 
       } catch (error) {
         console.error('Error al obtener las empresas:', error);
@@ -129,16 +102,12 @@ export default {
         }
       }
     },
-
-
     formatIdentification(identification) {
-      // Función para formatear la cédula como "X-XXXX-XXXX"
       if (identification.length === 9) {
         return `${identification.slice(0, 1)}-${identification.slice(1, 5)}-${identification.slice(5)}`;
       }
       return identification;
     },
-
     goBack() {
       this.$router.push('/entrepeneurhome');
     },
@@ -183,7 +152,6 @@ h2 {
   margin-bottom: 10px;
   margin-top: 0;
 }
-
 
 .table-container {
   background-color: #A9C5FF;

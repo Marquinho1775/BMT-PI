@@ -63,7 +63,7 @@ namespace BMT_backend.Handlers
 
         public List<EntrepreneurViewModel> GetEntrepreneurs() {
             List<EntrepreneurViewModel> entrepreneurs = new List<EntrepreneurViewModel>();
-            DataTable table = CreateQueryTable("select e.Identification, u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
+            DataTable table = CreateQueryTable("select e.Id, e.Identification, u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
                         "from Entrepreneurs e " +
                         "join Users u on e.UserId = u.Id;");
             foreach (DataRow row in table.Rows)
@@ -71,6 +71,7 @@ namespace BMT_backend.Handlers
                 entrepreneurs.Add(
                     new EntrepreneurViewModel
                     {
+                        Id = Convert.ToString(row["Id"]),
                         Name = Convert.ToString(row["Name"]),
                         LastName = Convert.ToString(row["LastName"]),
                         Username = Convert.ToString(row["Username"]),

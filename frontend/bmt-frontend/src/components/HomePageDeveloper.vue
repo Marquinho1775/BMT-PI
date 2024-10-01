@@ -1,9 +1,11 @@
 <template>
+
   <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
   </head>
+
   <body>
     <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
       <div>
@@ -14,10 +16,11 @@
       <div class="d-flex justify-content-end">
       </div>
       <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header" style="background-color: #02174B;">  
-  
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Opciones</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: #BCD6F3;"></button>
+        <div class="offcanvas-header" style="background-color: #02174B;">
+
+          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Opciones</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+            style="background-color: #BCD6F3;"></button>
         </div>
         <div class="offcanvas-body" style="background-color: #BCD6F3; margin: 0px; padding: 0px">
           <ul class="navbar-nav  
@@ -41,8 +44,9 @@
         </div>
       </div>
       <div class="user-icon-container">
-        <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-          <i class="menu">Menú</i> 
+        <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+          aria-controls="offcanvasNavbar">
+          <i class="menu">Menú</i>
         </button>
       </div>
     </div>
@@ -61,7 +65,6 @@ export default {
       Bootstrap();
     },
     handleLogout() {
-      // Navigate to logout view
       console.log('Navigating to logout view');
     },
     goToEnterprises() {
@@ -79,6 +82,7 @@ export default {
 
 <style scoped>
 @import 'bootstrap/dist/css/bootstrap.min.css';
+
 .logo {
   display: none;
 }
@@ -94,9 +98,10 @@ export default {
   background-color: #BCD6F3;
   border: none;
   padding: 10px 20px;
-  cursor: pointer;  
+  cursor: pointer;
   font-weight: bold;
 }
+
 .nav-link:hover {
   transition: none;
   background-color: #9ab0c9;
@@ -106,24 +111,27 @@ export default {
   cursor: pointer;
   font-weight: bold;
 }
+
 .title {
   background-color: #D0EDA0;
   color: #02174B;
   padding: 50px;
   border-radius: 100px;
 }
+
 .nav-tabs .nav-link.active {
   background-color: #8FA3BE;
   color: #91AC65;
 }
+
 .d-flex {
   position: fixed;
   top: 0;
   right: 0;
   padding: 10px;
 }
+
 .user-icon-container {
-  padding: 15px;
   position: fixed;
   top: 0;
   left: 0;
@@ -140,16 +148,20 @@ export default {
   padding: 10px;
   cursor: pointer;
 }
+
 .btn-primary {
-  background-color: #39517B; 
+  background-color: #39517B;
 }
+
 .btn-secondary {
   background-color: #D0EDA0;
   color: #02174B;
 }
+
 .btn-primary:hover {
   background-color: #02174B;
 }
+
 .btn-secondary:hover {
   background-color: #384D13;
   color: #D0EDA0;

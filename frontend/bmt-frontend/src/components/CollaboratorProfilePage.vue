@@ -1,39 +1,33 @@
 <template>
     <div class="profile-container d-flex justify-content-center align-items-center vh-100">
         <div class="card profile-card" style="max-width: 900px; width: 100%;">
-            <!-- Header with Profile Picture and Name -->
             <div class="card-header profile-card-header d-flex align-items-center">
                 <b-avatar src="https://placekitten.com/300/300" size="7rem" class="mr-3"></b-avatar>
                 <div class="profile-name-container">
-                    <h2 class="mb-0">{{ user.name }} {{ user.lastName }}</h2>
+                    <h2 class="mb-0">{{ collaborator.name }} {{ collaborator.lastName }}</h2>
                 </div>
             </div>
 
-            <!-- Profile Information Section -->
             <div class="card-body">
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <h4>Nombre</h4>
-                        <p>{{ user.name }} {{ user.lastName }}</p>
+                        <p>{{ collaborator.name }} {{ collaborator.lastName }}</p>
                     </div>
                     <div class="col-md-6">
                         <h4>Email</h4>
-                        <p>{{ user.email }}</p>
+                        <p>{{ collaborator.email }}</p>
                     </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <h4>Username</h4>
-                        <p>{{ user.username }}</p>
+                        <p>{{ collaborator.username }}</p>
                     </div>
                     <div class="col-md-6">
-                        <h4>Contraseña</h4>
+                        <h4>Emprendimiento</h4>
                         <p>
-                            <span v-if="showPassword">{{ user.password }}</span>
-                            <span v-else>••••••••</span>
-                            <button @click="togglePasswordVisibility" class="btn btn-link p-0 ml-2">
-                                {{ showPassword ? 'Ocultar' : 'Ver' }}
-                            </button>
+                            {{ collaborator.enterpriseName }}
                         </p>
                     </div>
                     <div class="d-flex justify-content-between">
@@ -45,27 +39,39 @@
     </div>
 </template>
 
-
-
 <script>
+import axios from 'axios';
 export default {
     data() {
         return {
-            user: {
+            collaborator: {
                 name: '',
                 lastName: '',
                 username: '',
                 email: '',
                 password: ''
             },
-            showPassword: false
+            collaboratorInfo: {
+                userID: '',
+                enterpriseName: ''
+            }
         };
     },
     created() {
         if (!localStorage.getItem('token')) {
             window.location.href = "/login";
         } else {
-            this.user = JSON.parse(localStorage.getItem('user')) || this.user;
+            this.collaboratorInfo = JSON.parse(localStorage.getItem('collaboratorInfo'));
+
+            const response = axios.post('https://localhost:7189/api/User/Unity',
+                {
+                    Id: this.collaboratorInfo.userID,
+                },
+            );
+
+            if (response && response.data) {
+                this.collaborator = response.data;
+            }
         }
     },
     methods: {
@@ -76,12 +82,6 @@ export default {
             this.showPassword = !this.showPassword;
         }
     },
-
-    create() {
-        if (!localStorage.getItem('token')) {
-            window.location.href = "/login";
-        }
-    }
 };
 </script>
 

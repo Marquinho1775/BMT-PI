@@ -1,4 +1,5 @@
 <template>
+
   <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
@@ -16,13 +17,13 @@
         <div class="offcanvas-body">
           <ul class="navbar-nav justify-content-end">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Opciones de usuario</a>
+              <a class="nav-link active" aria-current="page" href="#" style="padding: 10px;">Opciones de usuario</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" @click="goToMainPage">Página principal</a>
+              <a class="nav-link" href="#" style="padding: 10px;" @click="goToMainPage">Página principal</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Cerrar sesión</a>
+              <a class="nav-link" href="#" style="padding: 10px;">Cerrar sesión</a>
             </li>
           </ul>
         </div>
@@ -48,10 +49,9 @@
           <div class="grid-item">{{ user.identification }}</div>
           <div class="grid-item">
             <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-            :data-bs-html="true"
-            :data-bs-content="user.associatedCompanies.join('<br>')">
-            <button class="btn custom-popover-btn" type="button">...</button>
-          </span>
+              :data-bs-html="true" :data-bs-content="user.associatedCompanies.join('<br>')">
+              <button class="btn custom-popover-btn" type="button">...</button>
+            </span>
           </div>
         </div>
       </div>
@@ -217,7 +217,22 @@ body {
   font-weight: bold;
 }
 
+.nav-tabs .nav-link.active {
+  background-color: #8FA3BE;
+  color: #91AC65;
+}
+
 .custom-popover-btn:hover {
   background-color: #343a4000;
+}
+
+.nav-link:hover {
+  transition: none;
+  background-color: #9ab0c9;
+  border: none;
+  margin: none;
+  padding: none;
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>

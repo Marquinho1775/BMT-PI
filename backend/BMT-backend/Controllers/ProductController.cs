@@ -91,7 +91,7 @@ namespace BMT_backend.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating the product");
             }
-            }
+        }
 
         [HttpGet]
         public List<ProductViewModel> GetProducts()

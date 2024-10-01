@@ -84,66 +84,66 @@
 </template>
   
 <script>
-  import axios from 'axios';
-  
-  export default {
-    data() {
-      return {
-        idTypeOptions: [
-          {value: 1, text: 'Persona física'},
-          {value: 2, text: 'Persona jurídica'},
-          {value: null, text: 'Seleccione una de las anteriores', disabled: true}
-        ],
-        entrepreneurData: {
-          identification: '',
-          username: '',
-        },
-        enterpriseData: {
-          identificationType: null,
-          identificationNumber: '',
-          name: '',
-          description: '',
-        }
-      };
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      idTypeOptions: [
+        { value: 1, text: 'Persona física' },
+        { value: 2, text: 'Persona jurídica' },
+        { value: null, text: 'Seleccione una de las anteriores', disabled: true }
+      ],
+      entrepreneurData: {
+        identification: '',
+        username: '',
+      },
+      enterpriseData: {
+        identificationType: null,
+        identificationNumber: '',
+        name: '',
+        description: '',
+      }
+    };
+  },
+  methods: {
+    async registerEnterprise() {
+      try {
+        const entrepreneurResponse = await axios.post('https://localhost:7189/api/Entrepreneur', {
+          id: '',
+          username: JSON.parse(localStorage.getItem('user')).username,
+          identification: this.entrepreneurData.identification.trim(),
+        });
+        const enterpriseResponse = await axios.post('https://localhost:7189/api/Enterprise', {
+          id: '',
+          identificationType: parseInt(this.enterpriseData.identificationType),
+          identificationNumber: this.enterpriseData.identificationNumber.trim(),
+          name: this.enterpriseData.name.trim(),
+          description: this.enterpriseData.description.trim(),
+        });
+        const addToEnterpriseResponse = await axios.post('https://localhost:7189/api/Entrepreneur/add-to-enterprise', {
+          entrepreneurIdentification: this.entrepreneurData.identification.trim(),
+          enterpriseIdentification: this.enterpriseData.identificationNumber.trim(),
+          isAdmin: true,
+        });
+        console.log(entrepreneurResponse, enterpriseResponse, addToEnterpriseResponse);
+        await this.$swal.fire({
+          title: 'Registro exitoso',
+          text: '¡Su empresa ha sido registrada correctamente!',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        });
+        this.$router.push('/entrepeneurhome');
+      } catch (error) {
+        this.$swal.fire({
+          title: 'Error',
+          text: 'Hubo un error al registrar su empresa. Inténtalo de nuevo.',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        console.log(error);
+      }
     },
-    methods: {
-      async registerEnterprise() {
-        try {
-          const entrepreneurResponse = await axios.post('https://localhost:7189/api/Entrepreneur', {
-            id: '',
-            username: JSON.parse(localStorage.getItem('user')).username,
-            identification: this.entrepreneurData.identification.trim(),
-          });
-          const enterpriseResponse = await axios.post('https://localhost:7189/api/Enterprise', {
-            id: '',
-            identificationType: parseInt(this.enterpriseData.identificationType),
-            identificationNumber: this.enterpriseData.identificationNumber.trim(),
-            name: this.enterpriseData.name.trim(),
-            description: this.enterpriseData.description.trim(),
-          });
-          const addToEnterpriseResponse = await axios.post('https://localhost:7189/api/Entrepreneur/add-to-enterprise', {
-            entrepreneurIdentification: this.entrepreneurData.identification.trim(),
-            enterpriseIdentification: this.enterpriseData.identificationNumber.trim(),
-            isAdmin: true,
-          });
-          console.log(entrepreneurResponse, enterpriseResponse, addToEnterpriseResponse);
-          await this.$swal.fire({
-            title: 'Registro exitoso',
-            text: '¡Su empresa ha sido registrada correctamente!',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
-          this.$router.push('/entrepeneur-home');
-        } catch (error) {
-          this.$swal.fire({
-            title: 'Error',
-            text: 'Hubo un error al registrar su empresa. Inténtalo de nuevo.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-          console.log(error);
-        }
-      }, 
 
       onReset(event) {
         event.preventDefault();
@@ -154,23 +154,11 @@
         this.enterpriseData.description = '';
       },
 
-      goBack() {
-        this.$router.push('/entrepeneur-home');
-      }
-    },
-    // For testing purposes i need to get an user from backend and store it in the local storage
-    // in the future the user in local storage will be the user that logs in. After then just delete this method
-    created() {
-      axios.get('https://localhost:7189/api/User')
-        .then((response) => {
-          console.log(response.data);
-          localStorage.setItem('user', JSON.stringify(response.data[0]));
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    goBack() {
+      this.$router.push('/entrepeneurhome');
     }
-  };
+  },
+};
 </script>
   
 <style >
@@ -211,23 +199,7 @@
     background-color: #39517B;
   }
 
-  .form-input {
-    background-color: #D0EDA0 !important;;
-  }
-
-  #select-id-type {
-    background-color: #D0EDA0;
-  }
-
-  #identification-number {
-    background-color: #D0EDA0;
-  }
-
-  #name {
-    background-color: #D0EDA0;
-  }
-
-  #description {
-    background-color: #D0EDA0;
-  }
+.form-input {
+  background-color: #D0EDA0 !important;
+}
 </style>
