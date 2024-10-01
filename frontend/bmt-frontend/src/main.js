@@ -16,6 +16,8 @@ import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
 import ProfilePage from './components/ProfilePage.vue';
 import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
+import RegisterAddressForm from './components/RegisterAddress.vue';
+import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 // Import Bootstrap and BootstrapVue
@@ -63,7 +65,10 @@ const router = createRouter({
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/profile', name: "Profile", component: ProfilePage },
         { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
-        {path: '/product-register', name: "ProductRegister", component: ProductRegisterForm}
+        { path: '/register-address', name: "RegisterAddress", component: RegisterAddressForm },
+        { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard }
+
+        
     ]
 });
 

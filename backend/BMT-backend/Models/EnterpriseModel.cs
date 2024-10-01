@@ -17,6 +17,7 @@ namespace BMT_backend.Models
 
     public class EnterpriseViewModel
     {
+        public string Id { get; set; }
         public string EnterpriseName { get; set; }
         public string IdentificationNumber { get; set; }
         public string Description { get; set; }
