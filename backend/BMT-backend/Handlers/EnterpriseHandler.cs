@@ -32,7 +32,7 @@ namespace BMT_backend.Handlers
             SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
             DataTable tableFormatQuery = new DataTable();
             _conection.Open();
-            tableAdapter.Fill( tableFormatQuery);
+            tableAdapter.Fill(tableFormatQuery);
             _conection.Close();
             return tableFormatQuery;
         }
@@ -76,7 +76,7 @@ namespace BMT_backend.Handlers
         }
 
         public List<EntrepreneurViewModel> GetEnterpriseStaff(string enterpriseId)
-        {   
+        {
             List<EntrepreneurViewModel> staff = new List<EntrepreneurViewModel>();
             var queryCommand = new SqlCommand(getEnterpriseStaffQuery, _conection);
             SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
@@ -92,7 +92,7 @@ namespace BMT_backend.Handlers
             }
 
             foreach (DataRow row in tableFormatQuery.Rows)
-            {   
+            {
                 staff.Add(
                 new EntrepreneurViewModel
                 {
@@ -137,7 +137,8 @@ namespace BMT_backend.Handlers
             return administrator;
         }
 
-        public List<DevEnterpriseModel> GetDevEnterprises() {
+        public List<DevEnterpriseModel> GetDevEnterprises()
+        {
             List<DevEnterpriseModel> devEnterprises = new List<DevEnterpriseModel>();
             string query = "SELECT e.Name, " +
                            "(SELECT COUNT(*) FROM Entrepreneurs_Enterprises ee WHERE ee.EnterpriseId = e.Id) AS EmployeeQuantity, " +
@@ -162,5 +163,38 @@ namespace BMT_backend.Handlers
             }
             return devEnterprises;
         }
+
+        public EnterpriseModel? GetEnterpriseById(string enterpriseId)
+        {
+            var query = "SELECT * FROM Enterprises WHERE Id = @enterpriseId";
+            SqlCommand queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@enterpriseId", enterpriseId);
+
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable resultTable = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(resultTable);
+            _conection.Close();
+
+            if (resultTable.Rows.Count == 0)
+            {
+                return null;
+            }
+
+            DataRow row = resultTable.Rows[0];
+            var enterprise = new EnterpriseModel
+            {
+                Id = enterpriseId,
+                IdentificationType = Convert.ToInt32(row["IdentificationType"]),
+                IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
+                Name = Convert.ToString(row["Name"]),
+                Description = Convert.ToString(row["Description"]),
+                Administrator = GetEnterpriseAdministrator(enterpriseId),
+                Staff = GetEnterpriseStaff(enterpriseId)
+            };
+
+            return enterprise;
+        }
+
     }
 }

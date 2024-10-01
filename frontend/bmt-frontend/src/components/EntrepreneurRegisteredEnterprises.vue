@@ -19,7 +19,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber">
+              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber" @click="goToEnterprise(enterprise.id)">
                 <td>{{ enterprise.enterpriseName }}</td>
                 <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
                 <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
@@ -60,6 +60,7 @@ export default {
         const token = getToken();
         const user = JSON.parse(localStorage.getItem('user'));
 
+        // Verificar si el usuario está presente y tiene todos los campos requeridos
         if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
           console.error('Faltan datos del usuario');
           return;
@@ -93,6 +94,7 @@ export default {
         );
         this.enterprises = enterprisesResponse.data;
         console.log(this.enterprises);
+
       } catch (error) {
         console.error('Error al obtener las empresas:', error);
         if (error.response) {
@@ -108,6 +110,15 @@ export default {
     },
     goBack() {
       this.$router.push('/entrepeneurhome');
+    },
+
+    goToEnterprise(enterpriseId) {
+      if (!enterpriseId) {
+          console.error('El ID de la empresa es undefined');
+          return;
+      }
+      console.log(enterpriseId); // Asegúrate de que el ID no sea undefined
+      this.$router.push(`/enterprise/${enterpriseId}`);
     }
   }
 };

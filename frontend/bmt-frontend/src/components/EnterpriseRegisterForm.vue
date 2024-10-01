@@ -3,12 +3,17 @@
     <b-form @submit.prevent="registerEnterprise" @reset="onReset">
       <div id="form" class="card custom-card my-4">
         <h3 id="title" class="text-center card-header-custom">Datos del emprendedor</h3>
-        <div class="card-body">
-          <b-form-group id="group-identification-number-e" label="Número de identificación"
+        <div class="card-body"> 
+          <b-form-group
+            id="group-identification-number-e"
+            label="Número de identificación" 
             label-for="identification-number-e">
-            <b-form-input id="identification-number-e" class="form-input" v-model="entrepreneurData.identification"
+            <b-form-input 
+              id="identification-number-e" 
+              class="form-input"
+              v-model="entrepreneurData.identification" 
               placeholder="Ingrese su número de cédula" required>
-            </b-form-input>
+            </b-form-input> 
           </b-form-group>
         </div>
       </div>
@@ -16,41 +21,68 @@
       <div id="form" class="card custom-card my-4">
         <h3 id="title" class="text-center card-header-custom">Datos de la empresa</h3>
         <div class="card-body">
-          <b-form-group id="selection-group-id-type" label="Seleccione el tipo de identificación de su negocio"
+          <b-form-group 
+            id="selection-group-id-type" 
+            label="Seleccione el tipo de identificación de su negocio"
             label-for="group-id-type">
-            <b-form-select id="select-id-type" class="form-input" v-model="enterpriseData.identificationType" required
+            <b-form-select 
+              id="select-id-type"
+              class="form-input"
+              v-model="enterpriseData.identificationType"
+              required
               :options="idTypeOptions">
             </b-form-select>
           </b-form-group>
 
-          <b-form-group id="group-identification-number-en" label="Número de identificación"
+          <b-form-group 
+            id="group-identification-number-en" 
+            label="Número de identificación" 
             label-for="identification-number-en">
-            <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber"
+            <b-form-input 
+              id="identification-number-en" 
+              class="form-input"
+              v-model="enterpriseData.identificationNumber" 
               placeholder="Ingresar número de identificación" required>
             </b-form-input>
           </b-form-group>
 
-          <b-form-group id="group-name" label="Nombre:" label-for="name">
-            <b-form-input id="name" class="form-input" v-model="enterpriseData.name"
-              placeholder="Ingresar el nombre de su emprendimiento" required>
+          <b-form-group 
+            id="group-name"
+            label="Nombre:" 
+            label-for="name">
+            <b-form-input 
+              id="name" 
+              class="form-input"
+              v-model="enterpriseData.name" 
+              placeholder="Ingresar el nombre de su emprendimiento" 
+              required>
             </b-form-input>
           </b-form-group>
-
-          <b-form-group id="group-description" label="Descripción:" label-for="description">
-            <b-form-textarea id="description" class="form-input" v-model="enterpriseData.description"
-              placeholder="Ingresar una descripción de su emprendimiento" rows="4" max-rows="6" no-resize>
+          
+          <b-form-group 
+            id="group-description" 
+            label="Descripción:" 
+            label-for="description">
+            <b-form-textarea 
+              id="description" 
+              class="form-input"
+              v-model="enterpriseData.description" 
+              placeholder="Ingresar una descripción de su emprendimiento" 
+              rows="4"
+              max-rows="6"
+              no-resize>
             </b-form-textarea>
-          </b-form-group>
+          </b-form-group>    
         </div>
       </div>
       <div class="d-flex justify-content-between">
         <b-button variant="secondary" @click="goBack">Volver</b-button>
         <b-button type="submit" class="button">Registrar</b-button>
       </div>
-    </b-form>
+      </b-form>
   </div>
 </template>
-
+  
 <script>
 import axios from 'axios';
 
@@ -113,14 +145,14 @@ export default {
       }
     },
 
-    onReset(event) {
-      event.preventDefault();
-      this.entrepreneurData.identification = '';
-      this.enterpriseData.identificationType = null;
-      this.enterpriseData.identificationNumber = '';
-      this.enterpriseData.name = '';
-      this.enterpriseData.description = '';
-    },
+      onReset(event) {
+        event.preventDefault();
+        this.entrepreneurData.identification = '';
+        this.enterpriseData.identificationType = null;
+        this.enterpriseData.identificationNumber = '';
+        this.enterpriseData.name = '';
+        this.enterpriseData.description = '';
+      },
 
     goBack() {
       this.$router.push('/entrepeneurhome');
@@ -128,44 +160,44 @@ export default {
   },
 };
 </script>
+  
+<style >
+  .enterprise-register-container {
+    background-color: #D1E4FF;
+  }
 
-<style>
-.enterprise-register-container {
-  background-color: #D1E4FF;
-}
-
-div.custom-card {
+  div.custom-card {
   max-width: 600px;
   background-color: #9FC9FC;
   border-radius: 20px;
   margin: 0px;
-}
+  }
 
-.card-header-custom {
-  background-color: #36618E;
-  color: white;
-  padding: 20px;
-  border-radius: 20px 20px 0 0;
-  width: 100%;
-  height: 100%;
-}
-
-.button {
-  background-color: #39517B;
-}
-
-.button:hover {
-  background-color: #02174B;
-}
-
-#form {
-  background-color: #9FC9FC;
-}
-
-#title {
-  color: white;
-  background-color: #39517B;
-}
+  .card-header-custom {
+    background-color: #36618E;
+    color: white;
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .button {
+    background-color: #39517B;
+  }
+  
+  .button:hover {
+    background-color: #02174B;
+  }
+  
+  #form {
+    background-color: #9FC9FC;
+  }
+  
+  #title {
+    color: white;
+    background-color: #39517B;
+  }
 
 .form-input {
   background-color: #D0EDA0 !important;

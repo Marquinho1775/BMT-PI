@@ -11,35 +11,25 @@
     </div>
     <div>
       <div class="d-flex justify-content-end">
-        <button class="btn btn-secondary" @click="handleCollaboratorRegister">Registrar Colaborador</button>
-        <button class="btn btn-secondary" @click="handleRegisterEnterprise">Registrar Emprendimiento</button>
-        <button class="btn btn-primary" @click="handleLogOut">Cerrar Sesión</button>
+        <button class="btn btn-primary" @click="handleLogin">Iniciar Sesión</button>
+        <button class="btn btn-secondary" @click="handleRegister">Registrarse</button>
       </div>
       <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
       <div class="offcanvas-header" style="background-color: #02174B;">  
   
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Mi Perfil</h5>
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: #BCD6F3;"></button>
         </div>
         <div class="offcanvas-body" style="background-color: #BCD6F3;">
           <ul class="navbar-nav  
             justify-content-end">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#" @click="handleProfileInfo">Mis Datos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" @click="handleAsociatedEnterprise">Emprendimientos asociados</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" @click="handleAsociatedProducts">Productos asociados</a>
-            </li>
           </ul>
         </div>
       </div>
   
       <div class="user-icon-container">
         <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-          <i class="fa-user"> Mi Perfil</i>
+          <i class="fa-user">Menú</i>
         </button>
       </div>
     </div>
@@ -47,47 +37,24 @@
 </template>
   
 <script>
-  import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
-  export default {
-    methods: {
-      mounted() {
-        Bootstrap();
-      },
-      logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        this.isLoggedIn = false;
-        this.$swal.fire({
-          title: 'Sesión cerrada',
-          text: 'Has cerrado sesión exitosamente.',
-          icon: 'success',
-          confirmButtonText: 'Ok'
-        });
-      },
-      handleLogout() {
-        console.log('Navigating to logout view');
-        this.logout();
-        this.$router.push('/');
-      },
-      handleAsociatedEnterprise() {
-        console.log('Navigating to Enterprise register view');
-        this.$router.push('/enterprises');
-      },
-      handleProfileInfo() {
-        console.log('Navigating to profile info view');
-        this.$router.push('/profile');
-      },
-      handleCollaboratorRegister() {
-        console.log('Navigating to collaborator register view');
-        this.$router.push('/collab-register');
-      },
-      handleAsociatedProducts() {
-        console.log('Navigating to Products register view');
-        this.$router.push('/product');
-      }
+import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+export default {
+  methods: {
+    mounted() {
+      Bootstrap();
+    },
+    handleLogin() {
+      console.log('Navigating to login view');
+      this.$router.push('/login');
+    },
+    handleRegister() {
+      console.log('Navigating to register view');
+      this.$router.push('/register');
     }
   }
+}
 </script>
+  
 <style scoped>
   @import 'bootstrap/dist/css/bootstrap.min.css';
   .logo {
@@ -149,6 +116,14 @@
     background-color: #384D13;
     color: #D0EDA0;
   }
+  .nav-tabs .nav-link {
+  transition: none;
+  background-color: #BCD6F3;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  }
   .nav-link:hover {
     transition: none;
     background-color: #9ab0c9;
@@ -159,3 +134,4 @@
     font-weight: bold;
   }
 </style>
+  
