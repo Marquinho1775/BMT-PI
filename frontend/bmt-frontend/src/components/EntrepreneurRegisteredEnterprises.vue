@@ -23,13 +23,14 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber">
+              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber" @click="goToEnterprise(enterprise.id)">
                 <td>{{ enterprise.enterpriseName }}</td>
                 <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
                 <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
                 <td>{{ enterprise.description }}</td>
-
+                <td>{{ console.log(enterprise) }}</td>
               </tr>
+
 
 
               <!-- Botón posicionado en la esquina inferior izquierda -->
@@ -74,10 +75,10 @@ export default {
   methods: {
     async GetEnterprisesOfEntrepreneur() {
       try {
-        const token = getToken(); // Obtener el token para la autenticación
-        const user = JSON.parse(localStorage.getItem('user')); // Obtener el usuario del localStorage
+        const token = getToken(); 
+        const user = JSON.parse(localStorage.getItem('user')); 
 
-        // Verificar si el usuario está presente y tiene todos los campos requeridos
+
         if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
           console.error('Faltan datos del usuario');
           return;
@@ -87,7 +88,8 @@ export default {
         const obtainEntrepreneurResponse = await axios.post(
           'https://localhost:7189/api/Entrepreneur/ObtainEntrepreneurBasedOnUser',
           {
-            Id: user.id,  // Asegúrate de que los nombres de campos coincidan con el modelo del backend
+            
+            Id: user.id,
             Name: user.name,
             LastName: user.lastName,
             Username: user.username,
@@ -103,8 +105,9 @@ export default {
         );
 
         const entrepreneur = obtainEntrepreneurResponse.data;
+        console.log(user.id);
 
-        // Ahora, solicitar las empresas asociadas a este emprendedor
+        
         const enterprisesResponse = await axios.post(
           'https://localhost:7189/api/Entrepreneur/my-registered-enterprises',
           entrepreneur,
@@ -117,6 +120,7 @@ export default {
 
         this.enterprises = enterprisesResponse.data; // Guardar la respuesta en enterprises
         console.log(this.enterprises);
+
 
       } catch (error) {
         console.error('Error al obtener las empresas:', error);
@@ -137,6 +141,15 @@ export default {
 
     goBack() {
       this.$router.push('/entrepeneurhome');
+    },
+
+    goToEnterprise(enterpriseId) {
+      if (!enterpriseId) {
+          console.error('El ID de la empresa es undefined');
+          return;
+      }
+      console.log(enterpriseId); // Asegúrate de que el ID no sea undefined
+      this.$router.push(`/enterprise/${enterpriseId}`);
     }
   }
 };
@@ -180,7 +193,6 @@ h2 {
   min-height: 60vh;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  /* Añadido para posicionar el botón de manera absoluta */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -219,11 +231,8 @@ h2 {
 
 .button-container {
   position: absolute;
-  /* Posicionamiento absoluto para moverlo dentro del contenedor relativo */
   bottom: 20px;
-  /* Espacio desde el fondo */
   left: 20px;
-  /* Espacio desde la izquierda */
 }
 
 .button {
@@ -237,6 +246,5 @@ h2 {
 
 .button:hover {
   background-color: #2d3f5a;
-  /* Color de fondo cuando se hace hover */
 }
 </style>
