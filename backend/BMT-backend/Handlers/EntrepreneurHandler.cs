@@ -54,6 +54,7 @@ namespace BMT_backend.Handlers
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@EnterpriseIdentification", request.EnterpriseIdentification);
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@IsAdmin", request.IsAdmin ? 1 : 0);
 
+
             _conection.Open();
             bool exit = addEntrepreneurToEnterpriseCommand.ExecuteNonQuery() >= 1;
             _conection.Close();
@@ -92,8 +93,10 @@ namespace BMT_backend.Handlers
                            $"join Users u on (select UserId from Entrepreneurs where Identification = '{entrepreneur.Identification}') = u.Id " +
                            $"where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = '{entrepreneur.Identification}');";
 
+            // Llamada a la función que no se puede modificar
             DataTable tableOfEnterprises = CreateQueryTable(query);
 
+            // Procesar los resultados
             foreach (DataRow row in tableOfEnterprises.Rows)
             {
                 enterprises.Add(new EnterpriseViewModel

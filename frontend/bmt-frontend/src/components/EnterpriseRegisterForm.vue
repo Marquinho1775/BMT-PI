@@ -133,7 +133,7 @@
             icon: 'success',
             confirmButtonText: 'Ok'
           });
-          this.$router.push('/entrepeneurhome');
+          this.$router.push('/entrepeneur-home');
         } catch (error) {
           this.$swal.fire({
             title: 'Error',
@@ -155,7 +155,7 @@
       },
 
       goBack() {
-        this.$router.push('/entrepeneurhome');
+        this.$router.push('/entrepeneur-home');
       }
     },
     // For testing purposes i need to get an user from backend and store it in the local storage
@@ -213,5 +213,21 @@
 
   .form-input {
     background-color: #D0EDA0 !important;;
+  }
+
+  #select-id-type {
+    background-color: #D0EDA0;
+  }
+
+  #identification-number {
+    background-color: #D0EDA0;
+  }
+
+  #name {
+    background-color: #D0EDA0;
+  }
+
+  #description {
+    background-color: #D0EDA0;
   }
 </style>

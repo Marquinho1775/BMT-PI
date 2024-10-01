@@ -3,10 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-var builder = WebApplication.CreateBuilder(new WebApplicationOptions
-{
-    WebRootPath = "wwwroot"
-});
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
@@ -57,6 +54,5 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseStaticFiles();
 
 app.Run();
