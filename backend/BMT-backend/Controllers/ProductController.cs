@@ -99,19 +99,13 @@ namespace BMT_backend.Controllers
             var products = _productHandler.GetProducts();
             return products;
         }
-        [HttpGet("dev-products")]
-        public List<DevProductModel> GetDevProducts()
+
+        [HttpGet("get-tags")]
+        public List<string> GetTags()
         {
-            try
-            {
-                return _productHandler.GetDevProducts();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error retrieving products: {ex.Message}");
-                Response.StatusCode = 500;
-                return new List<DevProductModel>();
-            }
+            var tags = _productHandler.GetTags();
+            return tags;
         }
+
     }
 }

@@ -18,6 +18,7 @@ import ProfilePage from './components/ProfilePage.vue';
 import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
 import RegisterAddressForm from './components/RegisterAddress.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
+import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 // Import Bootstrap and BootstrapVue
 import 'bootstrap/dist/css/bootstrap.css';
