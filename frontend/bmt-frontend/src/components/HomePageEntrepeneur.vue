@@ -31,7 +31,7 @@
               <a class="nav-link" href="#" @click="handleAsociatedEnterprise">Emprendimientos asociados</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Productos asociados</a>
+              <a class="nav-link" href="#"@click="handleAsociatedProducts">Productos asociados</a>
             </li>
           </ul>
         </div>
@@ -80,6 +80,10 @@
       handleCollaboratorRegister() {
         console.log('Navigating to collaborator register view');
         this.$router.push('/collab-register');
+      },
+      handleAsociatedEnterprise() {
+        console.log('Navigating to Enterprise register view');
+        //this.$router.push('/products');
       }
     }
   }
