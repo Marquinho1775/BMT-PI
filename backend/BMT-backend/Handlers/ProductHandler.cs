@@ -176,8 +176,6 @@ namespace BMT_backend.Handlers
                     new ProductViewModel
                     {
                         Name = Convert.ToString(row["Name"]),
-                        Enterprise = Convert.ToString(row["Enterprise"]),
-                        Price = Convert.ToString(row["Price"]),
                         Description = Convert.ToString(row["Description"]),
                         Weight = Convert.ToDouble(row["Weight"]),
                         Price = Convert.ToDouble(row["Price"]),

@@ -20,16 +20,40 @@ namespace BMT_backend.Handlers
 
         public SqlConnection Connection { get => _connection; set => _connection = value; }
 
-        private DataTable CreateQuerryTable(string query)
+        private DataTable CreateQuerryTable(string query, SqlParameter[] parameters = null)
         {
-            SqlCommand queryCommand = new SqlCommand(query, Connection);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
             DataTable tableFormatQuery = new DataTable();
-            Connection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            Connection.Close();
+
+            try
+            {
+                using (SqlCommand queryCommand = new SqlCommand(query, Connection))
+                {
+                    // Add parameters if any
+                    if (parameters != null)
+                    {
+                        queryCommand.Parameters.AddRange(parameters);
+                    }
+
+                    using (SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand))
+                    {
+                        Connection.Open();
+                        tableAdapter.Fill(tableFormatQuery);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception message for debugging
+                Console.WriteLine($"Error in CreateQuerryTable: {ex.Message}");
+            }
+            finally
+            {
+                Connection.Close();
+            }
+
             return tableFormatQuery;
         }
+
 
         public List<UserModel> GetUsers()
         {
@@ -49,10 +73,40 @@ namespace BMT_backend.Handlers
                     Email = Convert.ToString(column["Email"]),
                     IsVerified = Convert.ToBoolean(column["IsVerified"]),
                     Password = Convert.ToString(column["Password"])
-
                 });
             }
             return users;
+        }
+
+        public UserModel GetUserById(string userId)
+        {
+            // Prepare the SQL query and parameters
+            string query = "SELECT * FROM dbo.Users WHERE Id = @Id";
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+        new SqlParameter("@Id", userId)
+            };
+
+            // Call the method to create a query table
+            DataTable resultTable = CreateQuerryTable(query, parameters);
+
+            // Check if a user was found
+            if (resultTable.Rows.Count > 0)
+            {
+                DataRow row = resultTable.Rows[0];
+                return new UserModel
+                {
+                    Id = Convert.ToString(row["Id"]),
+                    Name = Convert.ToString(row["Name"]),
+                    LastName = Convert.ToString(row["LastName"]),
+                    Username = Convert.ToString(row["Username"]),
+                    Email = Convert.ToString(row["Email"]),
+                    IsVerified = Convert.ToBoolean(row["IsVerified"]),
+                    Password = Convert.ToString(row["Password"])
+                };
+            }
+
+            return null; // Return null if no user was found
         }
 
         public bool CreateUser(UserModel user)
@@ -86,7 +140,8 @@ namespace BMT_backend.Handlers
             Connection.Close();
         }
 
-        public List<DevUserModel> GetDevUsers() {
+        public List<DevUserModel> GetDevUsers()
+        {
             List<DevUserModel> devUsers = new List<DevUserModel>();
             string query = "SELECT u.Name, u.LastName, u.Email, e.Identification, en.Name AS Enterprise " +
                "FROM Users u " +

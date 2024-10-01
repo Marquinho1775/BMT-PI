@@ -1,58 +1,46 @@
 <template>
 
-  <body>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-      <div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
+      <h3 id="titulo" class="text-center card-header-custom">
+        Registro de usuario
+      </h3>
+      <div class="card-body">
+        <b-form @submit.prevent="registerUser" @reset="onReset">
+          <b-form-group id="input-group-name" label="Nombre:">
+            <b-form-input class="input_place" v-model="formData.Name" placeholder="Ingresar nombre"
+              required></b-form-input>
+          </b-form-group>
 
-        <h3 id="titulo" class="text-center card-header-custom">
-          Registro de usuario
-        </h3>
+          <b-form-group id="input-group-lastname" label="Apellidos:">
+            <b-form-input class="input_place" v-model="formData.LastName" placeholder="Ingresar apellidos"
+              required></b-form-input>
+          </b-form-group>
 
-        <div class="card-body">
+          <b-form-group id="input-group-username" label="Nombre de usuario:" label-for="username">
+            <b-form-input class="input_place" v-model="formData.Username" placeholder="Ingresar nombre de usuario"
+              required></b-form-input>
+          </b-form-group>
 
-          <b-form @submit.prevent="registerUser" @reset="onReset">
+          <b-form-group id="input-group-email" label="Correo electronico:" label-for="email">
+            <b-form-input class="input_place" v-model="formData.Email" type="email"
+              placeholder="Ingresar correo electronico" required></b-form-input>
+          </b-form-group>
 
-            <!-- Nombre -->
-            <b-form-group id="input-group-name" label="Nombre:">
-              <b-form-input id="name" v-model="datosFormulario.Name" placeholder="Ingresar nombre"
-                required></b-form-input>
-            </b-form-group>
+          <b-form-group id="input-group-password" label="Contraseña:" label-for="password">
+            <b-form-input class="input_place" v-model="formData.Password" type="password"
+              placeholder="Ingresar contraseña" required></b-form-input>
+          </b-form-group>
 
-            <!-- Apellidos -->
-            <b-form-group id="input-group-lastname" label="Apellidos:">
-              <b-form-input id="lastName" v-model="datosFormulario.LastName" placeholder="Ingresar apellidos"
-                required></b-form-input>
-            </b-form-group>
-
-            <!-- Nombre de usuario -->
-            <b-form-group id="input-group-username" label="Nombre de usuario:" label-for="username">
-              <b-form-input id="username" v-model="datosFormulario.Username" placeholder="Ingresar nombre de usuario"
-                required></b-form-input>
-            </b-form-group>
-
-            <!-- Correo -->
-            <b-form-group id="input-group-email" label="Correo electronico:" label-for="email">
-              <b-form-input id="email" v-model="datosFormulario.Email" type="email"
-                placeholder="Ingresar correo electronico" required></b-form-input>
-            </b-form-group>
-
-            <!-- Botones -->
-            <b-form-group id="input-group-password" label="Contraseña:" label-for="password">
-              <b-form-input id="password" v-model="datosFormulario.Password" type="password"
-                placeholder="Ingresar contraseña" required></b-form-input>
-            </b-form-group>
-
-            <!-- Botones -->
-            <div class="d-flex justify-content-between">
-              <b-button variant="secondary" @click="Volver">Volver</b-button>
-              <b-button variant="secondary">Limpiar</b-button>
-              <b-button type="submit" class="button">Registrar</b-button>
-            </div>
-          </b-form>
-        </div>
+          <div class="d-flex justify-content-between">
+            <b-button variant="secondary" @click="Volver">Volver</b-button>
+            <b-button variant="secondary">Limpiar</b-button>
+            <b-button type="submit" class="button">Registrar</b-button>
+          </div>
+        </b-form>
       </div>
     </div>
-  </body>
+  </div>
 </template>
 
 <script>
@@ -61,7 +49,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      datosFormulario: {
+      formData: {
         Id: '',
         Name: '',
         LastName: '',
@@ -75,13 +63,13 @@ export default {
   methods: {
     registerUser() {
       axios.post('https://localhost:7189/api/User', {
-        Id: this.datosFormulario.Id,
-        Name: this.datosFormulario.Name,
-        LastName: this.datosFormulario.LastName,
-        Username: this.datosFormulario.Username,
-        Email: this.datosFormulario.Email,
-        isVerified: this.datosFormulario.isVerified,
-        Password: this.datosFormulario.Password,
+        Id: this.formData.Id,
+        Name: this.formData.Name,
+        LastName: this.formData.LastName,
+        Username: this.formData.Username,
+        Email: this.formData.Email,
+        isVerified: this.formData.isVerified,
+        Password: this.formData.Password,
       })
         .then((response) => {
           this.$swal.fire({
@@ -106,12 +94,11 @@ export default {
     },
     onReset(event) {
       event.preventDefault();
-
-      this.datosFormulario.Name = '';
-      this.datosFormulario.LastName = '';
-      this.datosFormulario.Username = '';
-      this.datosFormulario.Email = '';
-      this.datosFormulario.Password = '';
+      this.formData.Name = '';
+      this.formData.LastName = '';
+      this.formData.Username = '';
+      this.formData.Email = '';
+      this.formData.Password = '';
     },
     Volver() {
       window.location.href = "/";
@@ -153,6 +140,10 @@ body {
   background-color: #02174B;
 }
 
+.input_place {
+  background-color: #D0EDA0;
+}
+
 #form {
   background-color: #9FC9FC;
 }
@@ -160,25 +151,5 @@ body {
 #titulo {
   color: white;
   background-color: #39517B;
-}
-
-#name {
-  background-color: #D0EDA0;
-}
-
-#username {
-  background-color: #D0EDA0;
-}
-
-#lastName {
-  background-color: #D0EDA0;
-}
-
-#email {
-  background-color: #D0EDA0;
-}
-
-#password {
-  background-color: #D0EDA0;
 }
 </style>

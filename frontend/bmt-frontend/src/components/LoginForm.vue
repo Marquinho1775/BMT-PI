@@ -8,23 +8,19 @@
           <div class="card-body">
             <b-form @submit.prevent="loginUser">
 
-              <!-- Correo -->
               <b-form-group id="input-group-email" label="Correo electrónico:">
                 <b-form-input id="email" v-model="loginForm.Email" type="email"
                   placeholder="Ingresar correo electrónico" required></b-form-input>
               </b-form-group>
 
-              <!-- Botones -->
               <b-form-group id="input-group-password" label="Contraseña:">
                 <b-form-input id="password" v-model="loginForm.Password" type="password"
                   placeholder="Ingresar contraseña" required></b-form-input>
               </b-form-group>
 
-              <!-- Botones -->
               <div class="d-flex justify-content-between">
                 <b-button variant="secondary" @click="Volver">Volver</b-button>
                 <b-button class="button" type="submit">Iniciar sesión</b-button>
-
               </div>
             </b-form>
           </div>

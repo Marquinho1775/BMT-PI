@@ -169,22 +169,5 @@ div.custom-card {
 
 .form-input {
   background-color: #D0EDA0 !important;
-  ;
-}
-
-#select-id-type {
-  background-color: #D0EDA0;
-}
-
-#identification-number {
-  background-color: #D0EDA0;
-}
-
-#name {
-  background-color: #D0EDA0;
-}
-
-#description {
-  background-color: #D0EDA0;
 }
 </style>

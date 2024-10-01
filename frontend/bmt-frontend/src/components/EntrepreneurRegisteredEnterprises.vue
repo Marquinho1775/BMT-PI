@@ -1,7 +1,5 @@
 <template>
 
-  <head></head>
-
   <body>
     <div class="entrepreneur-enterprises">
       <div class="content">
@@ -10,8 +8,6 @@
             <h2 class="title">Emprendimientos asociados</h2>
           </div>
         </div>
-
-        <!-- Cuadro contenedor para la tabla -->
         <div class="table-container">
           <table class="enterprise-table">
             <thead>
@@ -28,27 +24,17 @@
                 <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
                 <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
                 <td>{{ enterprise.description }}</td>
-
               </tr>
-
-
-              <!-- Botón posicionado en la esquina inferior izquierda -->
-              <div class="button-container">
-                <button class="button" @click="goBack">Volver</button>
-              </div>
-
-
             </tbody>
           </table>
-
-
+          <div class="button-container">
+            <button class="button" @click="goBack">Volver</button>
+          </div>
         </div>
       </div>
     </div>
   </body>
 </template>
-
-
 
 <script>
 import axios from "axios";
@@ -57,7 +43,7 @@ import { getToken } from '@/helpers/auth';
 export default {
   data() {
     return {
-      enterprises: [], // Aquí se almacenarán las empresas obtenidas
+      enterprises: [],
       entrepreneur: {
         Id: '',
         Username: '',
@@ -65,29 +51,23 @@ export default {
       }
     };
   },
-
   mounted() {
-    // Llamar a la función cuando el componente esté montado
     this.GetEnterprisesOfEntrepreneur();
   },
-
   methods: {
     async GetEnterprisesOfEntrepreneur() {
       try {
-        const token = getToken(); // Obtener el token para la autenticación
-        const user = JSON.parse(localStorage.getItem('user')); // Obtener el usuario del localStorage
+        const token = getToken();
+        const user = JSON.parse(localStorage.getItem('user'));
 
-        // Verificar si el usuario está presente y tiene todos los campos requeridos
         if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
           console.error('Faltan datos del usuario');
           return;
         }
-
-        // Solicitar al backend el entrepreneur basado en el usuario
         const obtainEntrepreneurResponse = await axios.post(
           'https://localhost:7189/api/Entrepreneur/ObtainEntrepreneurBasedOnUser',
           {
-            Id: user.id,  // Asegúrate de que los nombres de campos coincidan con el modelo del backend
+            Id: user.id,
             Name: user.name,
             LastName: user.lastName,
             Username: user.username,
@@ -97,14 +77,11 @@ export default {
           },
           {
             headers: {
-              Authorization: `Bearer ${token}` // Incluye el token si es necesario
+              Authorization: `Bearer ${token}`
             }
           }
         );
-
         const entrepreneur = obtainEntrepreneurResponse.data;
-
-        // Ahora, solicitar las empresas asociadas a este emprendedor
         const enterprisesResponse = await axios.post(
           'https://localhost:7189/api/Entrepreneur/my-registered-enterprises',
           entrepreneur,
@@ -114,10 +91,8 @@ export default {
             }
           }
         );
-
-        this.enterprises = enterprisesResponse.data; // Guardar la respuesta en enterprises
+        this.enterprises = enterprisesResponse.data;
         console.log(this.enterprises);
-
       } catch (error) {
         console.error('Error al obtener las empresas:', error);
         if (error.response) {
@@ -125,16 +100,12 @@ export default {
         }
       }
     },
-
-
     formatIdentification(identification) {
-      // Función para formatear la cédula como "X-XXXX-XXXX"
       if (identification.length === 9) {
         return `${identification.slice(0, 1)}-${identification.slice(1, 5)}-${identification.slice(5)}`;
       }
       return identification;
     },
-
     goBack() {
       this.$router.push('/entrepeneurhome');
     }
@@ -171,7 +142,6 @@ h2 {
   margin-top: 0;
 }
 
-
 .table-container {
   background-color: #A9C5FF;
   padding: 20px;
@@ -180,7 +150,6 @@ h2 {
   min-height: 60vh;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   position: relative;
-  /* Añadido para posicionar el botón de manera absoluta */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -219,11 +188,8 @@ h2 {
 
 .button-container {
   position: absolute;
-  /* Posicionamiento absoluto para moverlo dentro del contenedor relativo */
   bottom: 20px;
-  /* Espacio desde el fondo */
   left: 20px;
-  /* Espacio desde la izquierda */
 }
 
 .button {
@@ -237,6 +203,5 @@ h2 {
 
 .button:hover {
   background-color: #2d3f5a;
-  /* Color de fondo cuando se hace hover */
 }
 </style>

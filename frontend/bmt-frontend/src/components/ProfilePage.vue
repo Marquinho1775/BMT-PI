@@ -1,7 +1,6 @@
 <template>
   <div class="profile-container d-flex justify-content-center align-items-center vh-100">
     <div class="card profile-card" style="max-width: 900px; width: 100%;">
-      <!-- Header with Profile Picture and Name -->
       <div class="card-header profile-card-header d-flex align-items-center">
         <b-avatar src="https://placekitten.com/300/300" size="7rem" class="mr-3"></b-avatar>
         <div class="profile-name-container">
@@ -9,7 +8,6 @@
         </div>
       </div>
 
-      <!-- Profile Information Section -->
       <div class="card-body">
         <div class="row mb-3">
           <div class="col-md-6">
@@ -46,7 +44,6 @@
 </template>
 
 
-
 <script>
 export default {
   data() {
@@ -77,11 +74,6 @@ export default {
     }
   },
 
-  create() {
-    if (!localStorage.getItem('token')) {
-         window.location.href = "/login";
-    } 
- }
 };
 </script>
 
