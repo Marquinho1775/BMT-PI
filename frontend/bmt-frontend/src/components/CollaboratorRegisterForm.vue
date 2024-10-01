@@ -7,27 +7,27 @@
 					<b-form @submit.prevent="registerEnterpriseCollab" @reset="onReset">
 						<!-- Enterprise Identification number -->
 						<b-form-group 
-							id="input-group-identification-number" 
+							id="input-group-input-box" 
 							label="Número de identificación de la empresa" 
-							label-for="identification-number">
+							label-for="input-box">
 							<b-form-input 
-								id="identification-number" 
-								v-model="enterpriseData.identificationNumber" 
+								id="input-box" 
+								v-model="collaboratorData.enterpriseCollab" 
 								placeholder="Ingresar número de identificación de la empresa" required>
 							</b-form-input> 
 						</b-form-group>
-						<!-- Identification number -->
-						<b-form-group
-							id="input-group-identification-number" 
-							label="Número de identificación del colaborador" 
-							label-for="identification-number">
+						<!-- username -->
+						<b-form-group 
+							id="input-group-input-box" 
+							label="Nombre de Usuario del colaborador" 
+							label-for="input-box">
 							<b-form-input 
-								id="identification-number" 
-								v-model="enterpriseData.identificationNumber" 
-								placeholder="Ingresar número de identificación del colaborador" required>
+								id="input-box" 
+								v-model="collaboratorData.username" 
+								placeholder="Ingresar nombre de usuario del colaborador" required>
 							</b-form-input>
 						</b-form-group>
-					<!-- Submit and Reset Buttons -->
+						<!-- Submit and Reset Buttons -->
 						<div class="d-flex justify-content-between">
 							<b-button variant="secondary" @click="goBack">Volver</b-button>
 							<b-button variant="secondary" @click="onReset">Limpiar</b-button>
@@ -46,59 +46,39 @@
 	export default {
 		data() {
 			return {
-				idTypeOptions: [
-					{value: 1, text: 'Persona física'},
-					{value: 2, text: 'Persona jurídica'},
-					{value: null, text: 'Seleccione una de las anteriores', disabled: true}
-				],
-				enterpriseData: {
-					identificationType: null,
-					identificationNumber: '',
-					name: '',
-					description: '',
+				collaboratorData: {
+					username: '',
+					enterpriseCollab: '',
 				}
 			};
 		},
 		methods: {
-			registerEnterpriseCollab() {
-				console.log(this.enterpriseData.identificationType);
-				console.log(this.enterpriseData.identificationNumber);
-				console.log(this.enterpriseData.name);
-				console.log(this.enterpriseData.description);
-
-				axios.post('https://localhost:7189/api/Enterprise', {
-					id: '',
-					identificationType: parseInt(this.enterpriseData.identificationType),
-					identificationNumber: this.enterpriseData.identificationNumber,
-					name: this.enterpriseData.name
-				})
-				.then((response) => {
-					this.$swal.fire({
-						title: 'Registro exitoso',
-						text: '¡Su colaborador ha sido añadido exitosamente!',
-						icon: 'success',
-						confirmButtonText: 'Ok'
-					})
-					.then(() => {
-						console.log(response);
-						window.location.href = "/entrepeneur-home";
-					});
-				})
-				.catch((error) => {
-					this.$swal.fire({
-						title: 'Error',
-						text: 'Hubo un error al registrar al colaborador. Inténtalo de nuevo.',
-						icon: 'error',
-						confirmButtonText: 'Ok'
-					});
-					console.log(error);
-				});
-			},
+			async registerEnterpriseCollab() {
+        try {
+					const user = JSON.parse(localStorage.getItem(this.collaboratorData.username));
+					const correo = user.email;
+					axios.post('https:/localhost:7189/api/Email/sendcollabmail', correo);
+          await this.$swal.fire({
+            title: 'Registro exitoso',
+            text: '¡Su empresa ha sido registrada correctamente!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+          this.$router.push('/entrepeneur-home');
+        } catch (error) {
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al registrar a su colaborador. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+          console.log(error);
+        }
+      }, 
 			onReset(event) {
 				event.preventDefault();
-				this.enterpriseData.identificationType = null;
-				this.enterpriseData.identificationNumber = '';
-				this.enterpriseData.name = '';
+				this.collaboratorData.username = null;
+				this.collaboratorData.enterpriseCollab = '';
 			},
 			goBack() {
 				window.location.href = "/entrepeneur-home";
@@ -149,19 +129,8 @@
 		background-color: #D0EDA0;
 	}
 
-	#select-id-type {
+	#input-box {
 		background-color: #D0EDA0;
 	}
 
-	#identification-number {
-		background-color: #D0EDA0;
-	}
-
-	#name {
-		background-color: #D0EDA0;
-	}
-
-	#description {
-		background-color: #D0EDA0;
-	}
 </style>

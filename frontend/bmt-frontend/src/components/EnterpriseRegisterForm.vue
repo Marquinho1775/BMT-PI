@@ -133,7 +133,7 @@
             icon: 'success',
             confirmButtonText: 'Ok'
           });
-          this.$router.push('/entrepeneur-home');
+          this.$router.push('/entrepeneurhome');
         } catch (error) {
           this.$swal.fire({
             title: 'Error',
@@ -155,7 +155,7 @@
       },
 
       goBack() {
-        this.$router.push('/entrepeneur-home');
+        this.$router.push('/entrepeneurhome');
       }
     },
     // For testing purposes i need to get an user from backend and store it in the local storage
