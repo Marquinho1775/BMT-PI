@@ -83,7 +83,7 @@
       },
       handleAsociatedProducts() {
         console.log('Navigating to Products register view');
-        //this.$router.push('/products');
+        this.$router.push('/product');
       }
     }
   }

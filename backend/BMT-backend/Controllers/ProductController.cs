@@ -99,6 +99,13 @@ namespace BMT_backend.Controllers
             var products = _productHandler.GetProducts();
             return products;
         }
-        
+
+        [HttpGet("get-tags")]
+        public List<string> GetTags()
+        {
+            var tags = _productHandler.GetTags();
+            return tags;
+        }
+
     }
 }

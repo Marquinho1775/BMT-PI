@@ -86,7 +86,7 @@ export default {
       }
     },
     goToMainPage() {
-      this.$router.push('/developerhome');
+      this.$router.push('/developer-home');
     },
   },
   mounted() {

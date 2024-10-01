@@ -15,7 +15,7 @@
         public List<string>? Tags { get; set; } // 
         public List<string>? ImagesURLs { get; set; }
     }
-        public class NonPerishableProductModel
+    public class NonPerishableProductModel
     {
         public string ProductId { get; set; } = null!;  // first post response
         public int Stock { get; set; } // form
@@ -27,6 +27,7 @@
         public int Limit { get; set; }  // form
         public string WeekDaysAvailable { get; set; }  // form
     }
+
     public class ProductViewModel
     {
         public string Name { get; set; }
