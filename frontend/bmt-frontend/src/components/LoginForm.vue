@@ -63,14 +63,14 @@ export default {
             localStorage.setItem('user', JSON.stringify(user));
 
             this.$swal.fire({
-              title: 'Registro exitoso',
+              title: 'Inicio de sesión exitoso',
               text: '¡Haz iniciado sesión correctamente!',
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
               if (user.isVerified) {
 
-                window.location.href = "/clienthome";
+                window.location.href = "/client-home";
               } else {
                 window.location.href = "/email-verification";
               }

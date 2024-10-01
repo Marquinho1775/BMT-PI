@@ -12,15 +12,12 @@ import ProfilePage from './components/ProfilePage.vue';
 
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
-import EmailVerification from './components/EmailVerification.vue';
 import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
 
 import HomePageDeveloper from './components/HomePageDeveloper.vue';
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
-import ProfilePage from './components/ProfilePage.vue';
-import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
 import RegisterAddressForm from './components/RegisterAddress.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
@@ -52,23 +49,23 @@ const router = createRouter({
         { path: '/', name: "Home", component: HomePage },
         { path: '/client-home', name: "ClientHome", component: HomePageUserClient },
         { path: '/entrepeneur-home', name: "entrepeneurhome", component: HomePageEntrepeneur },
+
         { path: '/register', name: "Register", component: RegisterForm },
         { path: '/login', name: "Login", component: LoginForm },
         { path: '/email-verification', name: "VerifyEmail", component: EmailVerification },
-        { path: '/login', name: "Login", component: LoginForm },
-        { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper},
-        { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises},
-        { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts},
-        { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers},
-        { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
-        { path: '/email-verification', name: "VerifyEmail", component: EmailVerification },
-        { path: '/login', name: "Login", component: LoginForm },
         { path: '/profile', name: "Profile", component: ProfilePage },
-        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
         { path: '/register-address', name: "RegisterAddress", component: RegisterAddressForm },
+
+        { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
+        { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
+        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
         { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
-        { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm }
-        
+        { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
+
+        { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
+        { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper },
+        { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
+        { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
     ]
 });
 

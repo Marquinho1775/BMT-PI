@@ -76,7 +76,7 @@ export default {
     },
     methods: {
         goBack() {
-            window.history.back();
+            this.$router.push('//enterprise/:id');
         },
         togglePasswordVisibility() {
             this.showPassword = !this.showPassword;

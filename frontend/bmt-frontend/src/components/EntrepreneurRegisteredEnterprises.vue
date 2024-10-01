@@ -19,7 +19,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber" @click="goToEnterprise(enterprise.id)">
+              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber"
+                @click="goToEnterprise(enterprise.id)">
                 <td>{{ enterprise.enterpriseName }}</td>
                 <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
                 <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
@@ -109,13 +110,13 @@ export default {
       return identification;
     },
     goBack() {
-      this.$router.push('/entrepeneurhome');
+      this.$router.push('/entrepeneur-home');
     },
 
     goToEnterprise(enterpriseId) {
       if (!enterpriseId) {
-          console.error('El ID de la empresa es undefined');
-          return;
+        console.error('El ID de la empresa es undefined');
+        return;
       }
       console.log(enterpriseId); // Asegúrate de que el ID no sea undefined
       this.$router.push(`/enterprise/${enterpriseId}`);

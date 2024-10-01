@@ -48,7 +48,7 @@ namespace BMT_backend.Handlers
                 return directions;
             }
 
-            foreach(DataRow row in tableFormatQuery.Rows)
+            foreach (DataRow row in tableFormatQuery.Rows)
             {
                 directions.Add(
                     new DirectionModel
