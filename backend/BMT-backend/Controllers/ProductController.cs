@@ -8,8 +8,8 @@ namespace BMT_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
-    {
+    public class ProductController : ControllerBase { 
+    
         private readonly ProductHandler _productHandler;
 
         public ProductController()

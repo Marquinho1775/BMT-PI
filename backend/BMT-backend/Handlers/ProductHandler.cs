@@ -128,7 +128,6 @@ namespace BMT_backend.Handlers
             return true;
         }
 
-
         private static List<DateTime> GetDispatchDates(int[] dispatchDays)
         {
             List<DateTime> dispatchDates = new List<DateTime>();
@@ -161,7 +160,6 @@ namespace BMT_backend.Handlers
             _conection.Close();
             return true;
         }
-
 
         public List<ProductViewModel> GetProducts()
             {

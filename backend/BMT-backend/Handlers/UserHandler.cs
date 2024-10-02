@@ -20,7 +20,7 @@ namespace BMT_backend.Handlers
 
         public SqlConnection Connection { get => _connection; set => _connection = value; }
 
-        private DataTable CreateQuerryTable(string query, SqlParameter[] parameters = null)
+        private DataTable CreateQueryTable(string query, SqlParameter[] parameters = null)
         {
             DataTable tableFormatQuery = new DataTable();
 
@@ -28,7 +28,6 @@ namespace BMT_backend.Handlers
             {
                 using (SqlCommand queryCommand = new SqlCommand(query, Connection))
                 {
-                    // Add parameters if any
                     if (parameters != null)
                     {
                         queryCommand.Parameters.AddRange(parameters);
@@ -43,8 +42,7 @@ namespace BMT_backend.Handlers
             }
             catch (Exception ex)
             {
-                // Log the exception message for debugging
-                Console.WriteLine($"Error in CreateQuerryTable: {ex.Message}");
+                Console.WriteLine($"Error in CreateQueryTable: {ex.Message}");
             }
             finally
             {
@@ -60,7 +58,7 @@ namespace BMT_backend.Handlers
             List<UserModel> users = new List<UserModel>();
             string query = "SELECT * FROM dbo.Users ";
             DataTable resultTable =
-            CreateQuerryTable(query);
+            CreateQueryTable(query);
             foreach (DataRow column in resultTable.Rows)
             {
                 users.Add(
@@ -80,17 +78,13 @@ namespace BMT_backend.Handlers
 
         public UserModel GetUserById(string userId)
         {
-            // Prepare the SQL query and parameters
             string query = "SELECT * FROM dbo.Users WHERE Id = @Id";
-            SqlParameter[] parameters = new SqlParameter[]
-            {
-        new SqlParameter("@Id", userId)
+            SqlParameter[] parameters = new SqlParameter[] {
+                new SqlParameter("@Id", userId)
             };
 
-            // Call the method to create a query table
-            DataTable resultTable = CreateQuerryTable(query, parameters);
+            DataTable resultTable = CreateQueryTable(query, parameters);
 
-            // Check if a user was found
             if (resultTable.Rows.Count > 0)
             {
                 DataRow row = resultTable.Rows[0];
@@ -106,7 +100,7 @@ namespace BMT_backend.Handlers
                 };
             }
 
-            return null; // Return null if no user was found
+            return null; 
         }
 
         public bool CreateUser(UserModel user)
@@ -164,7 +158,6 @@ namespace BMT_backend.Handlers
 
                 if (!usersDictionary.ContainsKey(userEmail))
                 {
-                    // Crear un nuevo DevUserModel si aún no existe en el diccionario
                     usersDictionary[userEmail] = new DevUserModel
                     {
                         Name = fullName,
@@ -174,7 +167,6 @@ namespace BMT_backend.Handlers
                     };
                 }
 
-                // Añadir la empresa a la lista de empresas asociadas
                 string enterpriseName = Convert.ToString(row["Enterprise"]);
                 if (!string.IsNullOrEmpty(enterpriseName))
                 {

@@ -11,8 +11,6 @@ namespace BMT_backend.Models
         public EntrepreneurViewModel? Administrator { get; set; }
         public List<EntrepreneurViewModel>? Staff { get; set; }
 
-        // public List<ProductModel> Catalog { get; set; }
-
     }
 
     public class EnterpriseViewModel

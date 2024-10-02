@@ -52,6 +52,9 @@
           <b-form-group id="input-group-confirm-password" label="Confirmar Contraseña: *" label-for="confirm-password">
             <b-form-input class="input_place" v-model="confirmPassword" type="password"
               placeholder="Confirmar contraseña" required></b-form-input>
+            <b-form-invalid-feedback v-if="!passwordMismatch">
+              No coinciden las contraseñas.
+            </b-form-invalid-feedback>
             <p v-if="passwordMismatch" class="text-danger">No coinciden las contraseñas</p>
           </b-form-group>
 
@@ -136,7 +139,7 @@ export default {
       window.location.href = "/";
     },
     validateName() {
-      const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]{1,20}$/;
+      const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,20}$/;
       this.nameValid = regex.test(this.formData.Name);
     },
     validateLastName() {
