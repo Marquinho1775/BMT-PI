@@ -73,7 +73,7 @@ export default {
   methods: {
     async getEnterprises() {
       try {
-        const response = await axios.get('https://localhost:7189/api/Developer/getProducts/dev-products');
+        const response = await axios.get('https://localhost:7189/api/Developer/GetProducts/');
         this.products = response.data;
         this.products = response.data.sort((a, b) => a.enterprise.localeCompare(b.enterprise));
         this.$nextTick(() => {
