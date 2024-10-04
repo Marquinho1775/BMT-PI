@@ -61,7 +61,7 @@
               <template #cell(coordinates)="data">
                 {{ data.item.coordinates }}
               </template>
-            
+
             </b-table>
           </div>
         </div>
@@ -70,7 +70,7 @@
           <b-button variant="secondary" @click="goBack">Volver</b-button>
           <b-button variant="primary" @click="redirectToAddDirection">Agregar Dirección</b-button>
 
-          
+
         </div>
       </div>
     </div>
@@ -116,15 +116,15 @@ export default {
   },
   methods: {
     goBack() {
-      window.history.back();
+      this.$router.push('/entrepeneur-home');
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
 
     redirectToAddDirection() {
-    this.$router.push('/register-address');
-     },
+      this.$router.push('/register-address');
+    },
 
     async GetDirectionsOfUser() {
       const token = getToken();
@@ -143,9 +143,9 @@ export default {
             }
           }
         );
-        
+
         console.log(response.data);
-        
+
         this.directions = response.data;
       } catch (error) {
         console.error('Error al obtener las direcciones del usuario:', error);

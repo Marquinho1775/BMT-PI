@@ -8,8 +8,8 @@ namespace BMT_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase
-    {
+    public class ProductController : ControllerBase { 
+    
         private readonly ProductHandler _productHandler;
 
         public ProductController()
@@ -91,7 +91,7 @@ namespace BMT_backend.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating the product");
             }
-            }
+        }
 
         [HttpGet]
         public List<ProductViewModel> GetProducts()

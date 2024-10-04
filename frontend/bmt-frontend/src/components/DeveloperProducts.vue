@@ -1,4 +1,5 @@
 <template>
+
   <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
       integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
@@ -8,21 +9,22 @@
   <body>
     <div>
       <div class="d-flex justify-content-end"></div>
-      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel"
+        style="height: 100vh;">
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Opciones</h5>
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">
+        <div class="offcanvas-body" style="background-color: #BCD6F3; margin: 0px; padding: 0px">
           <ul class="navbar-nav justify-content-end">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Opciones de usuario</a>
+              <a class="nav-link active" aria-current="page" href="#" style="padding: 10px;">Opciones de usuario</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" @click="goToMainPage">Página principal</a>
+              <a class="nav-link" href="#" style="padding: 10px;" @click="goToMainPage">Página principal</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Cerrar sesión</a>
+              <a class="nav-link" href="#" style="padding: 10px;">Cerrar sesión</a>
             </li>
           </ul>
         </div>
@@ -47,7 +49,8 @@
           <div class="grid-item">{{ product.enterprise }}</div>
           <div class="grid-item">{{ product.price }}</div>
           <div class="grid-item">
-            <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus" :data-bs-content="product.description">
+            <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
+              :data-bs-content="product.description">
               <button class="btn custom-popover-btn" type="button">...</button>
             </span>
           </div>
@@ -70,7 +73,7 @@ export default {
   methods: {
     async getEnterprises() {
       try {
-        const response = await axios.get('https://localhost:7189/api/Developer/getProducts/dev-products');
+        const response = await axios.get('https://localhost:7189/api/Developer/GetProducts/');
         this.products = response.data;
         this.products = response.data.sort((a, b) => a.enterprise.localeCompare(b.enterprise));
         this.$nextTick(() => {
@@ -86,7 +89,7 @@ export default {
       }
     },
     goToMainPage() {
-      this.$router.push('/developerhome');
+      this.$router.push('/developer-home');
     },
   },
   mounted() {
@@ -218,5 +221,15 @@ body {
 
 .custom-popover-btn:hover {
   background-color: #343a4000;
+}
+
+.nav-link:hover {
+  transition: none;
+  background-color: #9ab0c9;
+  border: none;
+  margin: none;
+  padding: none;
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>

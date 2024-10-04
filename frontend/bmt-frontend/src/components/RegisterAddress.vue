@@ -6,27 +6,33 @@
         <div class="card-body">
 
           <b-form-group label="Nombre de la direccion" label-for="numDirection">
-            <b-form-input id="Nombre de la direccion" v-model="addressData.numDirection" placeholder="Ingrese el nombre" required></b-form-input>
+            <b-form-input id="Nombre de la direccion" v-model="addressData.numDirection" placeholder="Ingrese el nombre"
+              required></b-form-input>
           </b-form-group>
 
           <b-form-group label="Provincia" label-for="province">
-            <b-form-input id="province" v-model="addressData.province" placeholder="Ingrese la provincia" required></b-form-input>
+            <b-form-input id="province" v-model="addressData.province" placeholder="Ingrese la provincia"
+              required></b-form-input>
           </b-form-group>
 
           <b-form-group label="Cantón" label-for="canton">
-            <b-form-input id="canton" v-model="addressData.canton" placeholder="Ingrese el cantón" required></b-form-input>
+            <b-form-input id="canton" v-model="addressData.canton" placeholder="Ingrese el cantón"
+              required></b-form-input>
           </b-form-group>
-          
+
           <b-form-group label="Distrito" label-for="district">
-            <b-form-input id="district" v-model="addressData.district" placeholder="Ingrese el distrito" required></b-form-input>
+            <b-form-input id="district" v-model="addressData.district" placeholder="Ingrese el distrito"
+              required></b-form-input>
           </b-form-group>
 
           <b-form-group label="Otras señales" label-for="otherSigns">
-            <b-form-textarea id="otherSigns" v-model="addressData.otherSigns" placeholder="Ingrese otras señales" rows="3"></b-form-textarea>
+            <b-form-textarea id="otherSigns" v-model="addressData.otherSigns" placeholder="Ingrese otras señales"
+              rows="3"></b-form-textarea>
           </b-form-group>
 
           <b-form-group label="Coordenadas" label-for="coordinates">
-            <b-form-input id="coordinates" v-model="addressData.coordinates" placeholder="Ingrese las coordenadas" required></b-form-input>
+            <b-form-input id="coordinates" v-model="addressData.coordinates" placeholder="Ingrese las coordenadas"
+              required></b-form-input>
           </b-form-group>
         </div>
       </div>

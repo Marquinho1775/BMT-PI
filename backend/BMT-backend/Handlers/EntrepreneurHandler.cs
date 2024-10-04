@@ -54,6 +54,7 @@ namespace BMT_backend.Handlers
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@EnterpriseIdentification", request.EnterpriseIdentification);
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@IsAdmin", request.IsAdmin ? 1 : 0);
 
+
             _conection.Open();
             bool exit = addEntrepreneurToEnterpriseCommand.ExecuteNonQuery() >= 1;
             _conection.Close();
@@ -62,7 +63,7 @@ namespace BMT_backend.Handlers
 
         public List<EntrepreneurViewModel> GetEntrepreneurs() {
             List<EntrepreneurViewModel> entrepreneurs = new List<EntrepreneurViewModel>();
-            DataTable table = CreateQueryTable("select e.Identification, u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
+            DataTable table = CreateQueryTable("select e.Id, e.Identification, u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
                         "from Entrepreneurs e " +
                         "join Users u on e.UserId = u.Id;");
             foreach (DataRow row in table.Rows)
@@ -70,6 +71,7 @@ namespace BMT_backend.Handlers
                 entrepreneurs.Add(
                     new EntrepreneurViewModel
                     {
+                        Id = Convert.ToString(row["Id"]),
                         Name = Convert.ToString(row["Name"]),
                         LastName = Convert.ToString(row["LastName"]),
                         Username = Convert.ToString(row["Username"]),
@@ -92,8 +94,10 @@ namespace BMT_backend.Handlers
                            $"join Users u on (select UserId from Entrepreneurs where Identification = '{entrepreneur.Identification}') = u.Id " +
                            $"where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = '{entrepreneur.Identification}');";
 
+            // Llamada a la función que no se puede modificar
             DataTable tableOfEnterprises = CreateQueryTable(query);
 
+            // Procesar los resultados
             foreach (DataRow row in tableOfEnterprises.Rows)
             {
                 enterprises.Add(new EnterpriseViewModel

@@ -16,35 +16,31 @@
     </div>
     <div>
       <div class="d-flex justify-content-end">
-        <button class="btn btn-secondary" @click="handleRegisterAsEntrpeneur">Registrar Colaborador</button>
-        <button class="btn btn-primary" @click="handleLogOut">Cerrar Sesión</button>
+        <button class="btn btn-secondary" @click="handleCollaboratorRegister">Registrar Colaborador</button>
+        <button class="btn btn-secondary" @click="handleRegisterEnterprise">Registrar Emprendimiento</button>
+        <button class="btn btn-primary" @click="handleLogout">Cerrar Sesión</button>
       </div>
       <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
         <div class="offcanvas-header" style="background-color: #02174B;">
 
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Mi Perfil</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+            style="background-color: #BCD6F3;"></button>
         </div>
         <div class="offcanvas-body" style="background-color: #BCD6F3;">
           <ul class="navbar-nav  
-              justify-content-end">
+            justify-content-end">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Mis Datos</a>
+              <a class="nav-link active" aria-current="page" href="#" @click="handleProfileInfo">Mis Datos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Página Principal</a>
+              <a class="nav-link" href="#" @click="handleAsociatedEnterprise">Emprendimientos asociados</a>
             </li>
+            <!-- <li class="nav-item">
+              <a class="nav-link" href="#" @click="handleAsociatedProducts">Productos asociados</a>
+            </li> -->
             <li class="nav-item">
-              <a class="nav-link" href="#">Pedidos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Información relevante</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" @click="handleEnterprises">Emprendimientos asociados</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Productos asociados</a>
+              <a class="nav-link" href="#" @click="handleProductRegister">Registrar producto</a>
             </li>
           </ul>
         </div>
@@ -68,20 +64,37 @@ export default {
       Bootstrap();
     },
     handleLogout() {
-      // Navigate to logout view
-      console.log('Navigating to logout view');
-      //this.$router.push('/Home');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      this.$swal.fire({
+        title: 'Sesión cerrada',
+        text: 'Has cerrado sesión exitosamente.',
+        icon: 'success',
+        confirmButtonText: 'Ok'
+      }).then(() => {
+        this.$router.push('/');
+      });
     },
-    handleRegisterAsEntrpeneur() {
-      // Navigate to  Entrepeneur register view
-      console.log('Navigating to Entrepenuer register view');
-      //this.$router.push('/Entregister');
-    },
-    handleEnterprises() {
-      // Navigate to  Enterprise view
-      console.log('Navigating to Enterprise view');
+    handleAsociatedEnterprise() {
+      console.log('Navigating to Enterprise register view');
       this.$router.push('/enterprises');
     },
+    handleProfileInfo() {
+      console.log('Navigating to profile info view');
+      this.$router.push('/profile');
+    },
+    handleCollaboratorRegister() {
+      console.log('Navigating to collaborator register view');
+      this.$router.push('/collab-register');
+    },
+    // handleAsociatedProducts() {
+    //   console.log('Navigating to Products register view');
+    //   this.$router.push('/product');
+    // },
+    handleProductRegister() {
+      console.log('Navigating to Products register view');
+      this.$router.push('/product');
+    }
   }
 }
 </script>
@@ -102,7 +115,6 @@ export default {
 
 .title {
   background-color: #D0EDA0;
-  /* Color de fondo del título */
   color: #02174B;
   padding: 50px;
   border-radius: 100px;
@@ -159,5 +171,15 @@ export default {
 .btn-secondary:hover {
   background-color: #384D13;
   color: #D0EDA0;
+}
+
+.nav-link:hover {
+  transition: none;
+  background-color: #9ab0c9;
+  border: none;
+  margin: none;
+  padding: none;
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>

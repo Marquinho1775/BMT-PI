@@ -3,10 +3,12 @@
     <div class="card custom-card">
       <h3 class="text-center card-header-custom">Verifica tu correo</h3>
       <div class="card-body">
-        <p class="text-center text-custom">Por favor introduce el código de verificación que se envió al correo electrónico que proporcionaste</p>
+        <p class="text-center text-custom">Por favor introduce el código de verificación que se envió al correo
+          electrónico que proporcionaste</p>
         <div class="form-group">
           <label for="verificationCode" class="label-custom">Código de verificación</label>
-          <input type="text" class="form-control custom-placeholder" id="verificationCode" v-model="verificationCode" placeholder="Inserte el código">
+          <input type="text" class="form-control custom-placeholder" id="verificationCode" v-model="verificationCode"
+            placeholder="Inserte el código">
         </div>
         <div class="d-grid gap-2">
           <button class="btn btn-custom btn-block mt-3" :disabled="isLoading" @click="verifyCode">
@@ -15,7 +17,7 @@
         </div>
         <p class="text-center mt-3">
           <a href="#" @click="resendCode" class="resend-link">¿No recibiste el código? Click para reenviar</a>
-        </p>  
+        </p>
         <div v-if="message" class="alert alert-danger mt-3" role="alert">
           {{ message }}
         </div>
@@ -55,20 +57,21 @@ export default {
               text: '¡La cuenta ha sido verificada correctamente!',
               icon: 'success',
               confirmButtonText: 'Ok'
-            })
-          }).then(response => {
-            console.log('Verificación exitosa:', response);
-            axios.post('https://localhost:7189/api/Email/verifyaccount', codeTaken)
-            .then(() => {
-              console.log('Cuenta verificada:', response);
-              window.location.href = "/";
-            })
-          }).catch(error => {
+            }).then(() => {
+              console.log('Verificación exitosa');
+              return axios.post('https://localhost:7189/api/Email/verifyaccount', codeTaken);
+            }).then(() => {
+              console.log('Cuenta verificada');
+              this.$router.push('/client-home'); // Use this for navigation
+            });
+          })
+          .catch(error => {
             console.error('Error en la verificación:', error);
+            this.message = 'Error en la verificación. Inténtalo de nuevo más tarde.';
           });
       } catch (error) {
         this.message = 'Error en la verificación. Inténtalo de nuevo más tarde.';
-      } finally {         
+      } finally {
         this.isLoading = false;
       }
     },
@@ -79,13 +82,13 @@ export default {
           Id: getUser().id
         };
         axios.post('https:/localhost:7189/api/Email/sendemail', correo)
-        .then(response => {
+          .then(response => {
             console.log('Reenvío con exito:', response);
             alert('Se ha enviado un correo con el código de verificación.');
-        })
-        .catch(error => {
+          })
+          .catch(error => {
             console.error('Error en la verificación:', error);
-        });
+          });
       } catch (error) {
         this.message = 'Error en el envío del código.';
       } finally {
@@ -152,7 +155,7 @@ export default {
 .resend-link {
   color: #36618E;
   text-decoration: none;
-  font-weight: 550; 
+  font-weight: 550;
 }
 
 .resend-link:hover {

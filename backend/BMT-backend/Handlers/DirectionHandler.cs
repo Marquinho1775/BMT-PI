@@ -19,7 +19,7 @@ namespace BMT_backend.Handlers
 
         public SqlConnection Connection { get => _conection; set => _conection = value; }
 
-        private DataTable CreateQuerryTable(string query)
+        private DataTable CreateQueryTable(string query)
         {
             SqlCommand queryCommand = new SqlCommand(query, Connection);
             SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
@@ -48,7 +48,7 @@ namespace BMT_backend.Handlers
                 return directions;
             }
 
-            foreach(DataRow row in tableFormatQuery.Rows)
+            foreach (DataRow row in tableFormatQuery.Rows)
             {
                 directions.Add(
                     new DirectionModel

@@ -1,58 +1,72 @@
 <template>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
+      <h3 id="titulo" class="text-center card-header-custom">
+        Registro de usuario
+      </h3>
+      <div class="card-body">
+        <b-form @submit.prevent="registerUser" @reset="onReset">
+          <b-form-group id="input-group-name" label="Nombre: *">
+            <b-form-input class="input_place" v-model="formData.Name" placeholder="Ingresar nombre" required
+              maxlength="20" :state="nameValid" @input="validateName"></b-form-input>
+            <b-form-invalid-feedback v-if="!nameValid">
+              El nombre solo puede contener letras y tener máximo 20 caracteres.
+            </b-form-invalid-feedback>
+          </b-form-group>
 
-  <body>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-      <div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
+          <b-form-group id="input-group-lastname" label="Apellidos: *">
+            <b-form-input class="input_place" v-model="formData.LastName" placeholder="Ingresar apellidos" required
+              maxlength="50" :state="lastnameValid" @input="validateLastName"></b-form-input>
+            <b-form-invalid-feedback v-if="!lastnameValid">
+              Los apellidos solo pueden contener letras y tener máximo 50 caracteres.
+            </b-form-invalid-feedback>
+          </b-form-group>
 
-        <h3 id="titulo" class="text-center card-header-custom">
-          Registro de usuario
-        </h3>
+          <b-form-group id="input-group-username" label="Nombre de usuario: *" label-for="username">
+            <b-form-input class="input_place" v-model="formData.Username" placeholder="Ingresar nombre de usuario"
+              required maxlength="20" :state="usernameValid" @input="validateUsername"></b-form-input>
+            <b-form-invalid-feedback v-if="!usernameValid">
+              El nombre de usuario solo puede contener letras, números, y los caracteres especiales -_´.
+            </b-form-invalid-feedback>
+          </b-form-group>
 
-        <div class="card-body">
+          <b-form-group id="input-group-email" label="Correo electronico: *" label-for="email">
+            <b-form-input class="input_place" v-model="formData.Email" type="email"
+              placeholder="Ingresar correo electronico" required :state="emailValid"
+              @input="validateEmail"></b-form-input>
+            <b-form-invalid-feedback v-if="!emailValid">
+              El correo debe tener el formato xxxx@xxx.xxx
+            </b-form-invalid-feedback>
+          </b-form-group>
 
-          <b-form @submit.prevent="registerUser" @reset="onReset">
+          <b-form-group id="input-group-password" label="Contraseña: *" label-for="password">
+            <b-form-input class="input_place" v-model="formData.Password" type="password"
+              placeholder="Ingresar contraseña" required maxlength="16" :state="passwordValid"
+              @input="validatePassword"></b-form-input>
+            <b-form-invalid-feedback v-if="!passwordValid">
+              La contraseña debe tener máximo 16 caracteres, incluir una mayúscula, una minúscula, un número y un
+              carácter especial.
+            </b-form-invalid-feedback>
+          </b-form-group>
 
-            <!-- Nombre -->
-            <b-form-group id="input-group-name" label="Nombre:">
-              <b-form-input id="name" v-model="datosFormulario.Name" placeholder="Ingresar nombre"
-                required></b-form-input>
-            </b-form-group>
+          <b-form-group id="input-group-confirm-password" label="Confirmar Contraseña: *" label-for="confirm-password">
+            <b-form-input class="input_place" v-model="confirmPassword" type="password"
+              placeholder="Confirmar contraseña" required></b-form-input>
+            <b-form-invalid-feedback v-if="!passwordMismatch">
+              No coinciden las contraseñas.
+            </b-form-invalid-feedback>
+            <p v-if="passwordMismatch" class="text-danger">No coinciden las contraseñas</p>
+          </b-form-group>
 
-            <!-- Apellidos -->
-            <b-form-group id="input-group-lastname" label="Apellidos:">
-              <b-form-input id="lastName" v-model="datosFormulario.LastName" placeholder="Ingresar apellidos"
-                required></b-form-input>
-            </b-form-group>
-
-            <!-- Nombre de usuario -->
-            <b-form-group id="input-group-username" label="Nombre de usuario:" label-for="username">
-              <b-form-input id="username" v-model="datosFormulario.Username" placeholder="Ingresar nombre de usuario"
-                required></b-form-input>
-            </b-form-group>
-
-            <!-- Correo -->
-            <b-form-group id="input-group-email" label="Correo electronico:" label-for="email">
-              <b-form-input id="email" v-model="datosFormulario.Email" type="email"
-                placeholder="Ingresar correo electronico" required></b-form-input>
-            </b-form-group>
-
-            <!-- Botones -->
-            <b-form-group id="input-group-password" label="Contraseña:" label-for="password">
-              <b-form-input id="password" v-model="datosFormulario.Password" type="password"
-                placeholder="Ingresar contraseña" required></b-form-input>
-            </b-form-group>
-
-            <!-- Botones -->
-            <div class="d-flex justify-content-between">
-              <b-button variant="secondary" @click="Volver">Volver</b-button>
-              <b-button variant="secondary">Limpiar</b-button>
-              <b-button type="submit" class="button">Registrar</b-button>
-            </div>
-          </b-form>
-        </div>
+          <div class="d-flex justify-content-between">
+            <b-button variant="secondary" @click="Volver">Volver</b-button>
+            <b-button variant="secondary">Limpiar</b-button>
+            <b-button type="submit" class="button" :disabled="passwordMismatch">Registrar</b-button>
+          </div>
+        </b-form>
       </div>
     </div>
-  </body>
+  </div>
 </template>
 
 <script>
@@ -61,7 +75,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      datosFormulario: {
+      formData: {
         Id: '',
         Name: '',
         LastName: '',
@@ -70,56 +84,81 @@ export default {
         isVerified: false,
         Password: '',
       },
+      confirmPassword: '',
     };
+  },
+  computed: {
+    passwordMismatch() {
+      return this.formData.Password !== this.confirmPassword;
+    },
   },
   methods: {
     registerUser() {
-      axios.post('https://localhost:7189/api/User', {
-        Id: this.datosFormulario.Id,
-        Name: this.datosFormulario.Name,
-        LastName: this.datosFormulario.LastName,
-        Username: this.datosFormulario.Username,
-        Email: this.datosFormulario.Email,
-        isVerified: this.datosFormulario.isVerified,
-        Password: this.datosFormulario.Password,
-      })
-        .then((response) => {
-          this.$swal.fire({
-            title: 'Registro exitoso',
-            text: '¡El usuario ha sido registrado correctamente!',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
-            console.log(response);
-            window.history.back();
-          });
+      if (!this.passwordMismatch) {
+        axios.post('https://localhost:7189/api/User', {
+          Id: this.formData.Id,
+          Name: this.formData.Name,
+          LastName: this.formData.LastName,
+          Username: this.formData.Username,
+          Email: this.formData.Email,
+          isVerified: this.formData.isVerified,
+          Password: this.formData.Password,
         })
-        .catch((error) => {
-          this.$swal.fire({
-            title: 'Error',
-            text: 'Hubo un error al registrar el usuario. Inténtalo de nuevo.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
+          .then((response) => {
+            this.$swal.fire({
+              title: 'Registro exitoso',
+              text: '¡El usuario ha sido registrado correctamente!',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              console.log(response);
+              window.history.back();
+            });
+          })
+          .catch((error) => {
+            this.$swal.fire({
+              title: 'Error',
+              text: 'Hubo un error al registrar el usuario. Inténtalo de nuevo.',
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            });
+            console.log(error);
           });
-          console.log(error);
-        });
+      }
     },
     onReset(event) {
       event.preventDefault();
-
-      this.datosFormulario.Name = '';
-      this.datosFormulario.LastName = '';
-      this.datosFormulario.Username = '';
-      this.datosFormulario.Email = '';
-      this.datosFormulario.Password = '';
+      this.formData.Name = '';
+      this.formData.LastName = '';
+      this.formData.Username = '';
+      this.formData.Email = '';
+      this.formData.Password = '';
+      this.confirmPassword = '';
     },
     Volver() {
       window.location.href = "/";
     },
+    validateName() {
+      const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,20}$/;
+      this.nameValid = regex.test(this.formData.Name);
+    },
+    validateLastName() {
+      const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{1,50}$/;
+      this.lastnameValid = regex.test(this.formData.LastName);
+    },
+    validateUsername() {
+      const regex = /^[a-zA-Z0-9-_´.]{1,20}$/;
+      this.usernameValid = regex.test(this.formData.Username);
+    },
+    validateEmail() {
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      this.emailValid = regex.test(this.formData.Email);
+    },
+    validatePassword() {
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{1,16}$/;
+      this.passwordValid = regex.test(this.formData.Password);
+    },
   },
-  created() {
-
-  }
 };
 </script>
 
@@ -153,6 +192,10 @@ body {
   background-color: #02174B;
 }
 
+.input_place {
+  background-color: #D0EDA0;
+}
+
 #form {
   background-color: #9FC9FC;
 }
@@ -160,25 +203,5 @@ body {
 #titulo {
   color: white;
   background-color: #39517B;
-}
-
-#name {
-  background-color: #D0EDA0;
-}
-
-#username {
-  background-color: #D0EDA0;
-}
-
-#lastName {
-  background-color: #D0EDA0;
-}
-
-#email {
-  background-color: #D0EDA0;
-}
-
-#password {
-  background-color: #D0EDA0;
 }
 </style>

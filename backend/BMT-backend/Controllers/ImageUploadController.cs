@@ -11,6 +11,7 @@ namespace BMT_backend.Controllers
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ImageUploadHandler _imgageUploadHandler;
+        
         public ImageUploadController(IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
