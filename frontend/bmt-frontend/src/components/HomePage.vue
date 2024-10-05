@@ -1,10 +1,18 @@
 <template>
   <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-ChzD5N+nKyoRSdeUVM4u/wJ6p9DZASogZ30E+5VqC/94wcjx3v+iIv2QO+j25a9E+9Hj+MEgQ8NNQWidgetr4t+iIv2QO+j25a9E+9Hj+MEgQ8NNQWidgetr4t+" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Links para Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+       rel="stylesheet"
+       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+       crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+       rel="stylesheet" 
+       integrity="sha512-ChzD5N+nKyoRSdeUVM4u/wJ6p9DZASogZ30E+5VqC/94wcjx3v+iIv2QO+j25a9E+9Hj+MEgQ8NNQWidgetr4t+iIv2QO+j25a9E+9Hj+MEgQ8NNQWidgetr4t+"
+       crossorigin="anonymous" referrerpolicy="no-referrer" />
   </head>
   <body>
-    <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
+    <div class="container-fluid d-flex flex-column align-items-center justify-content-center"
+         style="height: 100vh;">
       <div>
         <h2 class="title">Bienvenido a Business Tracker</h2>
       </div>
@@ -14,11 +22,13 @@
         <button class="btn btn-primary" @click="handleLogin">Iniciar Sesión</button>
         <button class="btn btn-secondary" @click="handleRegister">Registrarse</button>
       </div>
+      <!-- Menu Lateral -->
       <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
       <div class="offcanvas-header" style="background-color: #02174B;">  
   
         <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: #BCD6F3;"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                aria-label="Close" style="background-color: #BCD6F3;"></button>
         </div>
         <div class="offcanvas-body" style="background-color: #BCD6F3;">
           <ul class="navbar-nav  
@@ -26,9 +36,10 @@
           </ul>
         </div>
       </div>
-  
+      <!-- Botón de Acceso -->
       <div class="user-icon-container">
-        <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+        <button class="user-icon-button" data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
           <i class="fa-user">Menú</i>
         </button>
       </div>
@@ -37,22 +48,22 @@
 </template>
   
 <script>
-import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
-export default {
-  methods: {
-    mounted() {
-      Bootstrap();
-    },
-    handleLogin() {
-      console.log('Navigating to login view');
-      this.$router.push('/login');
-    },
-    handleRegister() {
-      console.log('Navigating to register view');
-      this.$router.push('/register');
+  import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+  export default {
+    methods: {
+      mounted() {
+        Bootstrap();
+      },
+      handleLogin() {
+        console.log('Navigating to login view');
+        this.$router.push('/login');
+      },
+      handleRegister() {
+        console.log('Navigating to register view');
+        this.$router.push('/register');
+      }
     }
   }
-}
 </script>
   
 <style scoped>
@@ -117,12 +128,12 @@ export default {
     color: #D0EDA0;
   }
   .nav-tabs .nav-link {
-  transition: none;
-  background-color: #BCD6F3;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-weight: bold;
+    transition: none;
+    background-color: #BCD6F3;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
   }
   .nav-link:hover {
     transition: none;
