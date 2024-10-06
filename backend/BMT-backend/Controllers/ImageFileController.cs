@@ -19,33 +19,32 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<ActionResult<bool>> UploadImage(ImageFileModel imageFile)
+        public async Task<IActionResult> UploadImages([FromForm] string ownerId, [FromForm] string ownerType, [FromForm] List<IFormFile> images)
         {
-            if (imageFile.Image == null || imageFile.Image.Length == 0)
+            if (images == null || images.Count == 0)
             {
-                return BadRequest("Debe proporcionar una imagen válida.");
+                return BadRequest("No images were provided.");
             }
-            try
+            var uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+            if (!Directory.Exists(uploadPath))
             {
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadPath);
+            }
+            foreach (var image in images)
+            {
+                if (image.Length > 0)
                 {
-                    Directory.CreateDirectory(uploadsFolder);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                    var filePath = Path.Combine(uploadPath, fileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await image.CopyToAsync(stream);
+                    }
+                    var relativePath = Path.Combine("uploads", fileName);
+                    _imageUploadHandler.SaveImage(ownerId, ownerType, relativePath);
                 }
-                var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.Image.FileName)}";
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.Image.CopyToAsync(fileStream);
-                }
-                var relativePath = Path.Combine("uploads", uniqueFileName);
-                _imageUploadHandler.SaveImage(imageFile.OwnerId, imageFile.OwnerType, relativePath);
-                return Ok(true);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error guardando la imagen: {ex.Message}");
-            }
+            return Ok("Images uploaded successfully.");
         }
 
         [HttpGet("get")]

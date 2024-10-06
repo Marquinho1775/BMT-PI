@@ -46,15 +46,13 @@ namespace BMT_backend.Handlers
                 parameterName = "@OwnerId";
             }
 
-            using (var connection = new SqlConnection(_conectionPath))
-            using (var createImageCommand = new SqlCommand(createImageQuery, connection))
-            {
-                createImageCommand.Parameters.Add(parameterName, SqlDbType.UniqueIdentifier).Value = Guid.Parse(ownerId);
-                createImageCommand.Parameters.Add("@URL", SqlDbType.VarChar, 255).Value = relativePath;
+            var createImageCommand = new SqlCommand(createImageQuery, _conection);
+            createImageCommand.Parameters.Add(parameterName, SqlDbType.UniqueIdentifier).Value = Guid.Parse(ownerId);
+            createImageCommand.Parameters.Add("@URL", SqlDbType.VarChar, 255).Value = relativePath;
 
-                connection.Open();
-                createImageCommand.ExecuteNonQuery();
-            }
+            _conection.Open();
+            createImageCommand.ExecuteNonQuery();
+            _conection.Close();
         }
 
         public List<string> GetImage(string ownerId)

@@ -20,20 +20,22 @@
           </b-form-group>
 
           <!-- Tags -->
-          <b-form-group id="group-tags" label="Tags:" label-for="tags">
-            <b-form-tags
-              v-model="productData.tags"
-              :input-id="'tags'"
-              :options="tags"
-              placeholder="Seleccione o agregue tags"
-              add-button-text="Añadir"
-              tag-variant="primary"
-              tag-remove-label="Eliminar este tag"
-            >
+          <b-form-group label="Etiquetas de producto:" label-for="tags-component-select">
+            <b-form-tags id="tags-component-select" v-model="value" size="lg"  class="mb-2" add-on-change no-outer-focus>
+              <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
+                <b-form-select class = "select-component" v-bind="inputAttrs" v-on="inputHandlers" :disabled="disabled || availableOptions.length === 0" :options="availableOptions">
+                  <template #first>
+                    <option disabled value="" class="'select-component'">Escoge una o varias etiquetas...</option>
+                  </template>
+                </b-form-select>
+                <ul v-if="tags.length > 0" class="list-inline d-inline-block mt-2">
+                  <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                    <b-form-tag id="tag-component" class="custom-tag" @remove="removeTag(tag)" :title="tag" :disabled="disabled">{{ tag }}</b-form-tag>
+                  </li>
+                </ul>
+              </template>
             </b-form-tags>
           </b-form-group>
-
-
 
           <!-- Peso -->
           <b-form-group id="group-weight" label="Peso (kg):" label-for="weight">
@@ -81,17 +83,19 @@
             </b-form-group>
           </div>
 
-          <!-- Subir Imágenes -->
-          <!-- <b-form-group id="group-images" label="Subir imágenes:" label-for="formFileMultiple">
-            <label for="formFileMultiple" class="form-label">Seleccionar múltiples archivos</label>
-            <input class="form-control" type="file" id="formFileMultiple" multiple @change="handleFileChange" />
-          </b-form-group> -->
+          <!-- Imagenes -->
+          <b-form-group label="Añada imagenes:" label-for="input-images">
+            <input
+              id="input-images"
+              type="file"
+              multiple
+              @change="handleFileChange"/>
+          </b-form-group>
 
           <div class="d-flex justify-content-between mt-4">
-            <b-button variant="secondary" @click="goBack">Volver</b-button>
-            <b-button type="submit" variant="primary">Registrar</b-button>
+            <b-button variant="secondary" class="custom-button" @click="goBack">Volver</b-button>
+            <b-button type="submit" class="custom-button" variant="primary">Registrar</b-button>
           </div>
-
         </b-form>
       </div>
     </div>
@@ -114,8 +118,8 @@ export default {
         stock: null,
         limit: null,
         weekDaysAvailable: [],
+        images: [],
       },
-      tags: [],
       weekdays: [
         { text: 'Lunes', value: '1' },
         { text: 'Martes', value: '2' },
@@ -125,7 +129,8 @@ export default {
         { text: 'Sábado', value: '6' },
         { text: 'Domingo', value: '0' },
       ],
-      productImages: [],
+      options: [],
+      value: []
     }
   },
   methods: {
@@ -139,27 +144,26 @@ export default {
           weight: this.productData.weight,
           price: this.productData.price,
           type: this.productData.type == "Perecedero" ? "Perishable" : "NonPerishable",
-          tags: this.productData.tags,
+          tags: this.value,
           stock: this.productData.stock != null ? this.productData.stock : 0,
           limit: this.productData.limit != null ? this.productData.limit : 0,
           weekDaysAvailable: this.productData.weekDaysAvailable.sort().join(''),
         });
-      
         const productId = response.data;
-        console.log(productId);
-
-        // for (let image of this.productImages) {
-        //   const formData = new FormData();
-        //   formData.append('image', image);  // Archivo de imagen
-        //   formData.append('ownerId', productId);  // ID del propietario
-
-        //   await axios.post('https://localhost:7189/api/ImageUpload/upload', formData, {
-        //     headers: {
-        //       'Content-Type': 'multipart/form-data',
-        //     },
-        //   });
-        // }
-
+        const formData = new FormData();
+        formData.append("ownerId", productId);
+        formData.append("ownerType", "Product");
+        for (const file of this.productData.images) {
+          formData.append("images", file);
+        }
+        await axios.post("https://localhost:7189/api/ImageFile/upload",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         this.$swal.fire({
           title: 'Éxito',
           text: 'Producto agregado exitosamente.',
@@ -168,7 +172,6 @@ export default {
         }).then(() => {
           this.$router.push('/entrepeneur-home');
         });
-
       } catch (error) {
         this.$swal.fire({
           title: 'Error',
@@ -179,26 +182,23 @@ export default {
         console.log(error);
       }
     },
-    // handleFileChange(event) {
-    //   const files = event.target.files;
-    //   this.productImages = Array.from(files); // Convertir el FileList a un array
-    //   console.log(this.productImages); // Asegurarte de que los archivos se están cargando
-    // },
     goBack() {
       this.$router.push('/entrepeneur-home');
     },
-    removeTag(tag) {
-      // Elimina la etiqueta seleccionada
-      const index = this.productData.tags.indexOf(tag);
-      if (index > -1) {
-        this.productData.tags.splice(index, 1);
-      }
+    handleFileChange(event) {
+      const files = event.target.files;
+      this.productData.images = files;
     },
+  },
+  computed: {
+    availableOptions() {
+      return this.options.filter(opt => this.value.indexOf(opt) === -1)
+    }
   },
   async created() {
     try {
       const response = await axios.get('https://localhost:7189/api/Product/get-tags');
-      this.tags = response.data;
+      this.options = response.data;
     } catch (error) {
       console.error('Error al obtener los tags:', error);
     }
@@ -207,16 +207,35 @@ export default {
 </script>
 
 <style>
-
-.formFileMultiple {
-  background-color: #D0EDA0
-}
-
-.form-control {
+#tags-component-select {
   background-color: #D0EDA0;
 }
 
-.price-input-bt {
-  background-color: #D0EDA0
+.custom-button {
+  background-color: #36618E !important;
+  border-color: #36618E !important;
+  color: white !important;
 }
+
+#form .custom-tag {
+  background-color: #36618E !important;
+  border-color: #36618E !important;
+  color: white !important;
+}
+
+#form .b-form-tag {
+  background-color: #36618E !important;
+  border-color: #36618E !important;
+  color: white !important;
+}
+
+#form .b-form-tag .close {
+  color: white !important; 
+}
+
+form .select-component {
+  background-color: #D0EDA0;
+  border : 1px solid #36618E;
+}
+
 </style>
