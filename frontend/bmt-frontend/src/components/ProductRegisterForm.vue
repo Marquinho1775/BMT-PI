@@ -20,10 +20,21 @@
           </b-form-group>
 
           <!-- Tags -->
-          <b-form-group id="group-tags" label="Tags:" label-for="tags">
-            <b-form-select id="tags" class="form-input" v-model="productData.tags" :options="tags" multiple
-              placeholder="Seleccione los tags">
-            </b-form-select>
+          <b-form-group label="Etiquetas de producto:" label-for="tags-component-select">
+            <b-form-tags id="tags-component-select" v-model="value" size="lg"  class="mb-2" add-on-change no-outer-focus>
+              <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
+                <b-form-select class = "select-component" v-bind="inputAttrs" v-on="inputHandlers" :disabled="disabled || availableOptions.length === 0" :options="availableOptions">
+                  <template #first>
+                    <option disabled value="" class="'select-component'">Escoge una o varias etiquetas...</option>
+                  </template>
+                </b-form-select>
+                <ul v-if="tags.length > 0" class="list-inline d-inline-block mt-2">
+                  <li v-for="tag in tags" :key="tag" class="list-inline-item">
+                    <b-form-tag id="tag-component" class="custom-tag" @remove="removeTag(tag)" :title="tag" :disabled="disabled">{{ tag }}</b-form-tag>
+                  </li>
+                </ul>
+              </template>
+            </b-form-tags>
           </b-form-group>
 
           <!-- Peso -->
@@ -50,7 +61,7 @@
           <!-- Campos adicionales según el tipo de producto -->
           <div v-if="productData.type === 'No perecedero'">
             <b-form-group id="group-stock" label="Cantidad de stock:" label-for="stock">
-              <b-form-input id="stock" class="form-input" v-model="nonPerishable.stock" type="number"
+              <b-form-input id="stock" class="form-input" v-model="productData.stock" type="number"
                 placeholder="Ingrese la cantidad de stock" required>
               </b-form-input>
             </b-form-group>
@@ -59,30 +70,32 @@
           <div v-if="productData.type === 'Perecedero'">
             <!-- Días de la semana -->
             <b-form-group id="group-weekdays" label="Días de disponibilidad:" label-for="weekdays">
-              <b-form-checkbox-group id="weekdays" v-model="perishable.weekDaysAvailable" :options="weekdays"
+              <b-form-checkbox-group id="weekdays" v-model="productData.weekDaysAvailable" :options="weekdays"
                 name="weekdays">
               </b-form-checkbox-group>
             </b-form-group>
 
             <!-- Límite por día -->
             <b-form-group id="group-limit" label="Límite por día:" label-for="limit">
-              <b-form-input id="limit" class="form-input" v-model="perishable.limit" type="number"
+              <b-form-input id="limit" class="form-input" v-model="productData.limit" type="number"
                 placeholder="Ingrese el límite por día" required>
               </b-form-input>
             </b-form-group>
           </div>
 
-          <!-- Subir Imágenes -->
-          <b-form-group id="group-images" label="Subir imágenes:" label-for="formFileMultiple">
-            <label for="formFileMultiple" class="form-label">Seleccionar múltiples archivos</label>
-            <input class="form-control" type="file" id="formFileMultiple" multiple @change="handleFileChange" />
+          <!-- Imagenes -->
+          <b-form-group label="Añada imagenes:" label-for="input-images">
+            <input
+              id="input-images"
+              type="file"
+              multiple
+              @change="handleFileChange"/>
           </b-form-group>
 
           <div class="d-flex justify-content-between mt-4">
-            <b-button variant="secondary" @click="goBack">Volver</b-button>
-            <b-button type="submit" variant="primary">Registrar</b-button>
+            <b-button variant="secondary" class="custom-button" @click="goBack">Volver</b-button>
+            <b-button type="submit" class="custom-button" variant="primary">Registrar</b-button>
           </div>
-
         </b-form>
       </div>
     </div>
@@ -101,31 +114,28 @@ export default {
         weight: '',
         price: '',
         type: '',
-      },
-      nonPerishable: {
+        tags: [],
         stock: null,
-      },
-      perishable: {
         limit: null,
         weekDaysAvailable: [],
+        images: [],
       },
-      productImages: [],
-      tags: [],
       weekdays: [
-        { text: 'Lunes', value: 'Lunes' },
-        { text: 'Martes', value: 'Martes' },
-        { text: 'Miércoles', value: 'Miércoles' },
-        { text: 'Jueves', value: 'Jueves' },
-        { text: 'Viernes', value: 'Viernes' },
-        { text: 'Sábado', value: 'Sábado' },
-        { text: 'Domingo', value: 'Domingo' },
+        { text: 'Lunes', value: '1' },
+        { text: 'Martes', value: '2' },
+        { text: 'Miércoles', value: '3' },
+        { text: 'Jueves', value: '4' },
+        { text: 'Viernes', value: '5' },
+        { text: 'Sábado', value: '6' },
+        { text: 'Domingo', value: '0' },
       ],
+      options: [],
+      value: []
     }
   },
   methods: {
     async addNewProduct() {
       try {
-        // Crear producto principal
         const response = await axios.post('https://localhost:7189/api/Product', {
           id: '',
           username: JSON.parse(localStorage.getItem('user')).username,
@@ -133,53 +143,27 @@ export default {
           description: this.productData.description,
           weight: this.productData.weight,
           price: this.productData.price,
+          type: this.productData.type == "Perecedero" ? "Perishable" : "NonPerishable",
+          tags: this.value,
+          stock: this.productData.stock != null ? this.productData.stock : 0,
+          limit: this.productData.limit != null ? this.productData.limit : 0,
+          weekDaysAvailable: this.productData.weekDaysAvailable.sort().join(''),
         });
-
-        const productId = response.data; // Obtener el ID del producto creado
-
-        // Guardar detalles adicionales según el tipo
-        if (this.productData.type === 'No perecedero') {
-          await axios.post('https://localhost:7189/api/Product/non-perishable', {
-            productId: productId,
-            stock: this.nonPerishable.stock,
-          });
-        } else if (this.productData.type === 'Perecedero') {
-          // Convertir los días seleccionados a formato numérico (0-6)
-          const dayMap = {
-            'Domingo': '0',
-            'Lunes': '1',
-            'Martes': '2',
-            'Miércoles': '3',
-            'Jueves': '4',
-            'Viernes': '5',
-            'Sábado': '6',
-          };
-          const weekDaysAvailableFormatted = this.perishable.weekDaysAvailable
-            .map(day => dayMap[day])
-            .sort() // Ordenar los días en orden numérico
-            .join('');
-
-          await axios.post('https://localhost:7189/api/Perishable/perishable', {
-            productId: productId,
-            limit: this.perishable.limit,
-            weekDaysAvailable: weekDaysAvailableFormatted,
-          });
+        const productId = response.data;
+        const formData = new FormData();
+        formData.append("ownerId", productId);
+        formData.append("ownerType", "Product");
+        for (const file of this.productData.images) {
+          formData.append("images", file);
         }
-
-        // Subir imágenes
-        for (let image of this.productImages) {
-          const formData = new FormData();
-          formData.append('image', image);  // Archivo de imagen
-          formData.append('ownerId', productId);  // ID del propietario
-
-          await axios.post('https://localhost:7189/api/ImageUpload/upload', formData, {
+        await axios.post("https://localhost:7189/api/ImageFile/upload",
+          formData,
+          {
             headers: {
-              'Content-Type': 'multipart/form-data',
+              "Content-Type": "multipart/form-data",
             },
-          });
-        }
-
-        // Mostrar éxito
+          }
+        );
         this.$swal.fire({
           title: 'Éxito',
           text: 'Producto agregado exitosamente.',
@@ -188,9 +172,7 @@ export default {
         }).then(() => {
           this.$router.push('/entrepeneur-home');
         });
-
       } catch (error) {
-        // Mostrar error
         this.$swal.fire({
           title: 'Error',
           text: 'Hubo un error al agregar el producto.',
@@ -200,20 +182,23 @@ export default {
         console.log(error);
       }
     },
-    handleFileChange(event) {
-      const files = event.target.files;
-      this.productImages = Array.from(files); // Convertir el FileList a un array
-      console.log(this.productImages); // Asegurarte de que los archivos se están cargando
-    },
     goBack() {
       this.$router.push('/entrepeneur-home');
     },
-
+    handleFileChange(event) {
+      const files = event.target.files;
+      this.productData.images = files;
+    },
+  },
+  computed: {
+    availableOptions() {
+      return this.options.filter(opt => this.value.indexOf(opt) === -1)
+    }
   },
   async created() {
     try {
       const response = await axios.get('https://localhost:7189/api/Product/get-tags');
-      this.tags = response.data;
+      this.options = response.data;
     } catch (error) {
       console.error('Error al obtener los tags:', error);
     }
@@ -222,15 +207,35 @@ export default {
 </script>
 
 <style>
-.formFileMultiple {
-  background-color: #D0EDA0
-}
-
-.form-control {
+#tags-component-select {
   background-color: #D0EDA0;
 }
 
-.price-input-bt {
-  background-color: #D0EDA0
+.custom-button {
+  background-color: #36618E !important;
+  border-color: #36618E !important;
+  color: white !important;
 }
+
+#form .custom-tag {
+  background-color: #36618E !important;
+  border-color: #36618E !important;
+  color: white !important;
+}
+
+#form .b-form-tag {
+  background-color: #36618E !important;
+  border-color: #36618E !important;
+  color: white !important;
+}
+
+#form .b-form-tag .close {
+  color: white !important; 
+}
+
+form .select-component {
+  background-color: #D0EDA0;
+  border : 1px solid #36618E;
+}
+
 </style>

@@ -11,6 +11,7 @@
     "@floating-ui/dom": "^1.6.11",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "bootstrap-vue": "^2.23.1",
     "bootstrap-vue-3": "^0.5.1",
     "core-js": "^3.8.3",
     "font-awesome": "^4.7.0",
