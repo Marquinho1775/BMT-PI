@@ -1,0 +1,6 @@
+@BMT_backend_HostAddress = http://localhost:5204
+
+GET {{BMT_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
