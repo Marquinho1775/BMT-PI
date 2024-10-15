@@ -94,7 +94,13 @@ export default {
           enterpriseIdentification: this.enterpriseData.identificationNumber.trim(),
           isAdmin: true,
         });
-        console.log(entrepreneurResponse, enterpriseResponse, addToEnterpriseResponse);
+
+        const updateRoleUser = await axios.put('https://localhost:7189/api/User/Role', {
+          id: JSON.parse(localStorage.getItem('user')).id,
+          role: 'emp',
+        });
+
+        console.log(entrepreneurResponse, enterpriseResponse, addToEnterpriseResponse, updateRoleUser);
         await this.$swal.fire({
           title: 'Registro exitoso',
           text: '¡Su empresa ha sido registrada correctamente!',
