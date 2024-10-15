@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data;
-using BMT_backend.Models;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Collections.Generic;
-using System.Security.Cryptography.Xml;
-using System;
 
 namespace BMT_backend.Handlers
 {
@@ -42,14 +37,12 @@ namespace BMT_backend.Handlers
             }
             else if (ownerType == "User")
             {
-                createImageQuery = "INSERT INTO UserImages(UserId, URL) VALUES(@OwnerId, @URL);";
+                createImageQuery = "UPDATE Users SET ProfilePictureURL = @URL WHERE Id = @OwnerId;";
                 parameterName = "@OwnerId";
             }
-
             var createImageCommand = new SqlCommand(createImageQuery, _conection);
             createImageCommand.Parameters.Add(parameterName, SqlDbType.UniqueIdentifier).Value = Guid.Parse(ownerId);
             createImageCommand.Parameters.Add("@URL", SqlDbType.VarChar, 255).Value = relativePath;
-
             _conection.Open();
             createImageCommand.ExecuteNonQuery();
             _conection.Close();
