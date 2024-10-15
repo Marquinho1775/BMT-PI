@@ -52,6 +52,20 @@ namespace BMT_backend.Controllers
             }
         }
 
+        [HttpPost("Role")]
+        public async Task<ActionResult<bool>> UpdateRole(string id, string role)
+        {
+            try
+            {
+                var result = _userHandler.UpdateRole(id, role);
+                return new JsonResult(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error actualizando el rol del usuario");
+            }
+        }
+
         [HttpPost("Unity")]
         public async Task<IActionResult> UserInfo(string id)
         {
