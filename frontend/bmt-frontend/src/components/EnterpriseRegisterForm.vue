@@ -53,6 +53,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -77,25 +78,25 @@ export default {
   methods: {
     async registerEnterprise() {
       try {
-        const entrepreneurResponse = await axios.post('https://localhost:7189/api/Entrepreneur', {
+        const entrepreneurResponse = await axios.post(API_URL + '/Entrepreneur', {
           id: '',
           username: JSON.parse(localStorage.getItem('user')).username,
           identification: this.entrepreneurData.identification.trim(),
         });
-        const enterpriseResponse = await axios.post('https://localhost:7189/api/Enterprise', {
+        const enterpriseResponse = await axios.post(API_URL + '/Enterprise', {
           id: '',
           identificationType: parseInt(this.enterpriseData.identificationType),
           identificationNumber: this.enterpriseData.identificationNumber.trim(),
           name: this.enterpriseData.name.trim(),
           description: this.enterpriseData.description.trim(),
         });
-        const addToEnterpriseResponse = await axios.post('https://localhost:7189/api/Entrepreneur/add-to-enterprise', {
+        const addToEnterpriseResponse = await axios.post(API_URL + '/Entrepreneur/add-to-enterprise', {
           entrepreneurIdentification: this.entrepreneurData.identification.trim(),
           enterpriseIdentification: this.enterpriseData.identificationNumber.trim(),
           isAdmin: true,
         });
 
-        const updateRoleUser = await axios.put('https://localhost:7189/api/User/Role', {
+        const updateRoleUser = await axios.put(API_URL + '/User/Role', {
           id: JSON.parse(localStorage.getItem('user')).id,
           role: 'emp',
         });

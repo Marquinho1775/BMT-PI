@@ -40,6 +40,7 @@
 <script>
 import axios from "axios";
 import { getToken } from '@/helpers/auth';
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -67,7 +68,7 @@ export default {
           return;
         }
         const obtainEntrepreneurResponse = await axios.post(
-          'https://localhost:7189/api/Entrepreneur/ObtainEntrepreneurBasedOnUser',
+          API_URL + '/Entrepreneur/ObtainEntrepreneurBasedOnUser',
           {
             Id: user.id,
             Name: user.name,
@@ -85,7 +86,7 @@ export default {
         );
         const entrepreneur = obtainEntrepreneurResponse.data;
         const enterprisesResponse = await axios.post(
-          'https://localhost:7189/api/Entrepreneur/my-registered-enterprises',
+          API_URL + '/Entrepreneur/my-registered-enterprises',
           entrepreneur,
           {
             headers: {

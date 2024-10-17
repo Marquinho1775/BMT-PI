@@ -29,6 +29,7 @@
 <script>
 import { getUser } from '@/helpers/auth';
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -50,7 +51,7 @@ export default {
           Code: this.verificationCode,
           Id: getUser().id
         };
-        await axios.post('https://localhost:7189/api/Email/verifycode', codeTaken)
+        await axios.post(API_URL + '/Email/verifycode', codeTaken)
           .then(() => {
             this.$swal.fire({
               title: 'Verificación exitosa',
@@ -59,7 +60,7 @@ export default {
               confirmButtonText: 'Ok'
             }).then(() => {
               console.log('Verificación exitosa');
-              return axios.post('https://localhost:7189/api/Email/verifyaccount', codeTaken);
+              return axios.post(API_URL + '/Email/verifyaccount', codeTaken);
             }).then(() => {
               console.log('Cuenta verificada');
               this.$router.push('/client-home'); // Use this for navigation
@@ -81,7 +82,7 @@ export default {
           Email: getUser().email,
           Id: getUser().id
         };
-        axios.post('https:/localhost:7189/api/Email/sendemail', correo)
+        axios.post(API_URL + '/Email/sendemail', correo)
           .then(response => {
             console.log('Reenvío con exito:', response);
             alert('Se ha enviado un correo con el código de verificación.');
