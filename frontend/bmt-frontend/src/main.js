@@ -32,6 +32,8 @@ import Swal from 'sweetalert2';
 import { getToken } from './helpers/auth';
 import axios from 'axios';
 
+export const API_URL = 'https://localhost:7189/api';
+
 // Set up Axios interceptors
 axios.interceptors.request.use(config => {
     const token = getToken();

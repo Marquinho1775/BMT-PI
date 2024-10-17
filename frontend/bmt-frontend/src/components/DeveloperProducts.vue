@@ -62,6 +62,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 import { Popover } from 'bootstrap';
 
 export default {
@@ -73,7 +74,7 @@ export default {
   methods: {
     async getEnterprises() {
       try {
-        const response = await axios.get('https://localhost:7189/api/Developer/GetProducts/');
+        const response = await axios.get(API_URL + '/Developer/GetProducts/');
         this.products = response.data;
         this.products = response.data.sort((a, b) => a.enterprise.localeCompare(b.enterprise));
         this.$nextTick(() => {

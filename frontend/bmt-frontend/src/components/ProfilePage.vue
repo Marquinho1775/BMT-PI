@@ -79,6 +79,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 import { getToken } from '@/helpers/auth';
 
 export default {
@@ -135,7 +136,7 @@ export default {
         }
 
         const response = await axios.post(
-          'https://localhost:7189/api/Direction/ObtainDirectionsFromUser',
+          API_URL + '/Direction/ObtainDirectionsFromUser',
           user,
           {
             headers: {

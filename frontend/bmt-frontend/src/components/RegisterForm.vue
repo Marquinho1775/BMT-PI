@@ -71,6 +71,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -95,7 +96,7 @@ export default {
   methods: {
     registerUser() {
       if (!this.passwordMismatch) {
-        axios.post('https://localhost:7189/api/User', {
+        axios.post(API_URL + '/User', {
           Id: this.formData.Id,
           Name: this.formData.Name,
           LastName: this.formData.LastName,
