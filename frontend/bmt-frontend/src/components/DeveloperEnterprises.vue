@@ -54,6 +54,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -64,7 +65,7 @@ export default {
   methods: {
     async getEnterprises() {
       try {
-        const response = await axios.get('https://localhost:7189/api/Developer/getEnterprises');
+        const response = await axios.get(API_URL + '/Developer/getEnterprises');
         this.enterprises = response.data;
       } catch (error) {
         console.error('Error fetching enterprises:', error);

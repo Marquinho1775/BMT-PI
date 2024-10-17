@@ -70,7 +70,8 @@ namespace BMT_backend.Handlers
                     Username = Convert.ToString(column["Username"]),
                     Email = Convert.ToString(column["Email"]),
                     IsVerified = Convert.ToBoolean(column["IsVerified"]),
-                    Password = Convert.ToString(column["Password"])
+                    Password = Convert.ToString(column["Password"]),
+                    Role = Convert.ToString(column["Role"])
                 });
             }
             return users;
@@ -96,10 +97,10 @@ namespace BMT_backend.Handlers
                     Username = Convert.ToString(row["Username"]),
                     Email = Convert.ToString(row["Email"]),
                     IsVerified = Convert.ToBoolean(row["IsVerified"]),
-                    Password = Convert.ToString(row["Password"])
+                    Password = Convert.ToString(row["Password"]),
+                    Role = Convert.ToString(row["Role"])
                 };
             }
-
             return null; 
         }
 
@@ -121,6 +122,22 @@ namespace BMT_backend.Handlers
 
             return result;
         }
+
+        public bool UpdateRole(string Id, string Role)
+        {
+            var query = "UPDATE dbo.Users SET Role = @Role WHERE Id = @Id";
+            var sqlCommandForQuery = new SqlCommand(query, Connection);
+
+            sqlCommandForQuery.Parameters.AddWithValue("@Role", Role);
+            sqlCommandForQuery.Parameters.AddWithValue("@Id", Id);
+
+            Connection.Open();
+            bool result = sqlCommandForQuery.ExecuteNonQuery() >= 1;
+            Connection.Close();
+
+            return result;
+        }
+
 
         public void VerifyAccount(string Id)
         {

@@ -41,6 +41,8 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
+
 export default {
     data() {
         return {
@@ -63,7 +65,7 @@ export default {
         } else {
             this.collaboratorInfo = JSON.parse(localStorage.getItem('collaboratorInfo'));
 
-            const response = axios.post('https://localhost:7189/api/User/Unity',
+            const response = axios.post(API_URL + '/User/Unity',
                 {
                     Id: this.collaboratorInfo.userID,
                 },

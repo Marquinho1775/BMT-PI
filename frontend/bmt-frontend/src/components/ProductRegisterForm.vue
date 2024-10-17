@@ -21,16 +21,19 @@
 
           <!-- Tags -->
           <b-form-group label="Etiquetas de producto:" label-for="tags-component-select">
-            <b-form-tags id="tags-component-select" v-model="value" size="lg"  class="mb-2" add-on-change no-outer-focus>
+            <b-form-tags id="tags-component-select" v-model="value" size="lg" class="mb-2" add-on-change no-outer-focus>
               <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
-                <b-form-select class = "select-component" v-bind="inputAttrs" v-on="inputHandlers" :disabled="disabled || availableOptions.length === 0" :options="availableOptions">
+                <b-form-select class="select-component" v-bind="inputAttrs" v-on="inputHandlers"
+                  :disabled="disabled || availableOptions.length === 0" :options="availableOptions">
                   <template #first>
                     <option disabled value="" class="'select-component'">Escoge una o varias etiquetas...</option>
                   </template>
                 </b-form-select>
                 <ul v-if="tags.length > 0" class="list-inline d-inline-block mt-2">
                   <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                    <b-form-tag id="tag-component" class="custom-tag" @remove="removeTag(tag)" :title="tag" :disabled="disabled">{{ tag }}</b-form-tag>
+                    <b-form-tag id="tag-component" class="custom-tag" @remove="removeTag(tag)" :title="tag"
+                      :disabled="disabled">{{ tag
+                      }}</b-form-tag>
                   </li>
                 </ul>
               </template>
@@ -85,11 +88,7 @@
 
           <!-- Imagenes -->
           <b-form-group label="Añada imagenes:" label-for="input-images">
-            <input
-              id="input-images"
-              type="file"
-              multiple
-              @change="handleFileChange"/>
+            <input id="input-images" type="file" multiple @change="handleFileChange" />
           </b-form-group>
 
           <div class="d-flex justify-content-between mt-4">
@@ -104,6 +103,7 @@
 
 <script>
 import axios from 'axios'
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -136,7 +136,7 @@ export default {
   methods: {
     async addNewProduct() {
       try {
-        const response = await axios.post('https://localhost:7189/api/Product', {
+        const response = await axios.post(API_URL + '/Product', {
           id: '',
           username: JSON.parse(localStorage.getItem('user')).username,
           name: this.productData.name,
@@ -156,7 +156,7 @@ export default {
         for (const file of this.productData.images) {
           formData.append("images", file);
         }
-        await axios.post("https://localhost:7189/api/ImageFile/upload",
+        await axios.post(API_URL + "/ImageFile/upload",
           formData,
           {
             headers: {
@@ -197,7 +197,7 @@ export default {
   },
   async created() {
     try {
-      const response = await axios.get('https://localhost:7189/api/Product/get-tags');
+      const response = await axios.get(API_URL + '/Product/get-tags');
       this.options = response.data;
     } catch (error) {
       console.error('Error al obtener los tags:', error);
@@ -230,12 +230,11 @@ export default {
 }
 
 #form .b-form-tag .close {
-  color: white !important; 
+  color: white !important;
 }
 
 form .select-component {
   background-color: #D0EDA0;
-  border : 1px solid #36618E;
+  border: 1px solid #36618E;
 }
-
 </style>
