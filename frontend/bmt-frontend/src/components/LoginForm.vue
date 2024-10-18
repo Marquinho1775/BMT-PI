@@ -70,7 +70,7 @@ export default {
             }).then(() => {
               if (user.isVerified) {
 
-                window.location.href = "/client-home";
+                window.location.href = "/";
               } else {
                 window.location.href = "/email-verification";
               }

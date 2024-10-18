@@ -129,7 +129,7 @@ export default {
     },
 
     goBack() {
-      this.$router.push('/client-home');
+      window.location.href = "/";
     }
   },
 };
