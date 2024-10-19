@@ -11,37 +11,157 @@
        crossorigin="anonymous" referrerpolicy="no-referrer" />
   </head>
   <body>
-    <div class="container-fluid d-flex flex-column align-items-center justify-content-center"
-         style="height: 100vh;">
+    <div>
+      <div class="container-fluid d-flex flex-column align-items-center justify-content-center"
+          style="height: 100vh;">
+        <div>
+          <h2 class="title">Bienvenido a Business Tracker</h2>
+        </div>
+      </div>
       <div>
-        <h2 class="title">Bienvenido a Business Tracker</h2>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-primary" @click="handleLogin" v-if="isLoggedIn === false">Iniciar Sesión</button>
+          <button class="btn btn-secondary" @click="handleRegister" v-if="isLoggedIn === false">Registrarse</button>
+        </div>
       </div>
     </div>
-    <div>
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-primary" @click="handleLogin">Iniciar Sesión</button>
-        <button class="btn btn-secondary" @click="handleRegister">Registrarse</button>
-      </div>
-      <!-- Menu Lateral -->
-      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header" style="background-color: #02174B;">  
-  
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
-                aria-label="Close" style="background-color: #BCD6F3;"></button>
-        </div>
-        <div class="offcanvas-body" style="background-color: #BCD6F3;">
-          <ul class="navbar-nav  
-            justify-content-end">
-          </ul>
+    <div v-if="userRole === 'cli'">
+      <div class="container-fluid d-flex flex-column align-items-center justify-content-center"
+          style="height: 100vh;">
+        <div>
+          <h2 class="title">Bienvenido a Business Tracker, {{ username }}</h2>
         </div>
       </div>
-      <!-- Botón de Acceso -->
-      <div class="user-icon-container">
-        <button class="user-icon-button" data-bs-toggle="offcanvas"
-                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-          <i class="fa-user">Menú</i>
-        </button>
+      <div>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-secondary"
+                @click="handleRegisterAsEntrpeneur">Registrarse Como Emprendedor</button>
+          <button class="btn btn-primary"
+                @click="handleLogout">Cerrar Sesión</button>
+        </div>
+        <!-- Menu Lateral -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar"
+            aria-labelledby="offcanvasNavbarLabel">
+          <div class="offcanvas-header"
+              style="background-color: #02174B;">
+
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Mi Perfil</h5>
+            <button type="button" class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+                style="background-color: #BCD6F3;"></button>
+          </div>
+          <!-- Botón de Acceso -->
+          <div class="offcanvas-body" style="background-color: #BCD6F3;">
+            <ul class="navbar-nav  
+              justify-content-end">
+              <li class="nav-item">
+                <a class="nav-link active"
+                  aria-current="page"
+                  href="#"
+                  @click="handleProfileInfo">Mis Datos</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="user-icon-container">
+          <button class="user-icon-button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#offcanvasNavbar"
+              aria-controls="offcanvasNavbar">
+            <i class="fa-user"> Mi Perfil</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div v-if="userRole === 'emp'">
+      <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
+        <div>
+          <h2 class="title">Bienvenido a Business Tracker, {{ username }}</h2>
+        </div>
+      </div>
+      <div>
+        <div class="d-flex justify-content-end">
+          <button class="btn btn-secondary" @click="handleCollaboratorRegister">Registrar Colaborador</button>
+          <button class="btn btn-secondary" @click="handleRegisterEnterprise">Registrar Emprendimiento</button>
+          <button class="btn btn-primary" @click="handleLogout">Cerrar Sesión</button>
+        </div>
+        <!-- Menu Lateral -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" v-if="userRole === 'cli'">
+          <div class="offcanvas-header" style="background-color: #02174B;">
+
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Mi Perfil</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+              style="background-color: #BCD6F3;"></button>
+          </div>
+          <div class="offcanvas-body" style="background-color: #BCD6F3;">
+            <ul class="navbar-nav  
+              justify-content-end">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#" @click="handleProfileInfo">Mis Datos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" @click="handleAsociatedEnterprise">Emprendimientos asociados</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" @click="handleProductRegister">Registrar producto</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- Botón de Acceso -->
+        <div class="user-icon-container">
+          <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar">
+            <i class="fa-user"> Mi Perfil</i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div v-if="userRole === 'dev'">
+      <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
+        <div>
+          <h2 class="title">Bienvenido a Business Tracker, {{ username }}</h2>
+        </div>
+      </div>
+      <div>
+        <div class="d-flex justify-content-end">
+        </div>
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+          <div class="offcanvas-header" style="background-color: #02174B;">
+
+            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Opciones</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"
+              style="background-color: #BCD6F3;"></button>
+          </div>
+          <div class="offcanvas-body" style="background-color: #BCD6F3; margin: 0px; padding: 0px">
+            <ul class="navbar-nav  
+              justify-content-end">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#" style="padding: 10px;">Opciones de usuario</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" style="padding: 10px;" @click="goToEnterprises">Emprendimientos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" style="padding: 10px;" @click="goToProducts">Productos</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" style="padding: 10px;" @click="goToUsers">Usuarios</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#" style="padding: 10px;" @click="handleLogout">Cerrar sesión</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="user-icon-container">
+          <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar">
+            <i class="menu">Menú</i>
+          </button>
+        </div>
       </div>
     </div>
   </body>
@@ -50,6 +170,17 @@
 <script>
   import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
   export default {
+    data() {
+      return {
+        user: '',
+        username: '',
+        userRole: '',
+        isLoggedIn: false
+      };
+    },
+    mounted() {
+      this.getRole();
+    },
     methods: {
       mounted() {
         Bootstrap();
@@ -58,10 +189,59 @@
         console.log('Navigating to login view');
         this.$router.push('/login');
       },
+      handleLogout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        this.$swal.fire({
+          title: 'Sesión cerrada',
+          text: 'Has cerrado sesión exitosamente.',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
+          this.$router.push('/');
+        });
+      },
       handleRegister() {
         console.log('Navigating to register view');
         this.$router.push('/register');
-      }
+      },
+      handleRegisterAsEntrpeneur() {
+        console.log('Navigating to Enterprise register view');
+        this.$router.push('/enterprise-register');
+      },
+      handleProfileInfo() {
+        console.log('Navigating to profile info view');
+        this.$router.push('/profile');
+      },
+      handleAsociatedEnterprise() {
+        console.log('Navigating to Enterprise register view');
+        this.$router.push('/enterprises');
+      },
+      handleCollaboratorRegister() {
+        console.log('Navigating to collaborator register view');
+        this.$router.push('/collab-register');
+      },
+      handleProductRegister() {
+        console.log('Navigating to Products register view');
+        this.$router.push('/product');
+      },
+      goToEnterprises() {
+        this.$router.push('/developer-enterprises');
+      },
+      goToProducts() {
+        this.$router.push('/developer-products');
+      },
+      goToUsers() {
+        this.$router.push('/developer-users');
+      },
+      getRole() {
+        this.user = JSON.parse(localStorage.getItem('user')) || this.user;
+        this.username = this.user.username;
+        this.userRole = this.user.role;
+        if (this.userRole === 'cli' || this.userRole === 'emp' || this.userRole === 'dev') {
+          this.isLoggedIn = true;
+        }
+      },
     }
   }
 </script>
@@ -127,22 +307,84 @@
     background-color: #384D13;
     color: #D0EDA0;
   }
-  .nav-tabs .nav-link {
-    transition: none;
-    background-color: #BCD6F3;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  .nav-link:hover {
-    transition: none;
-    background-color: #9ab0c9;
-    border: none;
-    margin: none;
-    padding: none;
-    cursor: pointer;
-    font-weight: bold;
-  }
+  .menu {
+  font-style: normal;
+  font-weight: bold;
+  color: #BCD6F3;
+}
+
+.nav-tabs .nav-link {
+  transition: none;
+  background-color: #BCD6F3;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.nav-link:hover {
+  transition: none;
+  background-color: #9ab0c9;
+  border: none;
+  margin: none;
+  padding: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.title {
+  background-color: #D0EDA0;
+  color: #02174B;
+  padding: 50px;
+  border-radius: 100px;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #8FA3BE;
+  color: #91AC65;
+}
+
+.d-flex {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+}
+
+.user-icon-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 10px;
+}
+
+.offcanvas-title {
+  color: #D0EDA0;
+}
+
+.user-icon-button {
+  background-color: #02174B;
+  border-radius: 50px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #39517B;
+}
+
+.btn-secondary {
+  background-color: #D0EDA0;
+  color: #02174B;
+}
+
+.btn-primary:hover {
+  background-color: #02174B;
+}
+
+.btn-secondary:hover {
+  background-color: #384D13;
+  color: #D0EDA0;
+}
 </style>
   

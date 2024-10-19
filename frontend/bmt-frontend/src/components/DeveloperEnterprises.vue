@@ -72,7 +72,7 @@ export default {
       }
     },
     goToMainPage() {
-      this.$router.push('/developer-home');
+      window.location.href = "/";
     },
   },
   mounted() {
