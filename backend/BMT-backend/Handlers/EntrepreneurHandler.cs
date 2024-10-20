@@ -38,21 +38,20 @@ namespace BMT_backend.Handlers
             return false;
         }
 
-        public string CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        public bool CheckIfEntrepreneurExists(string identification)
         {
-            if (CheckIfEntryInTable("Entrepreneurs", "Identification", entrepreneur.Identification))
+            if (CheckIfEntryInTable("Entrepreneurs", "Identification", identification))
             {
-                return "EntrepreneurAlreadyExists";
+                return true;
             }
+            return false;
+        }
+
+        public bool CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        {
             string createEntrepreneurQuery = "insert into Entrepreneurs (UserId, Identification) " +
                 "values ((select Id from Users where UserName = @UserName), " +
                         "@Identification);";
-
-            string debugString = "insert into Entrepreneurs (UserId, Identification) " +
-                "values ((select Id from Users where UserName = '" + entrepreneur.Username + "'), " +
-                        "'" + entrepreneur.Identification + "');";
-
-            Console.WriteLine(debugString);
 
             var createEntrepreneurCommand = new SqlCommand(createEntrepreneurQuery, _conection);
             createEntrepreneurCommand.Parameters.AddWithValue("@UserName", entrepreneur.Username);
@@ -60,7 +59,7 @@ namespace BMT_backend.Handlers
             _conection.Open();
             createEntrepreneurCommand.ExecuteNonQuery();
             _conection.Close();
-            return "NewEntrepreneurCreated";
+            return true;
         }
 
         public bool AddEntrepreneurToEnterprise(AddEntrepreneurToEnterpriseRequest request)
@@ -74,7 +73,6 @@ namespace BMT_backend.Handlers
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@EntrepreneurIdentification", request.EntrepreneurIdentification);
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@EnterpriseIdentification", request.EnterpriseIdentification);
             addEntrepreneurToEnterpriseCommand.Parameters.AddWithValue("@IsAdmin", request.IsAdmin ? 1 : 0);
-
 
             _conection.Open();
             bool exit = addEntrepreneurToEnterpriseCommand.ExecuteNonQuery() >= 1;

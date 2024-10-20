@@ -89,41 +89,44 @@ export default {
     },
     async submitForm() {
       try {
-        const entrepreneurResponse = await this.registerEntrepreneur();
-        if (entrepreneurResponse === "EntrepreneurAlreadyExists") {
+        const entrepreneurResponse = await this.checkExistingEntrepreneur();
+        if (entrepreneurResponse) {
           this.generateSweetAlert('Error', 'error', 'Ya existe un emprendedor registrado con este número de identificación.');
           this.restoreForm();
           return;
         }
-        // log
-        console.log('Entrepreneur registered successfully');
-        await this.changeRole();
-        this.generateSweetAlert('Registro exitoso', 'success', 'Se ha registrado exitosamente como emprendedor.');
-        // log
-        console.log('Role changed successfully');
-        const enterpriseResponse = await this.registerEnterprise();
-        if (enterpriseResponse === "EnterpriseAlreadyExistsId") {
+        let enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.identificationNumber);
+        if (enterpriseResponse) {
           this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este número de identificación.');
-          // log
-          console.log('Enterprise already exists with this identification number');
           this.restoreForm();
           return;
         }
-        if (enterpriseResponse === "EnterpriseAlreadyExistsName") {
+        enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.name);
+        if (enterpriseResponse) {
           this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este nombre.');
-          // log
-          console.log('Enterprise already exists with this name');
           this.restoreForm();
           return;
         }
+        await this.registerEntrepreneur();
+        await this.changeRole();
+        await this.registerEnterprise();
         await this.addEntrepreneurToEnterprise();
-        // log
-        console.log('Entrepreneur added to enterprise successfully');
         this.generateSweetAlert('Registro exitoso', 'success', 'Se ha registrado exitosamente su empresa.');
         this.$router.push('/entrepreneur-home');
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Ocurrió un error durante el registro. Por favor, inténtalo de nuevo.');
         console.error(error);
+      }
+    },
+
+    async checkExistingEntrepreneur() {
+      try {
+        const response = await axios.get(`${API_URL}/Entrepreneur/CheckExistingEntrepreneur?identification=${this.entrepreneurData.identification.trim()}`);
+        return response.data;
+      } catch (error) {
+        this.generateSweetAlert('Error', 'error', 'Hubo un error al verificar si el emprendedor ya existe.');
+        console.error(error);
+        throw error;
       }
     },
 
@@ -147,10 +150,20 @@ export default {
         const userId = JSON.parse(localStorage.getItem('user')).id;
         const role = 'emp';
         const url = `${API_URL}/User/Role?id=${encodeURIComponent(userId)}&role=${encodeURIComponent(role)}`;
-        console.log(url);
         await axios.post(url);
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al cambiar el rol del usuario.');
+        console.error(error);
+        throw error;
+      }
+    },
+
+    async checkExistingEnterprise(identification) {
+      try {
+        const response = await axios.get(`${API_URL}/Enterprise/CheckExistingEnterprise?identification=${identification.trim()}`);
+        return response.data;
+      } catch (error) {
+        this.generateSweetAlert('Error', 'error', 'Hubo un error al verificar si la empresa ya existe.');
         console.error(error);
         throw error;
       }
@@ -164,8 +177,7 @@ export default {
           identificationNumber: this.enterpriseData.identificationNumber.trim(),
           name: this.enterpriseData.name.trim(),
           description: this.enterpriseData.description.trim(),
-        });
-        console.log(response.data);
+        }); 
         return response.data;
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al registrar su empresa. Inténtalo de nuevo.');
@@ -181,7 +193,6 @@ export default {
           enterpriseIdentification: this.enterpriseData.identificationNumber.trim(),
           isAdmin: true,
         });
-        console.log('Entrepreneur added to enterprise successfully');
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al agregar el emprendedor a la empresa.');
         console.error(error);

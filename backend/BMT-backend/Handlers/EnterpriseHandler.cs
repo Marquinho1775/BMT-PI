@@ -48,16 +48,21 @@ namespace BMT_backend.Handlers
             return false;
         }
 
-        public string CreateEnterprise(EnterpriseModel enterprise)
+        public bool CheckIfEnterpriseExists(string identification)
         {
-            if (CheckIfEntryInTable("Enterprises", "IdentificationNumber", enterprise.IdentificationNumber))
+            if (CheckIfEntryInTable("Enterprises", "IdentificationNumber", identification))
             {
-                return "EnterpriseAlreadyExistsId";
-            }
-            if (CheckIfEntryInTable("Enterprises", "Name", enterprise.Name))
+                return true;
+            } 
+            else if (CheckIfEntryInTable("Enterprises", "Name", identification))
             {
-                return "EnterpriseAlreadyExistsName";
+                return true;
             }
+            return false;
+        }
+
+        public bool CreateEnterprise(EnterpriseModel enterprise)
+        {
             string createEnterpriseQuery = "insert into Enterprises (" +
             "IdentificationType, IdentificationNumber, Name, Description) " +
             "values (@IdentificationType, @IdentificationNumber, @Name, @Description);";
@@ -71,7 +76,7 @@ namespace BMT_backend.Handlers
             _conection.Open();
             queryCommand.ExecuteNonQuery();
             _conection.Close();
-            return "NewEnterpriseCreated";
+            return true;
         }
 
         public List<EnterpriseModel> GetEnterprises()
