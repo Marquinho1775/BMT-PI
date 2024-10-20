@@ -111,7 +111,7 @@ export default {
       return identification;
     },
     goBack() {
-      this.$router.push('/entrepeneur-home');
+      window.location.href = "/";
     },
 
     goToEnterprise(enterpriseId) {
