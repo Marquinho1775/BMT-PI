@@ -8,6 +8,8 @@ namespace BMT_backend.Models
         public string IdentificationNumber { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
         public EntrepreneurViewModel? Administrator { get; set; }
         public List<EntrepreneurViewModel>? Staff { get; set; }
 

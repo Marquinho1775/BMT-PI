@@ -3,8 +3,6 @@ using System.Data;
 using BMT_backend.Models;
 using BMT_backend.Controllers;
 using System.Data.SqlClient;
-using System.Collections.Generic;
-using BMT_backend.Controllers;
 
 namespace BMT_backend.Handlers
 {
@@ -160,7 +158,7 @@ namespace BMT_backend.Handlers
 
         private bool AddTagsToProduct(string ProductId, List<string> Tags)
         {
-            string addTagsQuery = "insert into Product_Tags (ProductId, TagId) " +
+            string addTagsQuery = "insert into ProductTags (ProductId, TagId) " +
                 "values(@ProductId, (select Id from Tags where Name = @TagName));";
             var addTagsCommand = new SqlCommand(addTagsQuery, _conection);
             addTagsCommand.Parameters.AddWithValue("@ProductId", ProductId);
@@ -206,7 +204,7 @@ namespace BMT_backend.Handlers
             List<string> tags = new List<string>();
             string getTagsQuery = "select t.Name " +
                 "from Tags t " +
-                "join Product_Tags pt on t.Id = pt.TagId " +
+                "join ProductTags pt on t.Id = pt.TagId " +
                 "where pt.ProductId = @ProductId;";
             var getTagsCommand = new SqlCommand(getTagsQuery, _conection);
             getTagsCommand.Parameters.AddWithValue("@ProductId", productId);

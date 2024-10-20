@@ -37,22 +37,47 @@ namespace BMT_backend.Handlers
             return tableFormatQuery;
         }
 
+        private bool CheckIfEntryInTable(string tableName, string columnName, string columnValue)
+        {
+            string query = "select " + columnName + " from " + tableName + " where " + columnName + " = '" + columnValue + "'";
+            DataTable table = CreateQueryTable(query);
+            if (table.Rows.Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool CheckIfEnterpriseExists(string identification)
+        {
+            if (CheckIfEntryInTable("Enterprises", "IdentificationNumber", identification)
+                || CheckIfEntryInTable("Enterprises", "Name", identification)
+                || CheckIfEntryInTable("Enterprises", "Email", identification)
+                || CheckIfEntryInTable("Enterprises", "PhoneNumber", identification))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public bool CreateEnterprise(EnterpriseModel enterprise)
         {
             string createEnterpriseQuery = "insert into Enterprises (" +
-            "IdentificationType, IdentificationNumber, Name, Description) " +
-            "values (@IdentificationType, @IdentificationNumber, @Name, @Description);";
+            "IdentificationType, IdentificationNumber, Name, Description, Email, PhoneNumber) " +
+            "values (@IdentificationType, @IdentificationNumber, @Name, @Description, @Email, @PhoneNumber);";
 
             var queryCommand = new SqlCommand(createEnterpriseQuery, _conection);
             queryCommand.Parameters.AddWithValue("@IdentificationType", enterprise.IdentificationType);
             queryCommand.Parameters.AddWithValue("@IdentificationNumber", enterprise.IdentificationNumber);
             queryCommand.Parameters.AddWithValue("@Name", enterprise.Name);
             queryCommand.Parameters.AddWithValue("@Description", enterprise.Description);
+            queryCommand.Parameters.AddWithValue("@Email", enterprise.Email);
+            queryCommand.Parameters.AddWithValue("@PhoneNumber", enterprise.PhoneNumber);
 
             _conection.Open();
-            bool exit = queryCommand.ExecuteNonQuery() >= 1;
+            queryCommand.ExecuteNonQuery();
             _conection.Close();
-            return exit;
+            return true;
         }
 
         public List<EnterpriseModel> GetEnterprises()
@@ -68,6 +93,8 @@ namespace BMT_backend.Handlers
                     IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
                     Name = Convert.ToString(row["Name"]),
                     Description = Convert.ToString(row["Description"]),
+                    Email = Convert.ToString(row["Email"]),
+                    PhoneNumber = Convert.ToString(row["PhoneNumber"]),
                     Administrator = GetEnterpriseAdministrator(Convert.ToString(row["Id"])),
                     Staff = GetEnterpriseStaff(Convert.ToString(row["Id"])),
                 });

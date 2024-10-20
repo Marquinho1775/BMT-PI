@@ -24,7 +24,7 @@
     <div>
       <div class="d-flex justify-content-end">
         <button class="btn btn-secondary"
-              @click="handleRegisterAsEntrpeneur">Registrarse Como Emprendedor</button>
+              @click="handleRegisterAsEntrepreneur">Registrarse Como Emprendedor</button>
         <button class="btn btn-primary"
               @click="handleLogout">Cerrar Sesión</button>
       </div>
@@ -85,7 +85,7 @@
           this.$router.push('/');
         });
       },
-      handleRegisterAsEntrpeneur() {
+      handleRegisterAsEntrepreneur() {
         console.log('Navigating to Enterprise register view');
         this.$router.push('/enterprise-register');
       },
