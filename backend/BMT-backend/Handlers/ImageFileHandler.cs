@@ -48,20 +48,43 @@ namespace BMT_backend.Handlers
             _conection.Close();
         }
 
-        public List<string> GetImage(string ownerId)
+        public List<string> GetProductImages(string productId)
         {
             List<string> images = new List<string>();
-            string getImageQuery = "select URL from Images where OwnerId = @OwnerId";
+            string getImageQuery = "select URL from ProductImages where ProductId = @ProductId";
             var getImageCommand = new SqlCommand(getImageQuery, _conection);
-            getImageCommand.Parameters.AddWithValue("@OwnerId", ownerId);
+            getImageCommand.Parameters.AddWithValue("@ProductId", productId);
+            
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(getImageCommand);
+            DataTable dataTable = new DataTable();
             _conection.Open();
-            DataTable dataTable = CreateQueryTable(getImageQuery);
+            tableAdapter.Fill(dataTable);
             _conection.Close();
+
             for (int i = 0; i < dataTable.Rows.Count; i++)
             {
                 images.Add(dataTable.Rows[i]["URL"].ToString());
             }
             return images;
+        }
+
+        public string GetProfileImage(string userId)
+        {
+            string getImageQuery = "select ProfilePictureURL from Users where Id = @UserId";
+            var getImageCommand = new SqlCommand(getImageQuery, _conection);
+            getImageCommand.Parameters.AddWithValue("@UserId", userId);
+
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(getImageCommand);
+            DataTable dataTable = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(dataTable);
+            _conection.Close();
+
+            if (dataTable.Rows.Count != 0)
+            {
+                return dataTable.Rows[0]["ProfilePictureURL"].ToString();
+            }
+            return "";
         }
     }
 }

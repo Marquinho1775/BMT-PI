@@ -10,8 +10,9 @@
           <b-form-group label="Número de identificación"
             label-for="identification-number-e">
             <b-form-input id="identification-number-e" class="form-input" v-model="entrepreneurData.identification"
-              placeholder="Ingrese su número de cédula" required>
+              placeholder="Ingrese su número de cédula" required :state="identificationValid1" @input="validateIdentification1">
             </b-form-input>
+            <b-form-invalid-feedback v-if="!identificationValid1">El número de cédula debe tener 9 dígitos.</b-form-invalid-feedback>
           </b-form-group>
 
         </div>
@@ -23,15 +24,18 @@
 
           <b-form-group id="selection-group-id-type" label="Seleccione el tipo de identificación de su negocio" label-for="select-id-type">
             <b-form-select id="select-id-type" class="form-input" v-model="enterpriseData.identificationType" required
-              :options="idTypeOptions">
+              :options="idTypeOptions" @change="validateIdentification2">
             </b-form-select>
           </b-form-group>
 
           <b-form-group id="group-identification-number-en" label="Número de identificación"
             label-for="identification-number-en">
-            <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber"
-              placeholder="Ingresar número de identificación" required>
+            <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber" 
+            placeholder="Ingresar número de identificación" required :state="identificationValid2" @input="validateIdentification2">
             </b-form-input>
+            <b-form-invalid-feedback v-if="identificationValid2 === false">
+              El número de identificación debe tener {{ enterpriseData.identificationType === 1 ? '9' : '10' }} dígitos.
+            </b-form-invalid-feedback>
           </b-form-group>
 
           <b-form-group id="group-name" label="Nombre:" label-for="name">
@@ -44,6 +48,20 @@
             <b-form-textarea id="description" class="form-input" v-model="enterpriseData.description"
               placeholder="Ingresar una descripción de su emprendimiento" rows="4" max-rows="6" no-resize>
             </b-form-textarea>
+          </b-form-group>
+
+          <b-form-group id="group-email" label="Correo electrónico:" label-for="email">
+            <b-form-input id="email" class="form-input" v-model="enterpriseData.email"
+              placeholder="Ingresar correo electrónico" type="email" required :state="emailValid" @input="validateEmail">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!emailValid">El correo debe tener el formato xxxx@xxx.xxx</b-form-invalid-feedback>
+          </b-form-group>
+
+          <b-form-group id="group-phone-number" label="Número de teléfono:" label-for="phone-number">
+            <b-form-input id="phone-number" class="form-input" v-model="enterpriseData.phoneNumber"
+              placeholder="Ingresar número de teléfono" required :state="phoneValid" @input="validatePhone">
+            </b-form-input>
+            <b-form-invalid-feedback v-if="!phoneValid">El número de teléfono debe tener 8 dígitos.</b-form-invalid-feedback>
           </b-form-group>
 
         </div>
@@ -80,7 +98,13 @@ export default {
         identificationNumber: '',
         name: '',
         description: '',
-      }
+        email: '',
+        phoneNumber: '',
+      },
+      identificationValid1: null,
+      identificationValid2: null,
+      emailValid: null,
+      phoneValid: null,
     };
   },
   methods: {
@@ -92,25 +116,36 @@ export default {
         const entrepreneurResponse = await this.checkExistingEntrepreneur();
         if (entrepreneurResponse) {
           this.generateSweetAlert('Error', 'error', 'Ya existe un emprendedor registrado con este número de identificación.');
-          this.restoreForm();
           return;
         }
         let enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.identificationNumber);
         if (enterpriseResponse) {
           this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este número de identificación.');
-          this.restoreForm();
           return;
         }
         enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.name);
         if (enterpriseResponse) {
           this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este nombre.');
-          this.restoreForm();
+          return;
+        }
+        enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.email);
+        if (enterpriseResponse) {
+          this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este correo electrónico.');
+          return;
+        }
+        enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.phoneNumber);
+        if (enterpriseResponse) {
+          this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este número de teléfono.');
           return;
         }
         await this.registerEntrepreneur();
+        console.log('Entrepreneur registered');
         await this.changeRole();
+        console.log('Role changed');
         await this.registerEnterprise();
+        console.log('Enterprise registered');
         await this.addEntrepreneurToEnterprise();
+        console.log('Entrepreneur added to enterprise');
         this.generateSweetAlert('Registro exitoso', 'success', 'Se ha registrado exitosamente su empresa.');
         this.$router.push('/entrepreneur-home');
       } catch (error) {
@@ -177,6 +212,8 @@ export default {
           identificationNumber: this.enterpriseData.identificationNumber.trim(),
           name: this.enterpriseData.name.trim(),
           description: this.enterpriseData.description.trim(),
+          email: this.enterpriseData.email.trim(),
+          phoneNumber: this.enterpriseData.phoneNumber.trim(),
         }); 
         return response.data;
       } catch (error) {
@@ -198,6 +235,37 @@ export default {
         console.error(error);
         throw error;
       }
+    },
+
+    validateIdentification1() {
+      const regex = /^[0-9]{9}$/;
+      this.identificationValid1 = regex.test(this.entrepreneurData.identification);
+    },
+
+    validateIdentification2() {
+      const idNumber = this.enterpriseData.identificationNumber.trim();
+      const idType = this.enterpriseData.identificationType;
+      let isValid = false;
+      if (idType === 1) {
+        const regex = /^[0-9]{9}$/;
+        isValid = regex.test(idNumber);
+      } else if (idType === 2) {
+        const regex = /^[0-9]{10}$/;
+        isValid = regex.test(idNumber);
+      } else {
+        isValid = null;
+      }
+      this.identificationValid2 = isValid;
+    },
+
+    validateEmail() {
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      this.emailValid = regex.test(this.enterpriseData.email);
+    },
+
+    validatePhone() {
+      const regex = /^[0-9]{8}$/;
+      this.phoneValid = regex.test(this.enterpriseData.phoneNumber);
     },
 
     onReset(event) {

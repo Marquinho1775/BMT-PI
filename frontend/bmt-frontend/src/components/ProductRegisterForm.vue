@@ -42,16 +42,18 @@
 
           <!-- Peso -->
           <b-form-group id="group-weight" label="Peso (kg):" label-for="weight">
-            <b-form-input id="weight" class="form-input" v-model="productData.weight" type="number"
-              placeholder="Ingrese el peso del producto" required>
+            <b-form-input id="weight" class="form-input" v-model="productData.weight" type="text"
+              placeholder="Ingrese el peso del producto" required :state="weightValid" @input="validateWeight">
             </b-form-input>
+            <b-form-invalid-feedback v-if="weightValid === false">Por favor, ingrese un peso válido.</b-form-invalid-feedback>
           </b-form-group>
 
           <!-- Precio -->
           <b-form-group id="group-price" label="Precio:" label-for="price">
-            <b-form-input id="price" class="form-input price-input-bt" v-model="productData.price" type="number"
-              placeholder="Ingrese el precio del producto" required>
+            <b-form-input id="price" class="form-input price-input-bt" v-model="productData.price" type="text"
+              placeholder="Ingrese el precio del producto" required :state="priceValid" @input="validatePrice">
             </b-form-input>
+            <b-form-invalid-feedback v-if="priceValid === false">Por favor, ingrese un precio válido.</b-form-invalid-feedback>
           </b-form-group>
 
           <!-- Tipo de Producto -->
@@ -61,12 +63,13 @@
             </b-form-radio-group>
           </b-form-group>
 
-          <!-- Campos adicionales según el tipo de producto -->
           <div v-if="productData.type === 'No perecedero'">
+            <!-- Stock -->
             <b-form-group id="group-stock" label="Cantidad de stock:" label-for="stock">
-              <b-form-input id="stock" class="form-input" v-model="productData.stock" type="number"
-                placeholder="Ingrese la cantidad de stock" required>
+              <b-form-input id="stock" class="form-input" v-model.number="productData.stock" type="number"
+                min="0" step="1" placeholder="Ingrese la cantidad de stock" required :state="stockValid" @input="validateStock">
               </b-form-input>
+              <b-form-invalid-feedback v-if="stockValid === false">Por favor, ingrese una cantidad de stock válida.</b-form-invalid-feedback>
             </b-form-group>
           </div>
 
@@ -79,11 +82,14 @@
             </b-form-group>
 
             <!-- Límite por día -->
-            <b-form-group id="group-limit" label="Límite por día:" label-for="limit">
-              <b-form-input id="limit" class="form-input" v-model="productData.limit" type="number"
-                placeholder="Ingrese el límite por día" required>
-              </b-form-input>
-            </b-form-group>
+            <div v-if="productData.type === 'Perecedero'">
+              <b-form-group id="group-limit" label="Límite por día:" label-for="limit">
+                <b-form-input id="limit" class="form-input" v-model.number="productData.limit" type="number" min="0"
+                  step="1" placeholder="Ingrese el límite por día" required :state="limitValid" @input="validateLimit">
+                </b-form-input>
+                <b-form-invalid-feedback v-if="limitValid === false">Por favor, ingrese un límite por día válido.</b-form-invalid-feedback>
+              </b-form-group>
+            </div>
           </div>
 
           <!-- Imagenes -->
@@ -130,7 +136,11 @@ export default {
         { text: 'Domingo', value: '0' },
       ],
       options: [],
-      value: []
+      value: [],
+      weightValid: null,
+      priceValid: null,
+      stockValid: null,
+      limitValid: null,
     }
   },
   methods: {
@@ -164,23 +174,35 @@ export default {
             },
           }
         );
-        this.$swal.fire({
-          title: 'Éxito',
-          text: 'Producto agregado exitosamente.',
-          icon: 'success',
-          confirmButtonText: 'Ok'
+        this.$swal.fire({title: 'Éxito', text: 'Producto agregado exitosamente.', icon: 'success', confirmButtonText: 'Ok'
         }).then(() => {
           this.$router.push('/entrepeneur-home');
         });
       } catch (error) {
-        this.$swal.fire({
-          title: 'Error',
-          text: 'Hubo un error al agregar el producto.',
-          icon: 'error',
-          confirmButtonText: 'Ok'
+        this.$swal.fire({title: 'Error', text: 'Hubo un error al agregar el producto.', icon: 'error', confirmButtonText: 'Ok'
         });
         console.log(error);
       }
+    },
+    validateWeight() {
+      const str = this.productData.weight;
+      console.log("validating weight", str);
+      this.weightValid =  !isNaN(str) && !isNaN(parseFloat(str)) && str >= 0 && str !== null;
+      console.log("weightValidatedAs", this.weightValid);
+    },
+    validatePrice() {
+      const str = this.productData.price;
+      console.log("validating price", str);
+      this.priceValid =  !isNaN(str) && !isNaN(parseFloat(str)) && str >= 0 && str !== null;
+      console.log("priceValidatedAs", this.priceValid);
+    },
+    validateStock() {
+      const stock = this.productData.stock;
+      this.stockValid = stock !== null && Number.isInteger(stock) && stock >= 0;
+    },
+    validateLimit() {
+      const limit = this.productData.limit;
+      this.limitValid = limit !== null && Number.isInteger(limit) && limit >= 0;
     },
     goBack() {
       this.$router.push('/entrepeneur-home');
