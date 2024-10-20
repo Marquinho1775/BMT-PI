@@ -79,3 +79,8 @@ EXEC UpdateForeignKeyWithCascade
 	@ChildTable = 'Entrepreneurs_Enterprises',
 	@ChildColumn = 'EnterpriseId',
 	@ParentTable = 'Enterprises';
+
+EXEC UpdateForeignKeyWithCascade
+	@ChildTable = 'Products',
+	@ChildColumn = 'EnterpriseId',
+	@ParentTable = 'Enterprises';
