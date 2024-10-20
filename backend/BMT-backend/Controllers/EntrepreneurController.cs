@@ -15,13 +15,15 @@ namespace BMT_backend.Controllers
             _entrepreneurHandler = new EntrepreneurHandler();
         }
 
-        [HttpGet] public List<EntrepreneurViewModel> Get()
+        [HttpGet]
+        public List<EntrepreneurViewModel> Get()
         {
             var entrepreneurs = _entrepreneurHandler.GetEntrepreneurs();
             return entrepreneurs;
         }
 
-        [HttpPost] public async Task<ActionResult<bool>> CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        [HttpPost] 
+        public async Task<ActionResult<bool>> CreateEntrepreneur(EntrepreneurModel entrepreneur)
         {
             try
             {

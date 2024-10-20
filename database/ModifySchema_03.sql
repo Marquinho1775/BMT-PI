@@ -14,7 +14,7 @@ create table ProductImages (
 );
 
 -- Añadir a usuario una columna para la dirección de la imágen de perfil
-alter table Users add ProfilePictureURL varchar(255) not null DEFAULT 'uploads/default.png';
+alter table Users add ProfilePictureURL varchar(255) not null DEFAULT 'uploads/defualt_profile_image.png';
 
 -- Modificar las restricciones de FK que referencian a products para que se haga un on delete cascade 
 EXEC UpdateForeignKeyWithCascade
@@ -58,24 +58,9 @@ EXEC UpdateForeignKeyWithCascade
     @ParentTable = 'Users',
     @ConstraintName = 'FK_Entrepreneurs_UserId';
 
-EXEC UpdateForeignKeyWithCascade
-	@ChildTable = 'Directions',
-    @ChildColumn = 'UserName',
-    @ParentTable = 'Users',
-	@ParentColumn = 'UserName';
+-- temp querys
+--select * from Products;
+-- * from Enterprises;
+--select * from ProductImages;
 
-EXEC UpdateForeignKeyWithCascade
-	@ChildTable = 'Codes',
-    @ChildColumn = 'Id',
-    @ParentTable = 'Users';
-
-EXEC UpdateForeignKeyWithCascade
-	@ChildTable = 'Entrepreneurs_Enterprises',
-	@ChildColumn = 'EntrepreneurId',
-	@ParentTable = 'Entrepreneurs',
-	@ConstraintName = 'FK_EntrepreneursEnterprises_EntrepreneurId';
-
-EXEC UpdateForeignKeyWithCascade
-	@ChildTable = 'Entrepreneurs_Enterprises',
-	@ChildColumn = 'EnterpriseId',
-	@ParentTable = 'Enterprises';
+-- delete from Products where Name = 'Producto1'

@@ -27,19 +27,40 @@ namespace BMT_backend.Handlers
             _conection.Close();
             return tableFormatQuery;
         }
-
-        public bool CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        private bool CheckIfEntryInTable (string tableName, string columnName, string columnValue)
         {
+            string query = "select " + columnName + " from " + tableName + " where " + columnName + " = '" + columnValue + "'";
+            DataTable table = CreateQueryTable(query);
+            if (table.Rows.Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public string CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        {
+            if (CheckIfEntryInTable("Entrepreneurs", "Identification", entrepreneur.Identification))
+            {
+                return "EntrepreneurAlreadyExists";
+            }
             string createEntrepreneurQuery = "insert into Entrepreneurs (UserId, Identification) " +
                 "values ((select Id from Users where UserName = @UserName), " +
                         "@Identification);";
+
+            string debugString = "insert into Entrepreneurs (UserId, Identification) " +
+                "values ((select Id from Users where UserName = '" + entrepreneur.Username + "'), " +
+                        "'" + entrepreneur.Identification + "');";
+
+            Console.WriteLine(debugString);
+
             var createEntrepreneurCommand = new SqlCommand(createEntrepreneurQuery, _conection);
             createEntrepreneurCommand.Parameters.AddWithValue("@UserName", entrepreneur.Username);
             createEntrepreneurCommand.Parameters.AddWithValue("@Identification", entrepreneur.Identification);
             _conection.Open();
-            bool exit = createEntrepreneurCommand.ExecuteNonQuery() >= 1;
+            createEntrepreneurCommand.ExecuteNonQuery();
             _conection.Close();
-            return exit;
+            return "NewEntrepreneurCreated";
         }
 
         public bool AddEntrepreneurToEnterprise(AddEntrepreneurToEnterpriseRequest request)
@@ -135,4 +156,5 @@ namespace BMT_backend.Handlers
         }
     }
 }
+
 

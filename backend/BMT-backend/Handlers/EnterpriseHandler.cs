@@ -37,8 +37,27 @@ namespace BMT_backend.Handlers
             return tableFormatQuery;
         }
 
-        public bool CreateEnterprise(EnterpriseModel enterprise)
+        private bool CheckIfEntryInTable(string tableName, string columnName, string columnValue)
         {
+            string query = "select " + columnName + " from " + tableName + " where " + columnName + " = '" + columnValue + "'";
+            DataTable table = CreateQueryTable(query);
+            if (table.Rows.Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public string CreateEnterprise(EnterpriseModel enterprise)
+        {
+            if (CheckIfEntryInTable("Enterprises", "IdentificationNumber", enterprise.IdentificationNumber))
+            {
+                return "EnterpriseAlreadyExistsId";
+            }
+            if (CheckIfEntryInTable("Enterprises", "Name", enterprise.Name))
+            {
+                return "EnterpriseAlreadyExistsName";
+            }
             string createEnterpriseQuery = "insert into Enterprises (" +
             "IdentificationType, IdentificationNumber, Name, Description) " +
             "values (@IdentificationType, @IdentificationNumber, @Name, @Description);";
@@ -50,9 +69,9 @@ namespace BMT_backend.Handlers
             queryCommand.Parameters.AddWithValue("@Description", enterprise.Description);
 
             _conection.Open();
-            bool exit = queryCommand.ExecuteNonQuery() >= 1;
+            queryCommand.ExecuteNonQuery();
             _conection.Close();
-            return exit;
+            return "NewEnterpriseCreated";
         }
 
         public List<EnterpriseModel> GetEnterprises()
