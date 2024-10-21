@@ -1,3 +1,4 @@
+
 import { createApp } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -24,7 +25,8 @@ import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
-
+import vuetify from './plugins/vuetify'
+import { loadFonts } from './plugins/webfontloader'
 import BootstrapVue3 from 'bootstrap-vue-3';
 import Swal from 'sweetalert2';
 
@@ -36,53 +38,56 @@ export const API_URL = 'https://localhost:7189/api';
 
 // Set up Axios interceptors
 axios.interceptors.request.use(config => {
-    const token = getToken();
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 }, error => {
-    return Promise.reject(error);
+  return Promise.reject(error);
 });
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes: [
-        { path: '/', name: "Home", component: HomePage },
-        { path: '/client-home', name: "ClientHome", component: HomePageUserClient },
-        { path: '/entrepeneur-home', name: "entrepeneurhome", component: HomePageEntrepeneur },
+  history: createWebHistory(),
+  routes: [
+    { path: '/', name: "Home", component: HomePage },
+    { path: '/client-home', name: "ClientHome", component: HomePageUserClient },
+    { path: '/entrepeneur-home', name: "entrepeneurhome", component: HomePageEntrepeneur },
 
-        { path: '/register', name: "Register", component: RegisterForm },
-        { path: '/login', name: "Login", component: LoginForm },
-        { path: '/email-verification', name: "VerifyEmail", component: EmailVerification },
-        { path: '/profile', name: "Profile", component: ProfilePage },
-        { path: '/register-address', name: "RegisterAddress", component: RegisterAddressForm },
+    { path: '/register', name: "Register", component: RegisterForm },
+    { path: '/login', name: "Login", component: LoginForm },
+    { path: '/email-verification', name: "VerifyEmail", component: EmailVerification },
+    { path: '/profile', name: "Profile", component: ProfilePage },
+    { path: '/register-address', name: "RegisterAddress", component: RegisterAddressForm },
 
-        { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
-        { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
-        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
-        { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
-        { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
+    { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
+    { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
+    { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
+    { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
+    { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
 
-        { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
-        { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper },
-        { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
-        { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
-    ]
+    { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
+    { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper },
+    { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
+    { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
+  ]
 });
 
 router.beforeEach((to, from, next) => {
-    const token = getToken();
+  const token = getToken();
 
-    if (to.meta.requiresAuth && !token) {
-        next('/login');
-    } else {
-        next();
-    }
+  if (to.meta.requiresAuth && !token) {
+    next('/login');
+  } else {
+    next();
+  }
 });
+
+loadFonts()
 
 const app = createApp(App);
 app.use(BootstrapVue3);
+app.use(vuetify)
 app.use(router);
 app.config.globalProperties.$swal = Swal;
 app.mount('#app');
