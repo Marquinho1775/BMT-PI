@@ -63,7 +63,7 @@ export default {
               return axios.post(API_URL + '/Email/verifyaccount', codeTaken);
             }).then(() => {
               console.log('Cuenta verificada');
-              this.$router.push('/client-home'); // Use this for navigation
+              this.$router.push('/');
             });
           })
           .catch(error => {

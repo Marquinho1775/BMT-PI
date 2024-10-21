@@ -7,12 +7,13 @@
         <h3 class="text-center card-header-custom">Datos del emprendedor</h3>
         <div class="card-body">
 
-          <b-form-group label="Número de identificación"
-            label-for="identification-number-e">
+          <b-form-group label="Número de identificación" label-for="identification-number-e">
             <b-form-input id="identification-number-e" class="form-input" v-model="entrepreneurData.identification"
-              placeholder="Ingrese su número de cédula" required :state="identificationValid1" @input="validateIdentification1">
+              placeholder="Ingrese su número de cédula" required :state="identificationValid1"
+              @input="validateIdentification1">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!identificationValid1">El número de cédula debe tener 9 dígitos.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!identificationValid1">El número de cédula debe tener 9
+              dígitos.</b-form-invalid-feedback>
           </b-form-group>
 
         </div>
@@ -22,7 +23,8 @@
         <h3 class="text-center card-header-custom">Datos de la empresa</h3>
         <div class="card-body">
 
-          <b-form-group id="selection-group-id-type" label="Seleccione el tipo de identificación de su negocio" label-for="select-id-type">
+          <b-form-group id="selection-group-id-type" label="Seleccione el tipo de identificación de su negocio"
+            label-for="select-id-type">
             <b-form-select id="select-id-type" class="form-input" v-model="enterpriseData.identificationType" required
               :options="idTypeOptions" @change="validateIdentification2">
             </b-form-select>
@@ -30,8 +32,9 @@
 
           <b-form-group id="group-identification-number-en" label="Número de identificación"
             label-for="identification-number-en">
-            <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber" 
-            placeholder="Ingresar número de identificación" required :state="identificationValid2" @input="validateIdentification2">
+            <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber"
+              placeholder="Ingresar número de identificación" required :state="identificationValid2"
+              @input="validateIdentification2">
             </b-form-input>
             <b-form-invalid-feedback v-if="identificationValid2 === false">
               El número de identificación debe tener {{ enterpriseData.identificationType === 1 ? '9' : '10' }} dígitos.
@@ -52,16 +55,19 @@
 
           <b-form-group id="group-email" label="Correo electrónico:" label-for="email">
             <b-form-input id="email" class="form-input" v-model="enterpriseData.email"
-              placeholder="Ingresar correo electrónico" type="email" required :state="emailValid" @input="validateEmail">
+              placeholder="Ingresar correo electrónico" type="email" required :state="emailValid"
+              @input="validateEmail">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!emailValid">El correo debe tener el formato xxxx@xxx.xxx</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!emailValid">El correo debe tener el formato
+              xxxx@xxx.xxx</b-form-invalid-feedback>
           </b-form-group>
 
           <b-form-group id="group-phone-number" label="Número de teléfono:" label-for="phone-number">
             <b-form-input id="phone-number" class="form-input" v-model="enterpriseData.phoneNumber"
               placeholder="Ingresar número de teléfono" required :state="phoneValid" @input="validatePhone">
             </b-form-input>
-            <b-form-invalid-feedback v-if="!phoneValid">El número de teléfono debe tener 8 dígitos.</b-form-invalid-feedback>
+            <b-form-invalid-feedback v-if="!phoneValid">El número de teléfono debe tener 8
+              dígitos.</b-form-invalid-feedback>
           </b-form-group>
 
         </div>
@@ -147,7 +153,7 @@ export default {
         await this.addEntrepreneurToEnterprise();
         console.log('Entrepreneur added to enterprise');
         this.generateSweetAlert('Registro exitoso', 'success', 'Se ha registrado exitosamente su empresa.');
-        this.$router.push('/entrepreneur-home');
+        this.$router.push('/');
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Ocurrió un error durante el registro. Por favor, inténtalo de nuevo.');
         console.error(error);
@@ -186,6 +192,7 @@ export default {
         const role = 'emp';
         const url = `${API_URL}/User/Role?id=${encodeURIComponent(userId)}&role=${encodeURIComponent(role)}`;
         await axios.post(url);
+        JSON.parse(localStorage.getItem('user')).role = role;
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al cambiar el rol del usuario.');
         console.error(error);
@@ -214,7 +221,7 @@ export default {
           description: this.enterpriseData.description.trim(),
           email: this.enterpriseData.email.trim(),
           phoneNumber: this.enterpriseData.phoneNumber.trim(),
-        }); 
+        });
         return response.data;
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al registrar su empresa. Inténtalo de nuevo.');
@@ -280,13 +287,11 @@ export default {
       this.enterpriseData.description = '';
     },
     goBack() {
-      this.$router.push('/client-home');
+      this.$router.push('/');
     },
   },
 
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

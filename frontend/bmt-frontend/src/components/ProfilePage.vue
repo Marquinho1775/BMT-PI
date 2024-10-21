@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     goBack() {
-      this.$router.push('/entrepeneur-home');
+      this.$router.push('/');
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
