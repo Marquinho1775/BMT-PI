@@ -48,15 +48,55 @@
       </v-list>
     </v-navigation-drawer>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN CONTENT: Mostrar productos en cards -->
     <v-main class="flex-grow-1">
       <v-container>
         <div v-if="!isLoggedIn" class="text-center">
           <h2>Bienvenido a Business Tracker</h2>
         </div>
         <div v-if="isLoggedIn">
-          <h2>Bienvenido a Business Tracker, {{ username }}, {{ userRole }}</h2>
+          <h2>Bienvenido a Business Tracker</h2>
         </div>
+
+        <!-- Productos -->
+        <v-row>
+          <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="4" lg="3">
+
+            <v-card class="mx-auto" max-width="344" elevation="4">
+
+              <v-carousel show-arrows="hover" height="200px" hide-delimiters>
+                <v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
+                  <v-img :src="image" height="200px" cover></v-img>
+                </v-carousel-item>
+              </v-carousel>
+
+              <v-card-title> {{ product.name }} </v-card-title>
+
+              <v-card-subtitle> ₡ {{ product.price }} </v-card-subtitle>
+
+              <v-card-actions>
+                <v-btn prepend-icon="mdi-plus" color="primary" text="Añadir al carrito"></v-btn>
+
+                <v-spacer></v-spacer>
+
+                <v-btn :icon="product.show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                  @click="product.show = !product.show"></v-btn>
+              </v-card-actions>
+
+              <v-expand-transition>
+                <div v-show="product.show">
+                  <v-divider></v-divider>
+                  <v-spacer></v-spacer>
+
+                  <v-row>
+                    <v-chip v-for="(tag, index) in product.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
+                  </v-row>
+                  <v-card-text> {{ product.description }} </v-card-text>
+                </div>
+              </v-expand-transition>
+            </v-card>
+          </v-col>
+        </v-row>
       </v-container>
     </v-main>
 
@@ -66,15 +106,15 @@
         &copy; 2024 Business Tracker. Todos los derechos reservados.
       </v-col>
     </v-footer>
-
   </v-app>
 </template>
 
 <script>
 import axios from 'axios';
 import { API_URL } from '@/main.js';
-export default {
+import { URL } from '@/main.js';
 
+export default {
   data() {
     return {
       username: '',
@@ -91,12 +131,20 @@ export default {
   methods: {
     async getProducts() {
       try {
-        const response = await axios.get(API_URL + '/Developer/GetProducts/');
+        const response = await axios.get(API_URL + '/Product');
+        console.log('Productos obtenidos:', response.data);
         this.products = response.data;
+        this.URLImage();
 
       } catch (error) {
         console.error('Error fetching products:', error);
       }
+    },
+    URLImage() {
+      this.products.forEach(product => {
+        product.imagesURLs = product.imagesURLs.map(image => URL + image);
+        product.show = false;
+      });
     },
     handleLogin() {
       this.$router.push('/login');
@@ -144,19 +192,21 @@ export default {
 <style scoped>
 .v-application {
   min-height: 100vh;
-  /* Ocupa al menos la altura completa de la pantalla */
   display: flex;
   flex-direction: column;
 }
 
 .v-footer {
   height: 50px;
-  /* Tamaño reducido del footer */
   background-color: #9FC9FC;
 }
 
 .flex-grow-1 {
   flex-grow: 1;
-  /* Asegura que el contenido principal ocupe todo el espacio disponible */
+}
+
+.v-card {
+  margin-bottom: 16px;
+  /* Separación entre las tarjetas */
 }
 </style>
