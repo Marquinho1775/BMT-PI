@@ -193,7 +193,7 @@ namespace BMT_backend.Handlers
                         Price = Convert.ToDouble(row["Price"]),
                         EnterpriseName = Convert.ToString(row["EnterpriseName"]),
                         Tags = GetProductTags(Convert.ToString(row["Id"])),
-                        // ImagesURLs = GetProductImages(Convert.ToString(row["Id"]))
+                        ImagesURLs = GetProductImages(Convert.ToString(row["Id"]))
                     }
                 );
             }
@@ -224,8 +224,8 @@ namespace BMT_backend.Handlers
         {
             List<string> images = new List<string>();
             string getImagesQuery = "select i.URL " +
-                "from Images i " +
-                "join Products p on i.OwnerId = p.Id " +
+                "from ProductImages i " +
+                "join Products p on i.ProductId = p.Id " +
                 "where p.Id = @ProductId;";
             var getImagesCommand = new SqlCommand(getImagesQuery, _conection);
             getImagesCommand.Parameters.AddWithValue("@ProductId", productId);

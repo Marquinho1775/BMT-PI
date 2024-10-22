@@ -23,20 +23,23 @@ import RegisterAddressForm from './components/RegisterAddress.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
-import SearchBar from './components/SearchBar.vue';
+import ProductCard from './components/ProductCard.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
-import vuetify from './plugins/vuetify'
-import { loadFonts } from './plugins/webfontloader'
 import BootstrapVue3 from 'bootstrap-vue-3';
 import Swal from 'sweetalert2';
+
+import vuetify from './plugins/vuetify'
+import { loadFonts } from './plugins/webfontloader'
+
 
 // Import the authentication utilities
 import { getToken } from './helpers/auth';
 import axios from 'axios';
 
-export const API_URL = 'https://localhost:7189/api';
+export const URL = 'https://localhost:7189/';
+export const API_URL = URL + 'api';
 
 // Set up Axios interceptors
 axios.interceptors.request.use(config => {
@@ -72,8 +75,6 @@ const router = createRouter({
     { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
-    
-    {path: '/search', name: "SearchBar", component: SearchBar}
   ]
 });
 
@@ -87,11 +88,16 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-loadFonts()
+loadFonts();
 
 const app = createApp(App);
+
 app.use(BootstrapVue3);
 app.use(vuetify)
 app.use(router);
+
+app.component('product-card', ProductCard);
+
 app.config.globalProperties.$swal = Swal;
+
 app.mount('#app');

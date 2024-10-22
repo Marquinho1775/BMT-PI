@@ -24,7 +24,7 @@
         public double Price { get; set; }
         public string EnterpriseName { get; set; }
         public List<string> Tags { get; set; }
-        // public List<string> ImagesURLs { get; set; }
+        public List<string> ImagesURLs { get; set; }
     }
 }
 
