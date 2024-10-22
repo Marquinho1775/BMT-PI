@@ -23,6 +23,8 @@ import RegisterAddressForm from './components/RegisterAddress.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
+import SearchBar from './components/SearchBar.vue';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
 import vuetify from './plugins/vuetify'
@@ -70,6 +72,8 @@ const router = createRouter({
     { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
+    
+    {path: '/search', name: "SearchBar", component: SearchBar}
   ]
 });
 

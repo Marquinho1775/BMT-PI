@@ -1,6 +1,3 @@
-USE BMT_database
-GO
-
 CREATE PROCEDURE UpdateForeignKeyWithCascade
     @ChildTable NVARCHAR(128),
     @ChildColumn NVARCHAR(128),

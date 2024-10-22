@@ -1,9 +1,3 @@
-create database BMT_database;
-GO
-
-use BMT_database;
-GO
-
 -- Creación de tabla de usuarios
 create table Users(
     Id			uniqueidentifier	NOT NULL PRIMARY KEY DEFAULT (newid()),
