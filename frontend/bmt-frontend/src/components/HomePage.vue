@@ -59,11 +59,8 @@
         </div>
 
         <!-- Productos -->
-        <v-row>
-          <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="4" lg="3">
-            <product-card :product="product" />
-          </v-col>
-        </v-row>
+        <product-search-grid :products="products" />
+
       </v-container>
     </v-main>
 
@@ -98,7 +95,6 @@ export default {
     async getProducts() {
       try {
         const response = await axios.get(`${API_URL}/Product`);
-        console.log('Productos obtenidos:', response.data);
         this.products = response.data;
         this.URLImage();
       } catch (error) {

@@ -1,6 +1,3 @@
-use BMT_database;
-go 
-
 -- Renombrar tabla de ProductTags
 sp_rename 'Product_Tags', 'ProductTags';
 

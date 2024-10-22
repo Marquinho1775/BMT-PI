@@ -1,6 +1,3 @@
-USE BMT_database
-GO
-
 ALTER TABLE Users
 ADD Role VARCHAR(3) NOT NULL DEFAULT 'cli';
 
