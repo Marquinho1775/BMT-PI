@@ -61,40 +61,7 @@
         <!-- Productos -->
         <v-row>
           <v-col v-for="product in products" :key="product.id" cols="12" sm="6" md="4" lg="3">
-
-            <v-card class="mx-auto" max-width="344" elevation="4">
-
-              <v-carousel show-arrows="hover" height="200px" hide-delimiters>
-                <v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
-                  <v-img :src="image" height="200px" cover></v-img>
-                </v-carousel-item>
-              </v-carousel>
-
-              <v-card-title> {{ product.name }} </v-card-title>
-
-              <v-card-subtitle> ₡ {{ product.price }} </v-card-subtitle>
-
-              <v-card-actions>
-                <v-btn prepend-icon="mdi-plus" color="primary" text="Añadir al carrito"></v-btn>
-
-                <v-spacer></v-spacer>
-
-                <v-btn :icon="product.show ? 'mdi-chevron-up' : 'mdi-chevron-down'"
-                  @click="product.show = !product.show"></v-btn>
-              </v-card-actions>
-
-              <v-expand-transition>
-                <div v-show="product.show">
-                  <v-divider></v-divider>
-                  <v-spacer></v-spacer>
-
-                  <v-row>
-                    <v-chip v-for="(tag, index) in product.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
-                  </v-row>
-                  <v-card-text> {{ product.description }} </v-card-text>
-                </div>
-              </v-expand-transition>
-            </v-card>
+            <product-card :product="product" />
           </v-col>
         </v-row>
       </v-container>
@@ -111,8 +78,7 @@
 
 <script>
 import axios from 'axios';
-import { API_URL } from '@/main.js';
-import { URL } from '@/main.js';
+import { API_URL, URL } from '@/main.js';
 
 export default {
   data() {
@@ -131,20 +97,23 @@ export default {
   methods: {
     async getProducts() {
       try {
-        const response = await axios.get(API_URL + '/Product');
+        const response = await axios.get(`${API_URL}/Product`);
         console.log('Productos obtenidos:', response.data);
         this.products = response.data;
         this.URLImage();
-
       } catch (error) {
         console.error('Error fetching products:', error);
       }
     },
     URLImage() {
       this.products.forEach(product => {
-        product.imagesURLs = product.imagesURLs.map(image => URL + image);
-        product.show = false;
+        if (Array.isArray(product.imagesURLs)) {
+          product.imagesURLs = product.imagesURLs.map(image => `${URL}${image}`);
+        } else {
+          console.warn(`El producto con ID ${product.id} no tiene una propiedad imagesURLs válida.`);
+        }
       });
+      console.log('Productos con URLs actualizadas:', this.products);
     },
     handleLogin() {
       this.$router.push('/login');
@@ -207,6 +176,5 @@ export default {
 
 .v-card {
   margin-bottom: 16px;
-  /* Separación entre las tarjetas */
 }
 </style>
