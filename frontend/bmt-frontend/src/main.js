@@ -23,12 +23,16 @@ import RegisterAddressForm from './components/RegisterAddress.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
+import ProductCard from './components/ProductCard.vue';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
-import vuetify from './plugins/vuetify'
-import { loadFonts } from './plugins/webfontloader'
 import BootstrapVue3 from 'bootstrap-vue-3';
 import Swal from 'sweetalert2';
+
+import vuetify from './plugins/vuetify'
+import { loadFonts } from './plugins/webfontloader'
+
 
 // Import the authentication utilities
 import { getToken } from './helpers/auth';
@@ -84,11 +88,16 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-loadFonts()
+loadFonts();
 
 const app = createApp(App);
+
 app.use(BootstrapVue3);
 app.use(vuetify)
 app.use(router);
+
+app.component('product-card', ProductCard);
+
 app.config.globalProperties.$swal = Swal;
+
 app.mount('#app');
