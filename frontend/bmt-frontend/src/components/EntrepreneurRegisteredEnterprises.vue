@@ -62,7 +62,6 @@ export default {
         const token = getToken();
         const user = JSON.parse(localStorage.getItem('user'));
 
-        // Verificar si el usuario está presente y tiene todos los campos requeridos
         if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
           console.error('Faltan datos del usuario');
           return;
@@ -119,7 +118,7 @@ export default {
         console.error('El ID de la empresa es undefined');
         return;
       }
-      console.log(enterpriseId); // Asegúrate de que el ID no sea undefined
+      console.log(enterpriseId);
       this.$router.push(`/enterprise/${enterpriseId}`);
     }
   }

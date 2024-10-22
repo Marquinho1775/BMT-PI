@@ -2,14 +2,14 @@
 	<v-card class="mx-auto" max-width="344" elevation="4">
 		<!-- Carrousel de Imágenes -->
 		<v-carousel show-arrows="hover" height="200px" hide-delimiters>
-			<v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
+			<v-carousel-item v-for="(image, index) in product.raw.imagesURLs" :key="index">
 				<v-img :src="image" height="200px" aspect-ratio="16/9" cover></v-img>
 			</v-carousel-item>
 		</v-carousel>
 
 		<!-- Título y Precio del Producto -->
-		<v-card-title>{{ product.name }}</v-card-title>
-		<v-card-subtitle>₡ {{ product.price }}</v-card-subtitle>
+		<v-card-title>{{ product.raw.name }}</v-card-title>
+		<v-card-subtitle>₡ {{ product.raw.price }}</v-card-subtitle>
 
 		<v-card-actions>
 			<v-btn prepend-icon="mdi-plus" color="primary" text>Añadir al carrito</v-btn>
@@ -23,9 +23,9 @@
 				<v-divider></v-divider>
 				<v-spacer></v-spacer>
 				<v-chip-group>
-					<v-chip v-for="(tag, index) in product.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
+					<v-chip v-for="(tag, index) in product.raw.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
 				</v-chip-group>
-				<v-card-text>{{ product.description }}</v-card-text>
+				<v-card-text>{{ product.raw.description }}</v-card-text>
 			</div>
 		</v-expand-transition>
 	</v-card>
@@ -42,7 +42,7 @@ export default {
 	},
 	data() {
 		return {
-			isShow: false, // Estado local para manejar la visibilidad
+			isShow: false,
 		};
 	},
 	mounted() {

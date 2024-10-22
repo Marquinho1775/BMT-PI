@@ -3,7 +3,7 @@
     <div class="card profile-card" style="max-width: 900px; width: 100%;">
       <!-- Header with Profile Picture and Name -->
       <div class="card-header profile-card-header d-flex align-items-center">
-        <b-avatar src="https://placekitten.com/300/300" size="7rem" class="mr-3"></b-avatar>
+        <b-avatar :src="imageURL" size="7rem" class="mr-3"></b-avatar>
         <div class="profile-name-container">
           <h2 class="mb-0">{{ user.name }} {{ user.lastName }}</h2>
         </div>
@@ -79,12 +79,13 @@
 
 <script>
 import axios from 'axios';
-import { API_URL } from '@/main.js';
+import { API_URL, URL } from '@/main.js';
 import { getToken } from '@/helpers/auth';
 
 export default {
   data() {
     return {
+      imageURL: '',
       user: {
         id: '',
         name: '',
@@ -92,9 +93,11 @@ export default {
         username: '',
         email: '',
         isVerified: false,
-        password: ''
+        password: '',
+        role: '',
+        profilePictureURL: '',
       },
-      directions: [], // Lista de direcciones del usuario
+      directions: [],
       showPassword: false,
       fields: [
         { key: 'numDirection', label: 'Nombre de la Dirección' },
@@ -103,8 +106,7 @@ export default {
         { key: 'district', label: 'Distrito' },
         { key: 'otherSigns', label: 'Otras señas' },
         { key: 'coordinates', label: 'Coordenadas' }
-      ]
-
+      ],
     };
   },
   created() {
@@ -113,9 +115,13 @@ export default {
     } else {
       this.user = JSON.parse(localStorage.getItem('user')) || this.user;
       this.GetDirectionsOfUser();
+      this.imageURL = URL + this.user.profilePictureURL;
     }
   },
   methods: {
+    CreateURLImage() {
+      this.imageURL = this.user.profilePicture.map(image => `${URL}${image}`);
+    } ,
     goBack() {
       this.$router.push('/');
     },
@@ -144,9 +150,6 @@ export default {
             }
           }
         );
-
-        console.log(response.data);
-
         this.directions = response.data;
       } catch (error) {
         console.error('Error al obtener las direcciones del usuario:', error);

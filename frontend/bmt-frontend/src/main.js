@@ -3,8 +3,6 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from './components/HomePage.vue';
-import HomePageUserClient from './components/HomePageUserClient.vue';
-import HomePageEntrepeneur from './components/HomePageEntrepeneur.vue';
 
 import RegisterForm from './components/RegisterForm.vue';
 import LoginForm from './components/LoginForm.vue';
@@ -15,7 +13,6 @@ import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
 
-import HomePageDeveloper from './components/HomePageDeveloper.vue';
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
@@ -24,6 +21,7 @@ import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 import ProductCard from './components/ProductCard.vue';
+import ProductSearchGrid from './components/ProductSearchGrid.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -56,8 +54,6 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: "Home", component: HomePage },
-    { path: '/client-home', name: "ClientHome", component: HomePageUserClient },
-    { path: '/entrepeneur-home', name: "entrepeneurhome", component: HomePageEntrepeneur },
 
     { path: '/register', name: "Register", component: RegisterForm },
     { path: '/login', name: "Login", component: LoginForm },
@@ -72,7 +68,6 @@ const router = createRouter({
     { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
-    { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
   ]
@@ -97,6 +92,7 @@ app.use(vuetify)
 app.use(router);
 
 app.component('product-card', ProductCard);
+app.component('product-search-grid', ProductSearchGrid);
 
 app.config.globalProperties.$swal = Swal;
 
