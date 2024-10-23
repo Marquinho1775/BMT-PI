@@ -22,6 +22,24 @@ namespace BMT_backend.Controllers
             return _entrepeneurshipHandler.GetEnterprises();
         }
 
+        [HttpGet("CheckExistingEnterprise")]
+        public async Task<ActionResult<bool>> CheckExistingEnterprise(string identification)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(identification))
+                {
+                    return BadRequest("Identification cannot be null or empty.");
+                }
+                var result = _entrepeneurshipHandler.CheckIfEnterpriseExists(identification);
+                return new JsonResult(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si la empresa existe");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<bool>> CreateEnterprise(EnterpriseModel enterprise)
         {

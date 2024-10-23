@@ -10,12 +10,12 @@ namespace BMT_backend.Controllers
     public class ImageFileController : ControllerBase
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ImageFileHandler _imageUploadHandler;
+        private readonly ImageFileHandler _imageFileHandler;
         
         public ImageFileController(IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;
-            _imageUploadHandler = new ImageFileHandler();
+            _imageFileHandler = new ImageFileHandler();
         }
 
         [HttpPost("upload")]
@@ -40,24 +40,38 @@ namespace BMT_backend.Controllers
                     {
                         await image.CopyToAsync(stream);
                     }
-                    var relativePath = Path.Combine("uploads", fileName);
-                    _imageUploadHandler.SaveImage(ownerId, ownerType, relativePath);
+                    var relativePath = "uploads/" + fileName;
+                    _imageFileHandler.SaveImage(ownerId, ownerType, relativePath);
                 }
             }
             return Ok("Images uploaded successfully.");
         }
 
-        [HttpGet("get")]
-        public ActionResult<List<string>> GetImages(string ownerId)
+        [HttpGet("get-product-images")]
+        public ActionResult<List<string>> GetProductImages(string productId)
         {
             try
             {
-                var images = _imageUploadHandler.GetImage(ownerId);
+                var images = _imageFileHandler.GetProductImages(productId);
                 return Ok(images);
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Error obteniendo las imágenes: {ex.Message}");
+            }
+        }
+
+        [HttpGet("get-profile-image")]
+        public ActionResult<string> GetProfileImage(string userId)
+        {
+            try
+            {
+                var image = _imageFileHandler.GetProfileImage(userId);
+                return Ok(image);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error obteniendo la imagen de perfil: {ex.Message}");
             }
         }
     }

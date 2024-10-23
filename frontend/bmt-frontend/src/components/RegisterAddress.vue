@@ -46,6 +46,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -64,7 +65,7 @@ export default {
   methods: {
     async registerAddress() {
       try {
-        const response = await axios.post('https://localhost:7189/api/Direction/CreateDirection', this.addressData);
+        const response = await axios.post(API_URL + '/Direction/CreateDirection', this.addressData);
         console.log(response);
         await this.$swal.fire({
           title: 'Registro exitoso',

@@ -61,6 +61,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 import { Popover } from 'bootstrap';
 
 export default {
@@ -72,7 +73,7 @@ export default {
   methods: {
     async getEnterprises() {
       try {
-        const response = await axios.get('https://localhost:7189/api/Developer/getUsers');
+        const response = await axios.get(API_URL + '/Developer/getUsers');
         this.users = response.data;
         this.$nextTick(() => {
           const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
@@ -87,7 +88,7 @@ export default {
       }
     },
     goToMainPage() {
-      this.$router.push('/developer-home');
+      window.location.href = "/";
     },
   },
   mounted() {

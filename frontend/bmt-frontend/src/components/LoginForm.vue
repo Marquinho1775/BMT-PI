@@ -32,6 +32,8 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
+
 export default {
   data() {
     return {
@@ -44,7 +46,7 @@ export default {
   methods: {
     async loginUser() {
       try {
-        const response = await axios.post('https://localhost:7189/api/User/login',
+        const response = await axios.post(API_URL + '/User/login',
           {
             Email: this.loginForm.Email.trim(),
             Password: this.loginForm.Password.trim()
@@ -69,8 +71,7 @@ export default {
               confirmButtonText: 'Ok'
             }).then(() => {
               if (user.isVerified) {
-
-                window.location.href = "/client-home";
+                window.location.href = "/";
               } else {
                 window.location.href = "/email-verification";
               }

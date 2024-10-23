@@ -12,5 +12,6 @@ namespace BMT_backend.Models
         public bool IsVerified { get; set; }
         public string Password { get; set; }
         public string? Role { get; set; }
+        public string? ProfilePictureURL { get; set; }
     }
 }

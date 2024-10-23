@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data;
-using BMT_backend.Models;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Collections.Generic;
-using System.Security.Cryptography.Xml;
-using System;
 
 namespace BMT_backend.Handlers
 {
@@ -42,33 +37,54 @@ namespace BMT_backend.Handlers
             }
             else if (ownerType == "User")
             {
-                createImageQuery = "INSERT INTO UserImages(UserId, URL) VALUES(@OwnerId, @URL);";
+                createImageQuery = "UPDATE Users SET ProfilePictureURL = @URL WHERE Id = @OwnerId;";
                 parameterName = "@OwnerId";
             }
-
             var createImageCommand = new SqlCommand(createImageQuery, _conection);
             createImageCommand.Parameters.Add(parameterName, SqlDbType.UniqueIdentifier).Value = Guid.Parse(ownerId);
             createImageCommand.Parameters.Add("@URL", SqlDbType.VarChar, 255).Value = relativePath;
-
             _conection.Open();
             createImageCommand.ExecuteNonQuery();
             _conection.Close();
         }
 
-        public List<string> GetImage(string ownerId)
+        public List<string> GetProductImages(string productId)
         {
             List<string> images = new List<string>();
-            string getImageQuery = "select URL from Images where OwnerId = @OwnerId";
+            string getImageQuery = "select URL from ProductImages where ProductId = @ProductId";
             var getImageCommand = new SqlCommand(getImageQuery, _conection);
-            getImageCommand.Parameters.AddWithValue("@OwnerId", ownerId);
+            getImageCommand.Parameters.AddWithValue("@ProductId", productId);
+            
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(getImageCommand);
+            DataTable dataTable = new DataTable();
             _conection.Open();
-            DataTable dataTable = CreateQueryTable(getImageQuery);
+            tableAdapter.Fill(dataTable);
             _conection.Close();
+
             for (int i = 0; i < dataTable.Rows.Count; i++)
             {
                 images.Add(dataTable.Rows[i]["URL"].ToString());
             }
             return images;
+        }
+
+        public string GetProfileImage(string userId)
+        {
+            string getImageQuery = "select ProfilePictureURL from Users where Id = @UserId";
+            var getImageCommand = new SqlCommand(getImageQuery, _conection);
+            getImageCommand.Parameters.AddWithValue("@UserId", userId);
+
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(getImageCommand);
+            DataTable dataTable = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(dataTable);
+            _conection.Close();
+
+            if (dataTable.Rows.Count != 0)
+            {
+                return dataTable.Rows[0]["ProfilePictureURL"].ToString();
+            }
+            return "";
         }
     }
 }

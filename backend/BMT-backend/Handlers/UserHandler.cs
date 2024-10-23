@@ -71,7 +71,8 @@ namespace BMT_backend.Handlers
                     Email = Convert.ToString(column["Email"]),
                     IsVerified = Convert.ToBoolean(column["IsVerified"]),
                     Password = Convert.ToString(column["Password"]),
-                    Role = Convert.ToString(column["Role"])
+                    Role = Convert.ToString(column["Role"]),
+                    ProfilePictureURL = Convert.ToString(column["ProfilePictureURL"])
                 });
             }
             return users;

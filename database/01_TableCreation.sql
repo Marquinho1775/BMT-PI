@@ -1,4 +1,5 @@
-use BMT_database;
+create database BMT_database
+GO
 
 -- Creación de tabla de usuarios
 create table Users(
