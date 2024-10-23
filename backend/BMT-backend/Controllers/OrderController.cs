@@ -1,6 +1,9 @@
-using BMT_backend.Handlers;
-using BMT_backend.Models;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BMT_backend.Models;
+using BMT_backend.Handlers;
+using Microsoft.Extensions.Configuration;
 
 namespace BMT_backend.Controllers
 {
@@ -10,53 +13,64 @@ namespace BMT_backend.Controllers
     {
         private readonly OrderHandler _orderHandler;
 
-        public OrderController(OrderHandler orderHandler)
+        public OrderController(IConfiguration configuration)
         {
-            _orderHandler = orderHandler;
+            _orderHandler = new OrderHandler(configuration);
         }
 
         [HttpPost]
-
-        public IActionResult CreateOrder(Order order)
+        public IActionResult CreateOrder(OrderModel order)
         {
             try
             {
-                if (!ModelState.IsValid)
+                if (order == null)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest("Order information is not valid.");
                 }
-
-                var result = _orderHandler.CreateOrder(order);
-                if (result)
-                {
-                    return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
-                }
-                else
-                {
-                    return StatusCode(500, "Error creating order");
-                }
+                var orderId = _orderHandler.CreateOrder(order);
+                return Ok(new { Id = orderId });
             }
-            catch (Exception ex)
+            catch
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating the order.");
             }
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetOrderById(int id)
+        [HttpGet]
+        public IEnumerable<OrderModel> GetOrders()
+        {
+            return _orderHandler.GetOrders();
+        }
+
+        [HttpPut("{id}/status")]
+        public IActionResult UpdateOrderStatus(string id, int newStatus)
         {
             try
             {
-                var order = _orderHandler.GetOrderById(id);
-                if (order == null)
+                var result = _orderHandler.UpdateOrderStatus(id, newStatus);
+                if (!result)
                 {
-                    return NotFound();
+                    return NotFound("Order not found.");
                 }
-                return Ok(order);
+                return NoContent();
             }
-            catch (Exception ex)
+            catch
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the order status.");
+            }
+        }
+
+        [HttpGet("orders-with-products")]
+        public IActionResult GetOrdersWithProducts()
+        {
+            try
+            {
+                var orders = _orderHandler.GetOrders();
+                return Ok(orders);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving orders.");
             }
         }
     }

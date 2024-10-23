@@ -1,68 +1,97 @@
-using BMT_backend.Models;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using Newtonsoft.Json;
+using BMT_backend.Models;
 
 namespace BMT_backend.Handlers
 {
     public class OrderHandler
     {
-        private SqlConnection _connection;
-        private string _connectionString;
+        private readonly SqlConnection _connection;
 
-        public OrderHandler()
+        public OrderHandler(IConfiguration configuration)
         {
-            var builder = WebApplication.CreateBuilder();
-            _connectionString = builder.Configuration.GetConnectionString("BMTContext");
-            Connection = new SqlConnection(_connectionString);
+            _connection = new SqlConnection(configuration.GetConnectionString("BMTContext"));
         }
 
-        public SqlConnection Connection { get => _connection; set => _connection = value; }
-
-        // Method to create a new order (assuming DeliveryAddress is not required)
-        public bool CreateOrder(Order order)
+        private DataTable CreateQueryTable(string query)
         {
-            var query = "INSERT INTO dbo.Orders (DeliveryDate) VALUES (@DeliveryDate)";
-            var queryCommand = new SqlCommand(query, Connection);
-            queryCommand.Parameters.AddWithValue("@DeliveryDate", order.DeliveryDate);
+            SqlCommand queryCommand = new SqlCommand(query, _connection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
+            _connection.Open();
+            tableAdapter.Fill(tableFormatQuery);
+            _connection.Close();
+            return tableFormatQuery;
+        }
 
-            Connection.Open();
-            bool result = queryCommand.ExecuteNonQuery() >= 1;
-            Connection.Close();
+        public string CreateOrder(OrderModel order)
+        {
+            string createOrderQuery = @"
+                INSERT INTO Orders (OrderDate, OrderCost, DeliveryFee, Weight, UserId, UserName, DirectionNum, Status, Products) 
+                OUTPUT INSERTED.OrderId
+                VALUES (@OrderDate, @OrderCost, @DeliveryFee, @Weight, @UserId, @UserName, @DirectionNum, @Status, @Products);";
 
-            // If successful, retrieve the newly created order ID and update the OrderItems
-            if (result)
+            using var command = new SqlCommand(createOrderQuery, _connection);
+            command.Parameters.AddWithValue("@OrderDate", order.OrderDate);
+            command.Parameters.AddWithValue("@OrderCost", order.OrderCost);
+            command.Parameters.AddWithValue("@DeliveryFee", order.DeliveryFee);
+            command.Parameters.AddWithValue("@Weight", order.Weight);
+            command.Parameters.AddWithValue("@UserId", order.UserId);
+            command.Parameters.AddWithValue("@UserName", order.UserName);
+            command.Parameters.AddWithValue("@DirectionNum", order.DirectionNum);
+            command.Parameters.AddWithValue("@Status", order.Status);
+            command.Parameters.AddWithValue("@Products", JsonConvert.SerializeObject(order.Products));
+
+            _connection.Open();
+            var orderId = command.ExecuteScalar()?.ToString();
+            _connection.Close();
+
+            return orderId ?? string.Empty;
+        }
+
+        public List<OrderModel> GetOrders()
+        {
+            var orders = new List<OrderModel>();
+            string query = "SELECT * FROM Orders;";
+
+            using var command = new SqlCommand(query, _connection);
+            var table = CreateQueryTable(query);
+
+            foreach (DataRow row in table.Rows)
             {
-                // Logic to retrieve the newly created order ID (e.g., using SCOPE_IDENTITY())
-                //order.Id = ;
-                foreach (var item in order.OrderItems)
+                orders.Add(new OrderModel
                 {
-                    item.OrderId = order.Id;
-                    // Call a separate method to create the OrderItem (not shown here)
-                    CreateOrderItem(item);
-                }
+                    OrderId = row["OrderId"].ToString(),
+                    OrderDate = Convert.ToDateTime(row["OrderDate"]),
+                    OrderCost = Convert.ToDecimal(row["OrderCost"]),
+                    DeliveryFee = Convert.ToDecimal(row["DeliveryFee"]),
+                    Weight = Convert.ToDecimal(row["Weight"]),
+                    UserId = row["UserId"].ToString(),
+                    UserName = row["UserName"].ToString(),
+                    DirectionNum = row["DirectionNum"].ToString(),
+                    Status = Convert.ToInt32(row["Status"]),
+                    Products = JsonConvert.DeserializeObject<List<ProductDetails>>(row["Products"].ToString())
+                });
             }
+            return orders;
+        }
+
+        public bool UpdateOrderStatus(string orderId, int newStatus)
+        {
+            string updateQuery = "UPDATE Orders SET Status = @Status WHERE OrderId = @OrderId;";
+
+            using var command = new SqlCommand(updateQuery, _connection);
+            command.Parameters.AddWithValue("@Status", newStatus);
+            command.Parameters.AddWithValue("@OrderId", orderId);
+
+            _connection.Open();
+            var result = command.ExecuteNonQuery() >= 1;
+            _connection.Close();
 
             return result;
-        }
-
-        internal object GetOrderById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        // Method to create a new order item (assuming OrderId is already set)
-        private void CreateOrderItem(OrderItem orderItem)
-        {
-            var query = "INSERT INTO dbo.OrderItems (OrderId, ProductId, Quantity) VALUES (@OrderId, @ProductId, @Quantity)";
-            var queryCommand = new SqlCommand(query, Connection);
-            queryCommand.Parameters.AddWithValue("@OrderId", orderItem.OrderId);
-            queryCommand.Parameters.AddWithValue("@ProductId", orderItem.ProductId);
-            queryCommand.Parameters.AddWithValue("@Quantity", orderItem.Quantity);
-
-            Connection.Open();
-            queryCommand.ExecuteNonQuery();
-            Connection.Close();
         }
     }
 }
