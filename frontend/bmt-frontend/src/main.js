@@ -4,21 +4,23 @@ import App from './App.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from './components/HomePage.vue';
 
-import RegisterForm from './components/RegisterForm.vue';
-import LoginForm from './components/LoginForm.vue';
-import EmailVerification from './components/EmailVerification.vue';
-import ProfilePage from './components/ProfilePage.vue';
+import UserRegisterForm from './components/UserRegisterForm.vue';
+import UserLoginForm from './components/UserLoginForm.vue';
+import UserEmailVerification from './components/UserEmailVerification.vue';
+import UserProfilePage from './components/UserProfilePage.vue';
+import UserRegisterAddress from './components/UserRegisterAddress.vue';
 
-import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
+
+import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
+import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
+
+import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
-import RegisterAddressForm from './components/RegisterAddress.vue';
-import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
-import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
@@ -55,16 +57,18 @@ const router = createRouter({
   routes: [
     { path: '/', name: "Home", component: HomePage },
 
-    { path: '/register', name: "Register", component: RegisterForm },
-    { path: '/login', name: "Login", component: LoginForm },
-    { path: '/email-verification', name: "VerifyEmail", component: EmailVerification },
-    { path: '/profile', name: "Profile", component: ProfilePage },
-    { path: '/register-address', name: "RegisterAddress", component: RegisterAddressForm },
+    { path: '/register', name: "Register", component: UserRegisterForm },
+    { path: '/login', name: "Login", component: UserLoginForm },
+    { path: '/email-verification', name: "VerifyEmail", component: UserEmailVerification },
+    { path: '/profile', name: "Profile", component: UserProfilePage },
+    { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress },
 
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
+    { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
+
     { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
     { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
-    { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
+
     { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
