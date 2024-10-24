@@ -24,6 +24,12 @@
           </v-list-item>
         </v-list-item-group>
         <v-list-item-group v-if="userRole === 'emp'">
+          <v-list-item @click="handleProfileInfo">
+            <v-list-item-title>Mi perfil</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="handleEntrepreneurEnterprises">
+            <v-list-item-title>Mis emprendimientos</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="handleCollaboratorRegister">
             <v-list-item-title>Registrar Colaborador</v-list-item-title>
           </v-list-item>
@@ -122,6 +128,9 @@ export default {
     },
     handleRegister() {
       this.$router.push('/register');
+    },
+    handleEntrepreneurEnterprises() {
+      this.$router.push('/enterprises');
     },
     handleProfileInfo() {
       this.$router.push('/profile');
