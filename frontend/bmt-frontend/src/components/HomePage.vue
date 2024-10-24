@@ -19,13 +19,16 @@
           <v-list-item @click="handleProfileInfo">
             <v-list-item-title>Mis Datos</v-list-item-title>
           </v-list-item>
+          <!-- <v-list-item @click="handleRegisterEntrepreneur">
+            <v-list-item-title>Registrarme como emprendedor</v-list-item-title>
+          </v-list-item> -->
           <v-list-item @click="handleRegisterEnterprise">
-            <v-list-item-title>Registrar Emprendimiento</v-list-item-title>
+            <v-list-item-title>Registrarme Emprendimiento</v-list-item-title>
           </v-list-item>
         </v-list-item-group>
         <v-list-item-group v-if="userRole === 'emp'">
-          <v-list-item @click="handleCollaboratorRegister">
-            <v-list-item-title>Registrar Colaborador</v-list-item-title>
+          <v-list-item @click="handleEntrepreneurInvitation">
+            <v-list-item-title>Invitar Colaborador</v-list-item-title>
           </v-list-item>
           <v-list-item @click="handleRegisterEnterprise">
             <v-list-item-title>Registrar Emprendimiento</v-list-item-title>
@@ -51,10 +54,7 @@
     <!-- MAIN CONTENT: Mostrar productos en cards -->
     <v-main class="flex-grow-1">
       <v-container>
-        <div v-if="!isLoggedIn" class="text-center">
-          <h2>Bienvenido a Business Tracker</h2>
-        </div>
-        <div v-if="isLoggedIn">
+        <div>
           <h2>Bienvenido a Business Tracker</h2>
         </div>
 
@@ -126,8 +126,8 @@ export default {
     handleProfileInfo() {
       this.$router.push('/profile');
     },
-    handleCollaboratorRegister() {
-      this.$router.push('/collab-register');
+    handleEntrepreneurInvitation() {
+      this.$router.push('/entrepreneur-invitation');
     },
     handleRegisterEnterprise() {
       this.$router.push('/enterprise-register');

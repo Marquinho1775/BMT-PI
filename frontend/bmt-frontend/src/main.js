@@ -11,7 +11,7 @@ import ProfilePage from './components/ProfilePage.vue';
 
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
-import CollaboratorProfilePage from './components/CollaboratorProfilePage.vue';
+import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
 
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
@@ -63,7 +63,7 @@ const router = createRouter({
 
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
     { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
-    { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
+    { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
     { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
 
