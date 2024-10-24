@@ -8,23 +8,19 @@
           <div class="card-body">
             <b-form @submit.prevent="loginUser">
 
-              <!-- Correo -->
               <b-form-group id="input-group-email" label="Correo electrónico:">
                 <b-form-input id="email" v-model="loginForm.Email" type="email"
                   placeholder="Ingresar correo electrónico" required></b-form-input>
               </b-form-group>
 
-              <!-- Botones -->
               <b-form-group id="input-group-password" label="Contraseña:">
                 <b-form-input id="password" v-model="loginForm.Password" type="password"
                   placeholder="Ingresar contraseña" required></b-form-input>
               </b-form-group>
 
-              <!-- Botones -->
               <div class="d-flex justify-content-between">
                 <b-button variant="secondary" @click="Volver">Volver</b-button>
                 <b-button class="button" type="submit">Iniciar sesión</b-button>
-
               </div>
             </b-form>
           </div>
@@ -36,6 +32,8 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
+
 export default {
   data() {
     return {
@@ -48,7 +46,7 @@ export default {
   methods: {
     async loginUser() {
       try {
-        const response = await axios.post('https://localhost:7189/api/User/login',
+        const response = await axios.post(API_URL + '/User/login',
           {
             Email: this.loginForm.Email.trim(),
             Password: this.loginForm.Password.trim()
@@ -67,13 +65,13 @@ export default {
             localStorage.setItem('user', JSON.stringify(user));
 
             this.$swal.fire({
-              title: 'Registro exitoso',
+              title: 'Inicio de sesión exitoso',
               text: '¡Haz iniciado sesión correctamente!',
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
               if (user.isVerified) {
-                window.location.href = "/clienthome";
+                window.location.href = "/";
               } else {
                 window.location.href = "/email-verification";
               }

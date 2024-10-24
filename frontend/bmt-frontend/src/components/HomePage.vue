@@ -1,137 +1,176 @@
 <template>
-  <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-ChzD5N+nKyoRSdeUVM4u/wJ6p9DZASogZ30E+5VqC/94wcjx3v+iIv2QO+j25a9E+9Hj+MEgQ8NNQWidgetr4t+iIv2QO+j25a9E+9Hj+MEgQ8NNQWidgetr4t+" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  </head>
-  <body>
-    <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 100vh;">
-      <div>
-        <h2 class="title">Bienvenido a Business Tracker</h2>
-      </div>
-    </div>
-    <div>
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-primary" @click="handleLogin">Iniciar Sesión</button>
-        <button class="btn btn-secondary" @click="handleRegister">Registrarse</button>
-      </div>
-      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header" style="background-color: #02174B;">  
-  
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menú</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: #BCD6F3;"></button>
+  <v-app class="d-flex flex-column">
+    <!-- HEADER: App Bar -->
+    <v-app-bar :elevation="10" app color="#9FC9FC" scroll-behavior="hide" dark>
+      <v-btn icon @click="menuDrawer = !menuDrawer">
+        <v-icon>mdi-menu</v-icon>
+      </v-btn>
+      <v-toolbar-title>Business Tracker</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn v-if="!isLoggedIn" color="primary" @click="handleLogin">Iniciar Sesión</v-btn>
+      <v-btn v-if="!isLoggedIn" color="secondary" @click="handleRegister">Registrarse</v-btn>
+      <v-btn v-if="isLoggedIn" color="primary" @click="handleLogout">Cerrar Sesión</v-btn>
+    </v-app-bar>
+
+    <!-- SIDEBAR: Navigation Drawer -->
+    <v-navigation-drawer v-model="menuDrawer" app color="#39517B">
+      <v-list dense>
+        <v-list-item-group v-if="userRole === 'cli'">
+          <v-list-item @click="handleProfileInfo">
+            <v-list-item-title>Mis Datos</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="handleRegisterEnterprise">
+            <v-list-item-title>Registrar Emprendimiento</v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+        <v-list-item-group v-if="userRole === 'emp'">
+          <v-list-item @click="handleCollaboratorRegister">
+            <v-list-item-title>Registrar Colaborador</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="handleRegisterEnterprise">
+            <v-list-item-title>Registrar Emprendimiento</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="handleProductRegister">
+            <v-list-item-title>Registrar Producto</v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+        <v-list-item-group v-if="userRole === 'dev'">
+          <v-list-item @click="goToEnterprises">
+            <v-list-item-title>Emprendimientos</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="goToProducts">
+            <v-list-item-title>Productos</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="goToUsers">
+            <v-list-item-title>Usuarios</v-list-item-title>
+          </v-list-item>
+        </v-list-item-group>
+      </v-list>
+    </v-navigation-drawer>
+
+    <!-- MAIN CONTENT: Mostrar productos en cards -->
+    <v-main class="flex-grow-1">
+      <v-container>
+        <div v-if="!isLoggedIn" class="text-center">
+          <h2>Bienvenido a Business Tracker</h2>
         </div>
-        <div class="offcanvas-body" style="background-color: #BCD6F3;">
-          <ul class="navbar-nav  
-            justify-content-end">
-          </ul>
+        <div v-if="isLoggedIn">
+          <h2>Bienvenido a Business Tracker</h2>
         </div>
-      </div>
-  
-      <div class="user-icon-container">
-        <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
-          <i class="fa-user">Menú</i>
-        </button>
-      </div>
-    </div>
-  </body>
+
+        <!-- Productos -->
+        <product-search-grid :products="products" />
+
+      </v-container>
+    </v-main>
+
+    <!-- FOOTER -->
+    <v-footer app padless color="#9FC9FC" dark>
+      <v-col class="text-center white--text">
+        &copy; 2024 Business Tracker. Todos los derechos reservados.
+      </v-col>
+    </v-footer>
+  </v-app>
 </template>
-  
+
 <script>
-import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import axios from 'axios';
+import { API_URL, URL } from '@/main.js';
+
 export default {
+  data() {
+    return {
+      username: '',
+      userRole: '',
+      isLoggedIn: false,
+      menuDrawer: false,
+      products: [],
+    };
+  },
+  mounted() {
+    this.getRole();
+    this.getProducts();
+  },
   methods: {
-    mounted() {
-      Bootstrap();
+    async getProducts() {
+      try {
+        const response = await axios.get(`${API_URL}/Product`);
+        this.products = response.data;
+        this.URLImage();
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    },
+    URLImage() {
+      this.products.forEach(product => {
+        if (Array.isArray(product.imagesURLs)) {
+          product.imagesURLs = product.imagesURLs.map(image => `${URL}${image}`);
+        } else {
+          console.warn(`El producto con ID ${product.id} no tiene una propiedad imagesURLs válida.`);
+        }
+      });
+      console.log('Productos con URLs actualizadas:', this.products);
     },
     handleLogin() {
-      console.log('Navigating to login view');
       this.$router.push('/login');
     },
+    handleLogout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      this.isLoggedIn = false;
+      this.$router.push('/');
+    },
     handleRegister() {
-      console.log('Navigating to register view');
       this.$router.push('/register');
+    },
+    handleProfileInfo() {
+      this.$router.push('/profile');
+    },
+    handleCollaboratorRegister() {
+      this.$router.push('/collab-register');
+    },
+    handleRegisterEnterprise() {
+      this.$router.push('/enterprise-register');
+    },
+    handleProductRegister() {
+      this.$router.push('/product');
+    },
+    goToEnterprises() {
+      this.$router.push('/developer-enterprises');
+    },
+    goToProducts() {
+      this.$router.push('/developer-products');
+    },
+    goToUsers() {
+      this.$router.push('/developer-users');
+    },
+    getRole() {
+      const user = JSON.parse(localStorage.getItem('user')) || {};
+      this.username = user.username || '';
+      this.userRole = user.role || '';
+      this.isLoggedIn = !!this.username;
     }
   }
-}
+};
 </script>
-  
+
 <style scoped>
-  @import 'bootstrap/dist/css/bootstrap.min.css';
-  .logo {
-    display: none;
-  }
-  .nav-tabs .nav-link {
-    background-color: #BCD6F3;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  .title {
-    background-color: #D0EDA0;
-    color: #02174B;
-    padding: 50px;
-    border-radius: 100px;
-  }
-  .nav-tabs .nav-link.active {
-    background-color: #8FA3BE;
-    color: #91AC65;
-  }
-  .d-flex {
-    position: fixed;
-    top: 0;
-    right: 0;
-    padding: 10px;
-  }
-  .user-icon-container {
-    padding: 15px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 10px;
-  }
-  .fa-user {
-    color: #BCD6F3;
-  }
-  .offcanvas-title {
-    color: #D0EDA0;
-  }
-  .user-icon-button {
-    background-color: #02174B;
-    border-radius: 50px;
-    padding: 10px;
-    cursor: pointer;
-  }
-  .btn-primary {
-    background-color: #39517B; 
-  }
-  .btn-secondary {
-    background-color: #D0EDA0;
-    color: #02174B;
-  }
-  .btn-primary:hover {
-    background-color: #02174B;
-  }
-  .btn-secondary:hover {
-    background-color: #384D13;
-    color: #D0EDA0;
-  }
-  .nav-tabs .nav-link {
-  transition: none;
-  background-color: #BCD6F3;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-weight: bold;
-  }
-  .nav-link:hover {
-    transition: none;
-    background-color: #9ab0c9;
-    border: none;
-    margin: none;
-    padding: none;
-    cursor: pointer;
-    font-weight: bold;
-  }
+.v-application {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.v-footer {
+  height: 50px;
+  background-color: #9FC9FC;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+.v-card {
+  margin-bottom: 16px;
+}
 </style>
-  

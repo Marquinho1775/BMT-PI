@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
 using BMT_backend.Models;
+using BMT_backend.Controllers;
 using System.Data.SqlClient;
-using System.Collections.Generic;
 
 namespace BMT_backend.Handlers
 {
@@ -10,6 +10,7 @@ namespace BMT_backend.Handlers
     {
         private SqlConnection _conection;
         private string _conectionPath;
+        private readonly ImageFileController _imageFileController;
 
         public ProductHandler()
         {
@@ -28,11 +29,31 @@ namespace BMT_backend.Handlers
             _conection.Close();
             return tableFormatQuery;
         }
+
         public string CreateProduct(ProductModel product)
         {
+            string productId = CreateBaseProduct(product);
+            bool exit = AddTagsToProduct(productId, product.Tags);
+            if (product.Type == "NonPerishable")
+            {
+                exit = CreateNonPerishableProduct(productId, product.Stock.Value);
+            }
+            else if(product.Type == "Perishable")
+            {
+                exit = CreatePerishableProduct(productId, product.Limit.Value, product.WeekDaysAvailable);
+            }
+            if (exit)
+            {
+                return productId;
+            }
+            return string.Empty;
+        }
+
+        private string CreateBaseProduct (ProductModel product)
+        {
             string createProductQuery = "insert into Products (EnterpriseId, Name, Description, Price, Weight) " +
-                "output Inserted.Id " +
-                "values(@EnterpriseId, @Name, @Description, @Price, @Weight);";
+             "output Inserted.Id " +
+             "values(@EnterpriseId, @Name, @Description, @Price, @Weight);";
 
             var createProductCommand = new SqlCommand(createProductQuery, _conection);
             createProductCommand.Parameters.AddWithValue("@EnterpriseId", GetEnterpriseIdByUsername(product.Username));
@@ -44,18 +65,18 @@ namespace BMT_backend.Handlers
             _conection.Open();
             var productId = createProductCommand.ExecuteScalar()?.ToString();
             _conection.Close();
-            return productId ?? string.Empty;
+            return productId;
         }
 
         private string GetEnterpriseIdByUsername(string username)
         {
-            string getEnterpriseIdFromUernameQuery = "SELECT e.Id " +
+            string getEnterpriseIdFromUsernameQuery = "SELECT e.Id " +
                 "FROM Enterprises e " +
                 "JOIN Entrepreneurs_Enterprises ee ON e.Id = ee.EnterpriseId " +
                 "JOIN Entrepreneurs en ON ee.EntrepreneurId = en.Id " +
                 "JOIN Users u ON en.UserId = u.Id " +
-                "WHERE u.UserName = @UserName;";
-            var getEnterpriseIdFromUernameCommand = new SqlCommand(getEnterpriseIdFromUernameQuery, _conection);
+                "WHERE u.UserName = @UserName and ee.Administrator = 1;";
+            var getEnterpriseIdFromUernameCommand = new SqlCommand(getEnterpriseIdFromUsernameQuery, _conection);
             getEnterpriseIdFromUernameCommand.Parameters.AddWithValue("@UserName", username);
             _conection.Open();
             var enterpriseIdentification = getEnterpriseIdFromUernameCommand.ExecuteScalar()?.ToString();
@@ -63,40 +84,32 @@ namespace BMT_backend.Handlers
             return enterpriseIdentification ?? string.Empty;
         }
 
-        public bool CreateNonPerishableProduct(NonPerishableProductModel product)
+        public bool CreateNonPerishableProduct(string ProductId, int Stock)
         {
             string createNonPerishableProductQuery = "insert into NonPerishableProducts (ProductId, Stock) " +
                 "values(@ProductId, @Stock);";
             var createNonPerishableProductCommand = new SqlCommand(createNonPerishableProductQuery, _conection);
-            createNonPerishableProductCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
-            createNonPerishableProductCommand.Parameters.AddWithValue("@Stock", product.Stock);
+            createNonPerishableProductCommand.Parameters.AddWithValue("@ProductId", ProductId);
+            createNonPerishableProductCommand.Parameters.AddWithValue("@Stock", Stock);
             _conection.Open();
             bool exit = createNonPerishableProductCommand.ExecuteNonQuery() >= 1;
             _conection.Close();
             return exit; 
-
         }
 
-        public bool CreatePerishableProduct(PerishableProductModel product)
+        public bool CreatePerishableProduct(string ProductId, int Limit, string WeekDaysAvailable)
         {
             string createPerishableProductQuery = "insert into PerishableProducts (ProductId, Limit, WeekDaysAvailable) " +
                 "values(@ProductId, @Limit, @WeekDaysAvailable);";
             var createPerishableProductCommand = new SqlCommand(createPerishableProductQuery, _conection);
-            createPerishableProductCommand.Parameters.AddWithValue("@ProductId", product.ProductId);
-            createPerishableProductCommand.Parameters.AddWithValue("@Limit", product.Limit);
-            createPerishableProductCommand.Parameters.AddWithValue("@WeekDaysAvailable", product.WeekDaysAvailable);
-
-            string queryWithValues = createPerishableProductCommand.CommandText;
-            foreach (SqlParameter param in createPerishableProductCommand.Parameters)
-            {
-                queryWithValues = queryWithValues.Replace(param.ParameterName, param.Value.ToString());
-            }
-            Console.WriteLine(queryWithValues);
-
+            createPerishableProductCommand.Parameters.AddWithValue("@ProductId", ProductId);
+            createPerishableProductCommand.Parameters.AddWithValue("@Limit", Limit);
+            createPerishableProductCommand.Parameters.AddWithValue("@WeekDaysAvailable", WeekDaysAvailable);
             _conection.Open();
             bool exit = createPerishableProductCommand.ExecuteNonQuery() >= 1;
             _conection.Close();
-            bool disponibilityCreated = CreateDateDisponibility(product);
+
+            bool disponibilityCreated = CreateDateDisponibility(ProductId, WeekDaysAvailable);
             if (!disponibilityCreated)
             {
                 return false;
@@ -104,15 +117,15 @@ namespace BMT_backend.Handlers
             return exit;
         }
 
-        private bool CreateDateDisponibility(PerishableProductModel model)
+        private bool CreateDateDisponibility(string ProductId, string WeekDaysAvailable)
         {
             string createDisponibilityQuery = "insert into DateDisponibility (ProductId, Date, Stock) " +
                 "values(@ProductId, @Date, (select Limit from PerishableProducts where ProductId = @ProductId));";
             var createDisponibilityCommand = new SqlCommand(createDisponibilityQuery, _conection);
-            createDisponibilityCommand.Parameters.AddWithValue("@ProductId", model.ProductId);
+            createDisponibilityCommand.Parameters.AddWithValue("@ProductId", ProductId);
             createDisponibilityCommand.Parameters.Add("@Date", SqlDbType.Date);
 
-            int[] dispatchDays = model.WeekDaysAvailable.ToString().ToCharArray().Select(c => int.Parse(c.ToString())).ToArray();
+            int[] dispatchDays = WeekDaysAvailable.ToString().ToCharArray().Select(c => int.Parse(c.ToString())).ToArray();
             List<DateTime> dispatchDates = GetDispatchDates(dispatchDays);
             foreach (DateTime date in dispatchDates)
             {
@@ -127,7 +140,6 @@ namespace BMT_backend.Handlers
             _conection.Close();
             return true;
         }
-
 
         private static List<DateTime> GetDispatchDates(int[] dispatchDays)
         {
@@ -144,16 +156,16 @@ namespace BMT_backend.Handlers
             return dispatchDates.OrderBy(d => d).ToList();
         }
 
-        public bool AddTagsToProduct(AddTagsToProductRequest request)
+        private bool AddTagsToProduct(string ProductId, List<string> Tags)
         {
-            string addTagsQuery = "insert into Product_Tags (ProductId, TagId) " +
+            string addTagsQuery = "insert into ProductTags (ProductId, TagId) " +
                 "values(@ProductId, (select Id from Tags where Name = @TagName));";
             var addTagsCommand = new SqlCommand(addTagsQuery, _conection);
-            addTagsCommand.Parameters.AddWithValue("@ProductId", request.ProductId);
+            addTagsCommand.Parameters.AddWithValue("@ProductId", ProductId);
             addTagsCommand.Parameters.Add("@TagName", SqlDbType.VarChar);
 
             _conection.Open();
-            foreach (string tag in request.Tags)
+            foreach (string tag in Tags)
             {
                 addTagsCommand.Parameters["@TagName"].Value = tag;
                 addTagsCommand.ExecuteNonQuery();
@@ -161,7 +173,6 @@ namespace BMT_backend.Handlers
             _conection.Close();
             return true;
         }
-
 
         public List<ProductViewModel> GetProducts()
             {
@@ -175,9 +186,10 @@ namespace BMT_backend.Handlers
                 products.Add(
                     new ProductViewModel
                     {
+                        Id = Convert.ToString(row["Id"]),
                         Name = Convert.ToString(row["Name"]),
                         Description = Convert.ToString(row["Description"]),
-                        Weight = Convert.ToDouble(row["Weight"]),
+                        Weight = Convert .ToDouble(row["Weight"]),
                         Price = Convert.ToDouble(row["Price"]),
                         EnterpriseName = Convert.ToString(row["EnterpriseName"]),
                         Tags = GetProductTags(Convert.ToString(row["Id"])),
@@ -192,7 +204,7 @@ namespace BMT_backend.Handlers
             List<string> tags = new List<string>();
             string getTagsQuery = "select t.Name " +
                 "from Tags t " +
-                "join Product_Tags pt on t.Id = pt.TagId " +
+                "join ProductTags pt on t.Id = pt.TagId " +
                 "where pt.ProductId = @ProductId;";
             var getTagsCommand = new SqlCommand(getTagsQuery, _conection);
             getTagsCommand.Parameters.AddWithValue("@ProductId", productId);
@@ -212,8 +224,8 @@ namespace BMT_backend.Handlers
         {
             List<string> images = new List<string>();
             string getImagesQuery = "select i.URL " +
-                "from Images i " +
-                "join Products p on i.OwnerId = p.Id " +
+                "from ProductImages i " +
+                "join Products p on i.ProductId = p.Id " +
                 "where p.Id = @ProductId;";
             var getImagesCommand = new SqlCommand(getImagesQuery, _conection);
             getImagesCommand.Parameters.AddWithValue("@ProductId", productId);
@@ -228,6 +240,21 @@ namespace BMT_backend.Handlers
             }
             return images;
         }
+
+        public List<string> GetTags()
+        {
+            List<string> tags = new List<string>();
+            var query = "select Name from Tags;";
+            DataTable table = CreateQueryTable(query);
+            foreach (DataRow row in table.Rows)
+            {
+                tags.Add(
+                    Convert.ToString(row["Name"])
+                );
+            }
+            return tags;
+        }
+
         public List<DevProductModel> GetDevProducts()
         {
             List<DevProductModel> devProducts = new List<DevProductModel>();

@@ -20,23 +20,45 @@ namespace BMT_backend.Handlers
 
         public SqlConnection Connection { get => _connection; set => _connection = value; }
 
-        private DataTable CreateQuerryTable(string query)
+        private DataTable CreateQueryTable(string query, SqlParameter[] parameters = null)
         {
-            SqlCommand queryCommand = new SqlCommand(query, Connection);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
             DataTable tableFormatQuery = new DataTable();
-            Connection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            Connection.Close();
+
+            try
+            {
+                using (SqlCommand queryCommand = new SqlCommand(query, Connection))
+                {
+                    if (parameters != null)
+                    {
+                        queryCommand.Parameters.AddRange(parameters);
+                    }
+
+                    using (SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand))
+                    {
+                        Connection.Open();
+                        tableAdapter.Fill(tableFormatQuery);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in CreateQueryTable: {ex.Message}");
+            }
+            finally
+            {
+                Connection.Close();
+            }
+
             return tableFormatQuery;
         }
+
 
         public List<UserModel> GetUsers()
         {
             List<UserModel> users = new List<UserModel>();
             string query = "SELECT * FROM dbo.Users ";
             DataTable resultTable =
-            CreateQuerryTable(query);
+            CreateQueryTable(query);
             foreach (DataRow column in resultTable.Rows)
             {
                 users.Add(
@@ -48,11 +70,39 @@ namespace BMT_backend.Handlers
                     Username = Convert.ToString(column["Username"]),
                     Email = Convert.ToString(column["Email"]),
                     IsVerified = Convert.ToBoolean(column["IsVerified"]),
-                    Password = Convert.ToString(column["Password"])
-
+                    Password = Convert.ToString(column["Password"]),
+                    Role = Convert.ToString(column["Role"]),
+                    ProfilePictureURL = Convert.ToString(column["ProfilePictureURL"])
                 });
             }
             return users;
+        }
+
+        public UserModel GetUserById(string userId)
+        {
+            string query = "SELECT * FROM dbo.Users WHERE Id = @Id";
+            SqlParameter[] parameters = new SqlParameter[] {
+                new SqlParameter("@Id", userId)
+            };
+
+            DataTable resultTable = CreateQueryTable(query, parameters);
+
+            if (resultTable.Rows.Count > 0)
+            {
+                DataRow row = resultTable.Rows[0];
+                return new UserModel
+                {
+                    Id = Convert.ToString(row["Id"]),
+                    Name = Convert.ToString(row["Name"]),
+                    LastName = Convert.ToString(row["LastName"]),
+                    Username = Convert.ToString(row["Username"]),
+                    Email = Convert.ToString(row["Email"]),
+                    IsVerified = Convert.ToBoolean(row["IsVerified"]),
+                    Password = Convert.ToString(row["Password"]),
+                    Role = Convert.ToString(row["Role"])
+                };
+            }
+            return null; 
         }
 
         public bool CreateUser(UserModel user)
@@ -74,6 +124,22 @@ namespace BMT_backend.Handlers
             return result;
         }
 
+        public bool UpdateRole(string Id, string Role)
+        {
+            var query = "UPDATE dbo.Users SET Role = @Role WHERE Id = @Id";
+            var sqlCommandForQuery = new SqlCommand(query, Connection);
+
+            sqlCommandForQuery.Parameters.AddWithValue("@Role", Role);
+            sqlCommandForQuery.Parameters.AddWithValue("@Id", Id);
+
+            Connection.Open();
+            bool result = sqlCommandForQuery.ExecuteNonQuery() >= 1;
+            Connection.Close();
+
+            return result;
+        }
+
+
         public void VerifyAccount(string Id)
         {
             var query = "UPDATE dbo.Users SET IsVerified = 1 WHERE Id = @Id";
@@ -86,7 +152,8 @@ namespace BMT_backend.Handlers
             Connection.Close();
         }
 
-        public List<DevUserModel> GetDevUsers() {
+        public List<DevUserModel> GetDevUsers()
+        {
             List<DevUserModel> devUsers = new List<DevUserModel>();
             string query = "SELECT u.Name, u.LastName, u.Email, e.Identification, en.Name AS Enterprise " +
                "FROM Users u " +
@@ -109,7 +176,6 @@ namespace BMT_backend.Handlers
 
                 if (!usersDictionary.ContainsKey(userEmail))
                 {
-                    // Crear un nuevo DevUserModel si aún no existe en el diccionario
                     usersDictionary[userEmail] = new DevUserModel
                     {
                         Name = fullName,
@@ -119,7 +185,6 @@ namespace BMT_backend.Handlers
                     };
                 }
 
-                // Añadir la empresa a la lista de empresas asociadas
                 string enterpriseName = Convert.ToString(row["Enterprise"]);
                 if (!string.IsNullOrEmpty(enterpriseName))
                 {

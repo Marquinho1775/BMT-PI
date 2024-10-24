@@ -3,7 +3,7 @@
     <div class="card profile-card" style="max-width: 900px; width: 100%;">
       <!-- Header with Profile Picture and Name -->
       <div class="card-header profile-card-header d-flex align-items-center">
-        <b-avatar src="https://placekitten.com/300/300" size="7rem" class="mr-3"></b-avatar>
+        <b-avatar :src="imageURL" size="7rem" class="mr-3"></b-avatar>
         <div class="profile-name-container">
           <h2 class="mb-0">{{ user.name }} {{ user.lastName }}</h2>
         </div>
@@ -36,29 +36,77 @@
               </button>
             </p>
           </div>
-          <div class="d-flex justify-content-between">
-            <b-button variant="secondary" @click="goBack">Volver</b-button>
+        </div>
+
+        <!-- Address Section -->
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <h4>Direcciones</h4>
+            <b-table striped hover :items="directions" :fields="fields" class="mt-3">
+              <template #cell(numDirection)="data">
+                {{ data.item.numDirection }}
+              </template>
+              <template #cell(province)="data">
+                {{ data.item.province }}
+              </template>
+              <template #cell(canton)="data">
+                {{ data.item.canton }}
+              </template>
+              <template #cell(district)="data">
+                {{ data.item.district }}
+              </template>
+              <template #cell(otherSigns)="data">
+                {{ data.item.otherSigns }}
+              </template>
+              <template #cell(coordinates)="data">
+                {{ data.item.coordinates }}
+              </template>
+
+            </b-table>
           </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <b-button variant="secondary" @click="goBack">Volver</b-button>
+          <b-button variant="primary" @click="redirectToAddDirection">Agregar Dirección</b-button>
+
+
         </div>
       </div>
     </div>
   </div>
 </template>
 
-
-
 <script>
+import axios from 'axios';
+import { API_URL, URL } from '@/main.js';
+import { getToken } from '@/helpers/auth';
+
 export default {
   data() {
     return {
+      imageURL: '',
       user: {
+        id: '',
         name: '',
         lastName: '',
         username: '',
         email: '',
-        password: ''
+        isVerified: false,
+        password: '',
+        role: '',
+        profilePictureURL: '',
       },
-      showPassword: false
+      directions: [],
+      showPassword: false,
+      fields: [
+        { key: 'numDirection', label: 'Nombre de la Dirección' },
+        { key: 'province', label: 'Provincia' },
+        { key: 'canton', label: 'Cantón' },
+        { key: 'district', label: 'Distrito' },
+        { key: 'otherSigns', label: 'Otras señas' },
+        { key: 'coordinates', label: 'Coordenadas' }
+      ],
     };
   },
   created() {
@@ -66,25 +114,51 @@ export default {
       window.location.href = "/login";
     } else {
       this.user = JSON.parse(localStorage.getItem('user')) || this.user;
+      this.GetDirectionsOfUser();
+      this.imageURL = URL + this.user.profilePictureURL;
     }
   },
   methods: {
+    CreateURLImage() {
+      this.imageURL = this.user.profilePicture.map(image => `${URL}${image}`);
+    } ,
     goBack() {
-      window.history.back();
+      this.$router.push('/');
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
-    }
-  },
+    },
 
-  create() {
-    if (!localStorage.getItem('token')) {
-         window.location.href = "/login";
-    } 
- }
+    redirectToAddDirection() {
+      this.$router.push('/register-address');
+    },
+
+    async GetDirectionsOfUser() {
+      const token = getToken();
+      const user = JSON.parse(localStorage.getItem('user'));
+      try {
+        if (!user || !user.id) {
+          throw new Error('El usuario no tiene todos los campos requeridos');
+        }
+
+        const response = await axios.post(
+          API_URL + '/Direction/ObtainDirectionsFromUser',
+          user,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        this.directions = response.data;
+      } catch (error) {
+        console.error('Error al obtener las direcciones del usuario:', error);
+      }
+    },
+
+  }
 };
 </script>
-
 
 <style scoped>
 .col-md-6 {

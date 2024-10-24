@@ -15,13 +15,33 @@ namespace BMT_backend.Controllers
             _entrepreneurHandler = new EntrepreneurHandler();
         }
 
-        [HttpGet] public List<EntrepreneurViewModel> Get()
+        [HttpGet]
+        public List<EntrepreneurViewModel> Get()
         {
             var entrepreneurs = _entrepreneurHandler.GetEntrepreneurs();
             return entrepreneurs;
         }
 
-        [HttpPost] public async Task<ActionResult<bool>> CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        [HttpGet("CheckExistingEntrepreneur")]
+        public async Task<ActionResult<bool>> CheckExistingEntrepreneur(string identification)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(identification))
+                {
+                    return BadRequest("Identification cannot be null or empty.");
+                }
+                var result = _entrepreneurHandler.CheckIfEntrepreneurExists(identification);
+                return new JsonResult(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si el emprendedor existe");
+            }
+        }
+
+        [HttpPost] 
+        public async Task<ActionResult<bool>> CreateEntrepreneur(EntrepreneurModel entrepreneur)
         {
             try
             {

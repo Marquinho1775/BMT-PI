@@ -17,13 +17,13 @@
         <div class="offcanvas-body">
           <ul class="navbar-nav justify-content-end">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Opciones de usuario</a>
+              <a class="nav-link active" aria-current="page" href="#" style="padding: 10px;">Opciones de usuario</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" @click="goToMainPage">Página principal</a>
+              <a class="nav-link" href="#" style="padding: 10px;" @click="goToMainPage">Página principal</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Cerrar sesión</a>
+              <a class="nav-link" href="#" style="padding: 10px;">Cerrar sesión</a>
             </li>
           </ul>
         </div>
@@ -54,6 +54,7 @@
 
 <script>
 import axios from 'axios';
+import { API_URL } from '@/main.js';
 
 export default {
   data() {
@@ -64,14 +65,14 @@ export default {
   methods: {
     async getEnterprises() {
       try {
-        const response = await axios.get('https://localhost:7189/api/Developer/getEnterprises');
+        const response = await axios.get(API_URL + '/Developer/getEnterprises');
         this.enterprises = response.data;
       } catch (error) {
         console.error('Error fetching enterprises:', error);
       }
     },
     goToMainPage() {
-      this.$router.push('/developerhome');
+      window.location.href = "/";
     },
   },
   mounted() {
@@ -169,5 +170,15 @@ body {
 
 .btn-close {
   background-color: #BCD6F3;
+}
+
+.nav-link:hover {
+  transition: none;
+  background-color: #9ab0c9;
+  border: none;
+  margin: none;
+  padding: none;
+  cursor: pointer;
+  font-weight: bold;
 }
 </style>

@@ -27,19 +27,39 @@ namespace BMT_backend.Handlers
             _conection.Close();
             return tableFormatQuery;
         }
+        private bool CheckIfEntryInTable (string tableName, string columnName, string columnValue)
+        {
+            string query = "select " + columnName + " from " + tableName + " where " + columnName + " = '" + columnValue + "'";
+            DataTable table = CreateQueryTable(query);
+            if (table.Rows.Count > 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool CheckIfEntrepreneurExists(string identification)
+        {
+            if (CheckIfEntryInTable("Entrepreneurs", "Identification", identification))
+            {
+                return true;
+            }
+            return false;
+        }
 
         public bool CreateEntrepreneur(EntrepreneurModel entrepreneur)
         {
             string createEntrepreneurQuery = "insert into Entrepreneurs (UserId, Identification) " +
                 "values ((select Id from Users where UserName = @UserName), " +
                         "@Identification);";
+
             var createEntrepreneurCommand = new SqlCommand(createEntrepreneurQuery, _conection);
             createEntrepreneurCommand.Parameters.AddWithValue("@UserName", entrepreneur.Username);
             createEntrepreneurCommand.Parameters.AddWithValue("@Identification", entrepreneur.Identification);
             _conection.Open();
-            bool exit = createEntrepreneurCommand.ExecuteNonQuery() >= 1;
+            createEntrepreneurCommand.ExecuteNonQuery();
             _conection.Close();
-            return exit;
+            return true;
         }
 
         public bool AddEntrepreneurToEnterprise(AddEntrepreneurToEnterpriseRequest request)
@@ -62,7 +82,7 @@ namespace BMT_backend.Handlers
 
         public List<EntrepreneurViewModel> GetEntrepreneurs() {
             List<EntrepreneurViewModel> entrepreneurs = new List<EntrepreneurViewModel>();
-            DataTable table = CreateQueryTable("select e.Identification, u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
+            DataTable table = CreateQueryTable("select e.Id, e.Identification, u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
                         "from Entrepreneurs e " +
                         "join Users u on e.UserId = u.Id;");
             foreach (DataRow row in table.Rows)
@@ -70,6 +90,7 @@ namespace BMT_backend.Handlers
                 entrepreneurs.Add(
                     new EntrepreneurViewModel
                     {
+                        Id = Convert.ToString(row["Id"]),
                         Name = Convert.ToString(row["Name"]),
                         LastName = Convert.ToString(row["LastName"]),
                         Username = Convert.ToString(row["Username"]),
@@ -86,20 +107,19 @@ namespace BMT_backend.Handlers
         {
             List<EnterpriseViewModel> enterprises = new List<EnterpriseViewModel>();
 
-            string query = $"select en.Name as EnterpriseName, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
+            string query = $"select en.Name as EnterpriseName , en.Id, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
                            $"from Entrepreneurs_Enterprises ee " +
                            $"join Enterprises en on ee.EnterpriseId = en.Id " +
                            $"join Users u on (select UserId from Entrepreneurs where Identification = '{entrepreneur.Identification}') = u.Id " +
                            $"where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = '{entrepreneur.Identification}');";
 
-            // Llamada a la función que no se puede modificar
             DataTable tableOfEnterprises = CreateQueryTable(query);
 
-            // Procesar los resultados
             foreach (DataRow row in tableOfEnterprises.Rows)
             {
                 enterprises.Add(new EnterpriseViewModel
                 {
+                    Id = Convert.ToString(row["Id"]),
                     EnterpriseName = Convert.ToString(row["EnterpriseName"]),
                     IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
                     Description = Convert.ToString(row["Description"]),
@@ -120,9 +140,6 @@ namespace BMT_backend.Handlers
                             $"FROM Entrepreneurs e " +
                             $"JOIN Users u ON e.UserId = u.Id " +
                             $"WHERE u.Id = '{user.Id}'";
-
-
-
             DataTable tableOfEntrepreneurBasedOnUser = CreateQueryTable(query);
 
             if (tableOfEntrepreneurBasedOnUser.Rows.Count > 0)
@@ -137,4 +154,5 @@ namespace BMT_backend.Handlers
         }
     }
 }
+
 

@@ -22,6 +22,24 @@ namespace BMT_backend.Controllers
             return _entrepeneurshipHandler.GetEnterprises();
         }
 
+        [HttpGet("CheckExistingEnterprise")]
+        public async Task<ActionResult<bool>> CheckExistingEnterprise(string identification)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(identification))
+                {
+                    return BadRequest("Identification cannot be null or empty.");
+                }
+                var result = _entrepeneurshipHandler.CheckIfEnterpriseExists(identification);
+                return new JsonResult(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si la empresa existe");
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<bool>> CreateEnterprise(EnterpriseModel enterprise)
         {
@@ -37,6 +55,27 @@ namespace BMT_backend.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creando la empresa");
+            }
+        }
+
+
+        [HttpGet("{enterpriseId}")]
+        public ActionResult<EnterpriseModel> GetEnterpriseById(string enterpriseId)
+        {
+            try
+            {
+                var enterprise = _entrepeneurshipHandler.GetEnterpriseById(enterpriseId);
+
+                if (enterprise == null)
+                {
+                    return NotFound("Empresa no encontrada");
+                }
+
+                return Ok(enterprise);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener la empresa");
             }
         }
     }
