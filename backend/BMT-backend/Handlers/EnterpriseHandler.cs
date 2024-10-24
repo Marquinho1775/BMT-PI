@@ -216,6 +216,8 @@ namespace BMT_backend.Handlers
                 IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
                 Name = Convert.ToString(row["Name"]),
                 Description = Convert.ToString(row["Description"]),
+                Email = Convert.ToString(row["Email"]),
+                PhoneNumber = Convert.ToString(row["PhoneNumber"]),
                 Administrator = GetEnterpriseAdministrator(enterpriseId),
                 Staff = GetEnterpriseStaff(enterpriseId)
             };
