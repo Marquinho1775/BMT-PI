@@ -1,9 +1,8 @@
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using BMT_backend.Models;
 using BMT_backend.Handlers;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace BMT_backend.Controllers
 {
@@ -19,59 +18,54 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateOrder(OrderModel order)
+        public IActionResult CreateOrder([FromBody] ShoppingCart cart, [FromQuery] string userId, [FromQuery] string userName, [FromBody] DirectionModel address)
         {
-            try
+            if (cart == null || address == null)
             {
-                if (order == null)
-                {
-                    return BadRequest("Order information is not valid.");
-                }
-                var orderId = _orderHandler.CreateOrder(order);
-                return Ok(new { Id = orderId });
+                return BadRequest("Invalid order data.");
             }
-            catch
+
+            string orderId = _orderHandler.CreateOrder(cart, userId, userName, address);
+
+            if (string.IsNullOrEmpty(orderId))
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error creating the order.");
+                return StatusCode(500, "Error creating the order.");
             }
+
+            return CreatedAtAction(nameof(GetOrderById), new { id = orderId }, null);
         }
 
         [HttpGet]
-        public IEnumerable<OrderModel> GetOrders()
+        public ActionResult<IEnumerable<OrderModel>> GetOrders()
         {
-            return _orderHandler.GetOrders();
+            var orders = _orderHandler.GetOrders();
+            return Ok(orders);
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<OrderModel> GetOrderById(int id)
+        {
+            var order = _orderHandler.GetOrderById(id);
+
+            if (order == null)
+            {
+                return NotFound($"Order with ID {id} not found.");
+            }
+
+            return Ok(order);
         }
 
         [HttpPut("{id}/status")]
-        public IActionResult UpdateOrderStatus(string id, int newStatus)
+        public IActionResult UpdateOrderStatus(int id, [FromBody] int newStatus)
         {
-            try
-            {
-                var result = _orderHandler.UpdateOrderStatus(id, newStatus);
-                if (!result)
-                {
-                    return NotFound("Order not found.");
-                }
-                return NoContent();
-            }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the order status.");
-            }
-        }
+            bool result = _orderHandler.UpdateOrderStatus(id.ToString(), newStatus);
 
-        [HttpGet("orders-with-products")]
-        public IActionResult GetOrdersWithProducts()
-        {
-            try
+            if (!result)
             {
-                var orders = _orderHandler.GetOrders();
-                return Ok(orders);
+                return NotFound($"Order with ID {id} not found.");
             }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error retrieving orders.");
-            }
+
+            return NoContent(); // Indica que la actualización fue exitosa
         }
     }
 }

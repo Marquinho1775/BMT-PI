@@ -23,6 +23,8 @@ import ProductRegisterForm from './components/ProductRegisterForm.vue';
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
 
+//import OrderCreatedView from './components/OrderCreatedView.vue';
+
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
 import BootstrapVue3 from 'bootstrap-vue-3';
@@ -70,6 +72,7 @@ const router = createRouter({
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
+    //{ path: '/order-created', name: "OrderCreated", component: OrderCreatedView }
   ]
 });
 
