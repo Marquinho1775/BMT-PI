@@ -66,17 +66,7 @@ export default {
           console.error('Faltan datos del usuario');
           return;
         }
-        const obtainEntrepreneurResponse = await axios.post(
-          API_URL + '/Entrepreneur/ObtainEntrepreneurBasedOnUser',
-          {
-            Id: user.id,
-            Name: user.name,
-            LastName: user.lastName,
-            Username: user.username,
-            Email: user.email,
-            Password: user.password,
-            IsVerified: user.isVerified
-          },
+        const obtainEntrepreneurResponse = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -84,15 +74,14 @@ export default {
           }
         );
         const entrepreneur = obtainEntrepreneurResponse.data;
+        console.log(entrepreneur);
         const enterprisesResponse = await axios.post(
-          API_URL + '/Entrepreneur/my-registered-enterprises',
-          entrepreneur,
+          API_URL + '/Entrepreneur/my-registered-enterprises?Identification=' + entrepreneur.identification,
           {
             headers: {
               Authorization: `Bearer ${token}`
             }
-          }
-        );
+          });
         this.enterprises = enterprisesResponse.data;
         console.log(this.enterprises);
 

@@ -99,7 +99,7 @@ app.use(vuetify)
 app.use(router);
 
 app.component('product-card', ProductCard);
-app.component('product-search-grid', ProductSearchGrid);
+app.component('productSearchGrid', ProductSearchGrid);
 app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);

@@ -3,10 +3,9 @@
   <div class="d-flex justify-content-center align-items-center vh-100">
     <b-form @submit.prevent="submitForm" @reset="onReset">
 
-      <div class="card custom-card my-4">
+      <div v-if="userRole === 'cli' " class="card custom-card my-4">
         <h3 class="text-center card-header-custom">Datos del emprendedor</h3>
         <div class="card-body">
-
           <b-form-group label="Número de identificación" label-for="identification-number-e">
             <b-form-input id="identification-number-e" class="form-input" v-model="entrepreneurData.identification"
               placeholder="Ingrese su número de cédula" required :state="identificationValid1"
@@ -15,7 +14,6 @@
             <b-form-invalid-feedback v-if="!identificationValid1">El número de cédula debe tener 9
               dígitos.</b-form-invalid-feedback>
           </b-form-group>
-
         </div>
       </div>
 
@@ -111,51 +109,53 @@ export default {
       identificationValid2: null,
       emailValid: null,
       phoneValid: null,
+      userRole: '',
     };
   },
+  mounted() {
+    this.getUserRole();
+  },
   methods: {
+    getUserRole() {
+      const user = JSON.parse(localStorage.getItem('user')) || {};
+      this.userRole = user.role || '';
+    },
     generateSweetAlert(title, icon, text) {
       this.$swal.fire({ title, icon, confirmButtonText: 'Ok', text });
     },
     async submitForm() {
       try {
-        const entrepreneurResponse = await this.checkExistingEntrepreneur();
-        if (entrepreneurResponse) {
-          this.generateSweetAlert('Error', 'error', 'Ya existe un emprendedor registrado con este número de identificación.');
-          return;
+        let entrepreneurIdentification = this.entrepreneurData.identification.trim();
+        if (entrepreneurIdentification !== '') {
+          const entrepreneurExists = await this.checkExistingEntrepreneur();
+          if (entrepreneurExists) {
+            this.generateSweetAlert('Error', 'error', 'Ya existe un emprendedor registrado con este número de identificación.');
+            return;
+          }
+          await this.registerEntrepreneur();
+          await this.changeRole();
+        } else {
+          entrepreneurIdentification = await this.getExistingEntrepreneur();
         }
-        let enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.identificationNumber);
-        if (enterpriseResponse) {
-          this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este número de identificación.');
-          return;
+        const enterpriseChecks = [
+          {value: this.enterpriseData.identificationNumber, message: 'Ya existe una empresa registrada con este número de identificación.',},
+          {value: this.enterpriseData.name,message: 'Ya existe una empresa registrada con este nombre.',},
+          {value: this.enterpriseData.email,message: 'Ya existe una empresa registrada con este correo electrónico.',},
+          {value: this.enterpriseData.phoneNumber,message: 'Ya existe una empresa registrada con este número de teléfono.',},
+        ];
+        for (const check of enterpriseChecks) {
+          const enterpriseExists = await this.checkExistingEnterprise(check.value);
+          if (enterpriseExists) {
+            this.generateSweetAlert('Error', 'error', check.message);
+            return;
+          }
         }
-        enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.name);
-        if (enterpriseResponse) {
-          this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este nombre.');
-          return;
-        }
-        enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.email);
-        if (enterpriseResponse) {
-          this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este correo electrónico.');
-          return;
-        }
-        enterpriseResponse = await this.checkExistingEnterprise(this.enterpriseData.phoneNumber);
-        if (enterpriseResponse) {
-          this.generateSweetAlert('Error', 'error', 'Ya existe una empresa registrada con este número de teléfono.');
-          return;
-        }
-        await this.registerEntrepreneur();
-        console.log('Entrepreneur registered');
-        await this.changeRole();
-        console.log('Role changed');
         await this.registerEnterprise();
-        console.log('Enterprise registered');
-        await this.addEntrepreneurToEnterprise();
-        console.log('Entrepreneur added to enterprise');
+        await this.addEntrepreneurToEnterprise( entrepreneurIdentification, this.enterpriseData.identificationNumber);
         this.generateSweetAlert('Registro exitoso', 'success', 'Se ha registrado exitosamente su empresa.');
         this.$router.push('/');
       } catch (error) {
-        this.generateSweetAlert('Error', 'error', 'Ocurrió un error durante el registro. Por favor, inténtalo de nuevo.');
+        this.generateSweetAlert( 'Error', 'error', 'Ocurrió un error durante el registro. Por favor, inténtalo de nuevo.');
         console.error(error);
       }
     },
@@ -230,11 +230,11 @@ export default {
       }
     },
 
-    async addEntrepreneurToEnterprise() {
+    async addEntrepreneurToEnterprise(entrepreneurId, enterpriseId) {
       try {
         await axios.post(`${API_URL}/Entrepreneur/add-to-enterprise`, {
-          entrepreneurIdentification: this.entrepreneurData.identification.trim(),
-          enterpriseIdentification: this.enterpriseData.identificationNumber.trim(),
+          entrepreneurIdentification: entrepreneurId.trim(),
+          enterpriseIdentification: enterpriseId.trim(),
           isAdmin: true,
         });
       } catch (error) {
@@ -242,6 +242,16 @@ export default {
         console.error(error);
         throw error;
       }
+    },
+
+    async getExistingEntrepreneur() {
+      const user = JSON.parse(localStorage.getItem('user'));
+      let response = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.data.identification;
     },
 
     validateIdentification1() {

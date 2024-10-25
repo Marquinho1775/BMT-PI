@@ -3,10 +3,7 @@
     <AppHeader/>
     <v-main class="flex-grow-1">
       <v-container>
-        <div>
-          <h2>Bienvenido a Business Tracker</h2>
-        </div>
-        <product-search-grid :products="products" />
+        <productSearchGrid :products="products" />
       </v-container>
     </v-main>
     <AppFooter/>
@@ -17,7 +14,6 @@
 <script>
 import axios from 'axios';
 import { API_URL, URL } from '@/main.js';
-
 export default {
   data() {
     return {
