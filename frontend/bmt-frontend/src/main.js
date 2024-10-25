@@ -24,7 +24,9 @@ import DeveloperUsers from './components/DeveloperUsers.vue';
 
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
+import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
+import AppFooter from './components/AppFooter.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -98,7 +100,9 @@ app.use(router);
 
 app.component('product-card', ProductCard);
 app.component('product-search-grid', ProductSearchGrid);
+app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
+app.component('AppFooter', AppFooter);
 
 app.config.globalProperties.$swal = Swal;
 
