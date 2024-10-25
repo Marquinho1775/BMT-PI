@@ -107,7 +107,7 @@ namespace BMT_backend.Handlers
         {
             List<EnterpriseViewModel> enterprises = new List<EnterpriseViewModel>();
 
-            string query = $"select en.Name as EnterpriseName , en.Id, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description " +
+            string query = $"select en.Name as EnterpriseName, en.Id, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description, en.Email, en.PhoneNumber " +
                            $"from Entrepreneurs_Enterprises ee " +
                            $"join Enterprises en on ee.EnterpriseId = en.Id " +
                            $"join Users u on (select UserId from Entrepreneurs where Identification = '{Identification}') = u.Id " +
@@ -125,6 +125,8 @@ namespace BMT_backend.Handlers
                     Description = Convert.ToString(row["Description"]),
                     AdminName = Convert.ToString(row["UserName"]),
                     AdminLastName = Convert.ToString(row["LastName"]),
+                    Email = Convert.ToString(row["Email"]),
+                    PhoneNumber = Convert.ToString(row["PhoneNumber"])
                 });
                 Console.WriteLine(enterprises.Last());
             }

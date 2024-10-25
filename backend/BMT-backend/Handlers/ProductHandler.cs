@@ -281,5 +281,39 @@ namespace BMT_backend.Handlers
             }
             return devProducts;
         }
+
+        public List<ProductViewModel> GetProductsByEnterprise(string enterpriseName)
+        {
+            List<ProductViewModel> productsOfEnterprise = new List<ProductViewModel>();
+
+            var query = "select p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
+                        "from Products p " +
+                        "join Enterprises e on p.EnterpriseId = e.Id " +
+                        "where e.Name = @EnterpriseName;";
+            var queryCommand = new SqlCommand(query, _conection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
+            queryCommand.Parameters.AddWithValue("@enterpriseName", enterpriseName);
+
+            _conection.Open();
+            tableAdapter.Fill(tableFormatQuery);
+            _conection.Close();
+
+            foreach (DataRow row in tableFormatQuery.Rows)
+            {
+                productsOfEnterprise.Add(new ProductViewModel
+                {
+                    Id = Convert.ToString(row["Id"]),
+                    Name = Convert.ToString(row["Name"]),
+                    Description = Convert.ToString(row["Description"]),
+                    Weight = Convert.ToDouble(row["Weight"]),
+                    Price = Convert.ToDouble(row["Price"]),
+                    EnterpriseName = Convert.ToString(row["EnterpriseName"]),
+                    Tags = GetProductTags(Convert.ToString(row["Id"])),
+                    ImagesURLs = GetProductImages(Convert.ToString(row["Id"]))
+                });
+            }
+            return productsOfEnterprise;
+        }
     }
 }

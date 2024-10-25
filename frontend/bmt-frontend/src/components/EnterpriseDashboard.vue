@@ -1,51 +1,148 @@
 <template>
-  <div class="enterprise-dashboard">
-    <div class="content">
-      <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 10vh;">
-        <div>
-          <h2 class="title">{{ enterprise.name }}</h2>
-        </div>
-      </div>
-      <div class="details-container">
-        <div class="enterprise-details">
-          <p><strong>Cédula del emprendimiento:</strong> {{ enterprise.identificationNumber ?
-            formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
-          <p><strong>Correo del administrador:</strong> {{ enterprise.administrator?.email || 'N/A' }}</p>
-        </div>
+  <v-app class="d-flex flex-column">
+    <!-- HEADER -->
+    <v-app-bar :elevation="10" app color="#9FC9FC" scroll-behavior="hide" dark>
+      <v-btn icon @click="menuDrawer = !menuDrawer">
+        <v-icon>mdi-menu</v-icon>
+      </v-btn>
+      <v-toolbar-title>Business Tracker</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn color="primary" @click="goBack">Volver</v-btn>
+    </v-app-bar>
 
-        <div class="staff-list" v-if="enterprise.staff && enterprise.staff.length">
-          <h3>Emprendedores asociados</h3>
-          <ul>
-            <li v-for="staff in enterprise.staff" :key="staff.id">{{ staff.name }} {{ staff.lastName }}</li>
-          </ul>
-        </div>
+    <!-- SIDEBAR -->
+    <v-navigation-drawer v-model="menuDrawer" app color="#39517B">
+      <v-list dense>
+        <v-list-item @click="handleProfileInfo">
+          <v-list-item-title>Mi perfil</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="handleEntrepreneurEnterprises">
+          <v-list-item-title>Mis emprendimientos</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="handleCollaboratorRegister">
+          <v-list-item-title>Registrar Colaborador</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="handleRegisterEnterprise">
+          <v-list-item-title>Registrar Emprendimiento</v-list-item-title>
+        </v-list-item>
+        <v-list-item @click="handleProductRegister">
+          <v-list-item-title>Registrar Producto</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
 
-        <div class="product-list">
-          <h3>Productos</h3>
-          <p>Productos no disponibles por el momento</p>
-        </div>
+    <!-- MAIN CONTENT -->
+    <v-main class="flex-grow-1">
+      <v-container>
+        <v-card class="pa-5 mb-4">
+          <v-row>
+            <v-col>
+              <h2 class="text-center">{{ enterprise.name }}</h2>
+            </v-col>
+          </v-row>
+          <v-card-text>
+            <p><strong>Cédula del emprendimiento:</strong> {{ enterprise.identificationNumber ? formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
+            <p><strong>Correo empresarial:</strong> {{ enterprise.email || 'N/A' }}</p>
+            <p><strong>Número de teléfono:</strong> {{ enterprise.phoneNumber || 'N/A' }}</p>
+            <div v-if="enterprise.staff && enterprise.staff.length">
+              <h3>Emprendedores asociados</h3>
+              <ul>
+                <li v-for="staff in enterprise.staff" :key="staff.id">
+                  {{ staff.name }} {{ staff.lastName }}
+                </li>
+              </ul>
+            </div>
+          </v-card-text>
+          <v-card-title>
+            <h3 class="text-left">Productos</h3>
+          </v-card-title>
+          <v-card-text>
+            <div v-if="products.length">
+              <!-- Display Products with Pagination -->
+              <v-row>
+                <v-col cols="12" sm="6" md="4" v-for="product in paginatedProducts" :key="product.id">
+                  <v-card class="product-card">
+                    <v-carousel show-arrows="hover" height="200px" hide-delimiters>
+                      <v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
+                        <v-img :src="image" height="200px" aspect-ratio="16/9" cover></v-img>
+                      </v-carousel-item>
+                    </v-carousel>
+                    <v-card-title>{{ product.name }}</v-card-title>
+                    <v-card-subtitle>Precio: {{ product.price }} colones</v-card-subtitle>
+                    <v-card-text>
+                      <p>{{ product.description }}</p>
+                      <p><strong>Peso:</strong> {{ product.weight }} kg</p>
+                      <!-- Display Tags if Available -->
+                      <div v-if="product.tags && product.tags.length">
+                        <p><strong>Tags:</strong></p>
+                        <v-chip-group>
+                          <v-chip
+                            v-for="(tag, index) in product.tags"
+                            :key="index"
+                            class="ma-1"
+                            color="primary"
+                            outlined
+                          >
+                            {{ tag }}
+                          </v-chip>
+                        </v-chip-group>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+              <!-- Paginación -->
+              <div class="pagination-container">
+                <v-btn icon @click="prevPage" :disabled="currentPage === 1">
+                  <v-icon>mdi-chevron-left</v-icon>
+                </v-btn>
+                <span>Página {{ currentPage }} de {{ totalPages }}</span>
+                <v-btn icon @click="nextPage" :disabled="currentPage === totalPages">
+                  <v-icon>mdi-chevron-right</v-icon>
+                </v-btn>
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </v-container>
+    </v-main>
 
-        <div class="button-container">
-          <button class="button" @click="goBack">Volver</button>
-        </div>
-      </div>
-    </div>
-  </div>
+    <!-- FOOTER -->
+    <v-footer app padless color="#9FC9FC" dark>
+      <v-col class="text-center white--text">
+        &copy; 2024 Business Tracker. Todos los derechos reservados.
+      </v-col>
+    </v-footer>
+  </v-app>
 </template>
 
 <script>
 import axios from 'axios';
-import { API_URL } from '@/main.js';
+import { API_URL, URL } from '@/main.js';
 import { getToken } from '@/helpers/auth';
 
 export default {
   data() {
     return {
+      menuDrawer: false,
       enterprise: {
         administrator: {},
         staff: []
-      }
+      },
+      products: [],
+      currentPage: 1,
+      productsPerPage: 3
     };
+  },
+  computed: {
+    paginatedProducts() {
+      const start = (this.currentPage - 1) * this.productsPerPage;
+      const end = start + this.productsPerPage;
+      return this.products.slice(start, end);
+    },
+    totalPages() {
+      return Math.ceil(this.products.length / this.productsPerPage);
+    }
   },
   async created() {
     const enterpriseId = this.$route.params.id;
@@ -55,6 +152,7 @@ export default {
         headers: { Authorization: `Bearer ${token}` }
       });
       this.enterprise = enterpriseResponse.data;
+      await this.getProducts();
     } catch (error) {
       console.error('Error al cargar la empresa:', error);
       if (error.response) {
@@ -71,66 +169,83 @@ export default {
     },
     goBack() {
       this.$router.push('/enterprises');
+    },
+    async getProducts() {
+      try {
+        const response = await axios.get(`${API_URL}/Product/${this.enterprise.name}`);
+        this.products = response.data;
+        this.URLImage();
+      } catch (error) {
+        console.error('Error al obtener productos:', error);
+      }
+    },
+    URLImage() {
+      this.products.forEach(product => {
+        if (Array.isArray(product.imagesURLs)) {
+          product.imagesURLs = product.imagesURLs.map(image => `${URL}${image}`);
+        } else {
+          console.warn(`El producto con ID ${product.id} no tiene una propiedad imagesURLs válida.`);
+        }
+      });
+      console.log('Productos con URLs actualizadas:', this.products);
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage += 1;
+      }
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage -= 1;
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-.enterprise-dashboard {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #D1E4FF;
-  justify-content: flex-start;
-  align-items: center;
-  padding-top: 20px;
+.v-app-bar {
+  background-color: #9FC9FC;
 }
 
-.content {
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.v-footer {
+  height: 50px;
+  background-color: #9FC9FC;
 }
 
-.title {
-  background-color: #D0EDA0;
-  color: #02174B;
-  padding: 15px;
-  border-radius: 100px;
+.v-card {
+  background-color: #A9C5FF;
+}
+
+.text-center {
   text-align: center;
 }
 
-.details-container {
-  background-color: #A9C5FF;
-  padding: 20px;
-  border-radius: 15px;
-  width: 100%;
-  min-height: 60vh;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+ul {
+  padding-left: 20px;
+  list-style-type: disc;
+  margin-top: 10px;
 }
 
-button {
-  background-color: #39517B;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.product-card {
+  background-color: #f5f5f5;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 8px;
 }
 
-button:hover {
-  background-color: #2d3f5a;
-}
-
-.staff-list,
-.product-list {
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-top: 20px;
 }
 
-.staff-list h3,
-.product-list h3 {
-  margin-bottom: 10px;
+span {
+  margin: 0 10px;
+}
+
+.ma-1 {
+  margin: 4px;
 }
 </style>
