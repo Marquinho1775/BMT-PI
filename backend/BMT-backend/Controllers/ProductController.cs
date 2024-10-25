@@ -49,5 +49,18 @@ namespace BMT_backend.Controllers
             return tags;
         }
 
+        [HttpGet("{enterpriseName}")]
+        public ActionResult<List<ProductViewModel>> GetProductsByEnterprise(string enterpriseName)
+        {
+            try
+            {
+                var products = _productHandler.GetProductsByEnterprise(enterpriseName);
+                return Ok(products);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los productos de la empresa.");
+            }
+        }
     }
 }
