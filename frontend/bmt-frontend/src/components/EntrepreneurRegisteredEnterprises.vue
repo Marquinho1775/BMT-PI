@@ -1,37 +1,6 @@
 <template>
   <v-app class="d-flex flex-column">
-    <!-- HEADER -->
-    <v-app-bar :elevation="10" app color="#9FC9FC" scroll-behavior="hide" dark>
-      <v-btn icon @click="menuDrawer = !menuDrawer">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
-      <v-toolbar-title>Business Tracker</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" @click="goBack">Volver</v-btn>
-    </v-app-bar>
-
-    <!-- SIDEBAR -->
-    <v-navigation-drawer v-model="menuDrawer" app color="#39517B">
-      <v-list dense>
-        <v-list-item @click="handleProfileInfo">
-            <v-list-item-title>Mi perfil</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="handleEntrepreneurEnterprises">
-            <v-list-item-title>Mis emprendimientos</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="handleCollaboratorRegister">
-            <v-list-item-title>Registrar Colaborador</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="handleRegisterEnterprise">
-            <v-list-item-title>Registrar Emprendimiento</v-list-item-title>
-          </v-list-item>
-          <v-list-item @click="handleProductRegister">
-            <v-list-item-title>Registrar Producto</v-list-item-title>
-          </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
-    <!-- MAIN CONTENT -->
+    <AppHeader/>
     <v-main class="flex-grow-1">
       <v-container>
             <h2 class="text-center">Emprendimientos asociados</h2>
@@ -62,12 +31,8 @@
       </v-container>
     </v-main>
 
-    <!-- FOOTER -->
-    <v-footer app padless color="#9FC9FC" dark>
-      <v-col class="text-center white--text">
-        &copy; 2024 Business Tracker. Todos los derechos reservados.
-      </v-col>
-    </v-footer>
+    <AppFooter/>
+    <AppSidebar/>
   </v-app>
 </template>
 
@@ -109,7 +74,6 @@ export default {
           }
         );
         const entrepreneur = obtainEntrepreneurResponse.data;
-        console.log(entrepreneur);
         const enterprisesResponse = await axios.post(
           API_URL + '/Entrepreneur/my-registered-enterprises?Identification=' + entrepreneur.identification,
           {
@@ -118,7 +82,6 @@ export default {
             }
           });
         this.enterprises = enterprisesResponse.data;
-        console.log(this.enterprises);
 
       } catch (error) {
         console.error('Error al obtener las empresas:', error);

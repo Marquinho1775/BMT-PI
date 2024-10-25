@@ -1,84 +1,83 @@
 <template>
-
-  <div class="d-flex justify-content-center align-items-center vh-100">
-    <b-form @submit.prevent="submitForm" @reset="onReset">
-
-      <div v-if="userRole === 'cli' " class="card custom-card my-4">
-        <h3 class="text-center card-header-custom">Datos del emprendedor</h3>
-        <div class="card-body">
-          <b-form-group label="Número de identificación" label-for="identification-number-e">
-            <b-form-input id="identification-number-e" class="form-input" v-model="entrepreneurData.identification"
-              placeholder="Ingrese su número de cédula" required :state="identificationValid1"
-              @input="validateIdentification1">
-            </b-form-input>
-            <b-form-invalid-feedback v-if="!identificationValid1">El número de cédula debe tener 9
-              dígitos.</b-form-invalid-feedback>
-          </b-form-group>
+  <v-app class="d-flex flex-column">
+    <AppHeader/>
+    <div class="d-flex justify-content-center align-items-center vh-100">
+      <b-form @submit.prevent="submitForm" @reset="onReset">
+        <div v-if="userRole === 'cli' " class="card custom-card my-4">
+          <h3 class="text-center card-header-custom">Datos del emprendedor</h3>
+          <div class="card-body">
+            <b-form-group label="Número de identificación" label-for="identification-number-e">
+              <b-form-input id="identification-number-e" class="form-input" v-model="entrepreneurData.identification"
+                placeholder="Ingrese su número de cédula" required :state="identificationValid1"
+                @input="validateIdentification1">
+              </b-form-input>
+              <b-form-invalid-feedback v-if="!identificationValid1">El número de cédula debe tener 9
+                dígitos.</b-form-invalid-feedback>
+            </b-form-group>
+          </div>
         </div>
-      </div>
-
-      <div id="form" class="card custom-card my-4">
-        <h3 class="text-center card-header-custom">Datos de la empresa</h3>
-        <div class="card-body">
-
-          <b-form-group id="selection-group-id-type" label="Seleccione el tipo de identificación de su negocio"
-            label-for="select-id-type">
-            <b-form-select id="select-id-type" class="form-input" v-model="enterpriseData.identificationType" required
-              :options="idTypeOptions" @change="validateIdentification2">
-            </b-form-select>
-          </b-form-group>
-
-          <b-form-group id="group-identification-number-en" label="Número de identificación"
-            label-for="identification-number-en">
-            <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber"
-              placeholder="Ingresar número de identificación" required :state="identificationValid2"
-              @input="validateIdentification2">
-            </b-form-input>
-            <b-form-invalid-feedback v-if="identificationValid2 === false">
-              El número de identificación debe tener {{ enterpriseData.identificationType === 1 ? '9' : '10' }} dígitos.
-            </b-form-invalid-feedback>
-          </b-form-group>
-
-          <b-form-group id="group-name" label="Nombre:" label-for="name">
-            <b-form-input id="name" class="form-input" v-model="enterpriseData.name"
-              placeholder="Ingresar el nombre de su emprendimiento" required>
-            </b-form-input>
-          </b-form-group>
-
-          <b-form-group id="group-description" label="Descripción:" label-for="description">
-            <b-form-textarea id="description" class="form-input" v-model="enterpriseData.description"
-              placeholder="Ingresar una descripción de su emprendimiento" rows="4" max-rows="6" no-resize>
-            </b-form-textarea>
-          </b-form-group>
-
-          <b-form-group id="group-email" label="Correo electrónico:" label-for="email">
-            <b-form-input id="email" class="form-input" v-model="enterpriseData.email"
-              placeholder="Ingresar correo electrónico" type="email" required :state="emailValid"
-              @input="validateEmail">
-            </b-form-input>
-            <b-form-invalid-feedback v-if="!emailValid">El correo debe tener el formato
-              xxxx@xxx.xxx</b-form-invalid-feedback>
-          </b-form-group>
-
-          <b-form-group id="group-phone-number" label="Número de teléfono:" label-for="phone-number">
-            <b-form-input id="phone-number" class="form-input" v-model="enterpriseData.phoneNumber"
-              placeholder="Ingresar número de teléfono" required :state="phoneValid" @input="validatePhone">
-            </b-form-input>
-            <b-form-invalid-feedback v-if="!phoneValid">El número de teléfono debe tener 8
-              dígitos.</b-form-invalid-feedback>
-          </b-form-group>
-
+  
+        <div id="form" class="card custom-card my-4">
+          <h3 class="text-center card-header-custom">Datos de la empresa</h3>
+          <div class="card-body">
+  
+            <b-form-group id="selection-group-id-type" label="Seleccione el tipo de identificación de su negocio"
+              label-for="select-id-type">
+              <b-form-select id="select-id-type" class="form-input" v-model="enterpriseData.identificationType" required
+                :options="idTypeOptions" @change="validateIdentification2">
+              </b-form-select>
+            </b-form-group>
+  
+            <b-form-group id="group-identification-number-en" label="Número de identificación"
+            k  label-for="identification-number-en">
+              <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber"
+                placeholder="Ingresar número de identificación" required :state="identificationValid2"
+                @input="validateIdentification2">
+              </b-form-input>
+              <b-form-invalid-feedback v-if="identificationValid2 === false">
+                El número de identificación debe tener {{ enterpriseData.identificationType === 1 ? '9' : '10' }} dígitos.
+              </b-form-invalid-feedback>
+            </b-form-group>
+  
+            <b-form-group id="group-name" label="Nombre:" label-for="name">
+              <b-form-input id="name" class="form-input" v-model="enterpriseData.name"
+                placeholder="Ingresar el nombre de su emprendimiento" required>
+              </b-form-input>
+            </b-form-group>
+  
+            <b-form-group id="group-description" label="Descripción:" label-for="description">
+              <b-form-textarea id="description" class="form-input" v-model="enterpriseData.description"
+                placeholder="Ingresar una descripción de su emprendimiento" rows="4" max-rows="6" no-resize>
+              </b-form-textarea>
+            </b-form-group>
+  
+            <b-form-group id="group-email" label="Correo electrónico:" label-for="email">
+              <b-form-input id="email" class="form-input" v-model="enterpriseData.email"
+                placeholder="Ingresar correo electrónico" type="email" required :state="emailValid"
+                @input="validateEmail">
+              </b-form-input>
+              <b-form-invalid-feedback v-if="!emailValid">El correo debe tener el formato
+                xxxx@xxx.xxx</b-form-invalid-feedback>
+            </b-form-group>
+  
+            <b-form-group id="group-phone-number" label="Número de teléfono:" label-for="phone-number">
+              <b-form-input id="phone-number" class="form-input" v-model="enterpriseData.phoneNumber"
+                placeholder="Ingresar número de teléfono" required :state="phoneValid" @input="validatePhone">
+              </b-form-input>
+              <b-form-invalid-feedback v-if="!phoneValid">El número de teléfono debe tener 8
+                dígitos.</b-form-invalid-feedback>
+            </b-form-group>
+          </div>
         </div>
-      </div>
-
-      <div class="d-flex justify-content-between">
-        <b-button variant="secondary" @click="goBack">Volver</b-button>
-        <b-button type="submit" class="button">Registrar</b-button>
-      </div>
-
-    </b-form>
-  </div>
-
+        <div class="d-flex justify-content-between">
+          <b-button variant="secondary" @click="goBack">Volver</b-button>
+          <b-button type="submit" class="button">Registrar</b-button>
+        </div>
+      </b-form>
+    </div>
+    <AppFooter/>
+    <AppSidebar/>
+  </v-app>
 </template>
 
 <script>

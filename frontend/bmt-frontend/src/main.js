@@ -72,7 +72,7 @@ const router = createRouter({
     { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
     { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
 
-    { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
+    { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },

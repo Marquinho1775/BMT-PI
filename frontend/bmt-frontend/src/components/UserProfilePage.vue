@@ -1,80 +1,85 @@
 <template>
-  <div class="profile-container d-flex justify-content-center align-items-center vh-100">
-    <div class="card profile-card" style="max-width: 900px; width: 100%;">
-      <!-- Header with Profile Picture and Name -->
-      <div class="card-header profile-card-header d-flex align-items-center">
-        <b-avatar :src="imageURL" size="7rem" class="mr-3"></b-avatar>
-        <div class="profile-name-container">
-          <h2 class="mb-0">{{ user.name }} {{ user.lastName }}</h2>
-        </div>
-      </div>
-
-      <!-- Profile Information Section -->
-      <div class="card-body">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <h4>Nombre</h4>
-            <p>{{ user.name }} {{ user.lastName }}</p>
-          </div>
-          <div class="col-md-6">
-            <h4>Email</h4>
-            <p>{{ user.email }}</p>
+  <v-app class="d-flex flex-column">
+    <AppHeader/>
+    <div class="profile-container d-flex justify-content-center align-items-center vh-100">
+      <div class="card profile-card" style="max-width: 900px; width: 100%;">
+        <!-- Header with Profile Picture and Name -->
+        <div class="card-header profile-card-header d-flex align-items-center">
+          <b-avatar :src="imageURL" size="7rem" class="mr-3"></b-avatar>
+          <div class="profile-name-container">
+            <h2 class="mb-0">{{ user.name }} {{ user.lastName }}</h2>
           </div>
         </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <h4>Username</h4>
-            <p>{{ user.username }}</p>
+  
+        <!-- Profile Information Section -->
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h4>Nombre</h4>
+              <p>{{ user.name }} {{ user.lastName }}</p>
+            </div>
+            <div class="col-md-6">
+              <h4>Email</h4>
+              <p>{{ user.email }}</p>
+            </div>
           </div>
-          <div class="col-md-6">
-            <h4>Contraseña</h4>
-            <p>
-              <span v-if="showPassword">{{ user.password }}</span>
-              <span v-else>••••••••</span>
-              <button @click="togglePasswordVisibility" class="btn btn-link p-0 ml-2">
-                {{ showPassword ? 'Ocultar' : 'Ver' }}
-              </button>
-            </p>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <h4>Username</h4>
+              <p>{{ user.username }}</p>
+            </div>
+            <div class="col-md-6">
+              <h4>Contraseña</h4>
+              <p>
+                <span v-if="showPassword">{{ user.password }}</span>
+                <span v-else>••••••••</span>
+                <button @click="togglePasswordVisibility" class="btn btn-link p-0 ml-2">
+                  {{ showPassword ? 'Ocultar' : 'Ver' }}
+                </button>
+              </p>
+            </div>
           </div>
-        </div>
-
-        <!-- Address Section -->
-        <div class="row mb-3">
-          <div class="col-md-12">
-            <h4>Direcciones</h4>
-            <b-table striped hover :items="directions" :fields="fields" class="mt-3">
-              <template #cell(numDirection)="data">
-                {{ data.item.numDirection }}
-              </template>
-              <template #cell(province)="data">
-                {{ data.item.province }}
-              </template>
-              <template #cell(canton)="data">
-                {{ data.item.canton }}
-              </template>
-              <template #cell(district)="data">
-                {{ data.item.district }}
-              </template>
-              <template #cell(otherSigns)="data">
-                {{ data.item.otherSigns }}
-              </template>
-              <template #cell(coordinates)="data">
-                {{ data.item.coordinates }}
-              </template>
-
-            </b-table>
+  
+          <!-- Address Section -->
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <h4>Direcciones</h4>
+              <b-table striped hover :items="directions" :fields="fields" class="mt-3">
+                <template #cell(numDirection)="data">
+                  {{ data.item.numDirection }}
+                </template>
+                <template #cell(province)="data">
+                  {{ data.item.province }}
+                </template>
+                <template #cell(canton)="data">
+                  {{ data.item.canton }}
+                </template>
+                <template #cell(district)="data">
+                  {{ data.item.district }}
+                </template>
+                <template #cell(otherSigns)="data">
+                  {{ data.item.otherSigns }}
+                </template>
+                <template #cell(coordinates)="data">
+                  {{ data.item.coordinates }}
+                </template>
+  
+              </b-table>
+            </div>
           </div>
-        </div>
-
-        <div class="d-flex justify-content-between">
-          <b-button variant="secondary" @click="goBack">Volver</b-button>
-          <b-button variant="primary" @click="redirectToAddDirection">Agregar Dirección</b-button>
-
-
+  
+          <div class="d-flex justify-content-between">
+            <b-button variant="secondary" @click="goBack">Volver</b-button>
+            <b-button variant="primary" @click="redirectToAddDirection">Agregar Dirección</b-button>
+  
+  
+          </div>
         </div>
       </div>
     </div>
-  </div>
+    <AppFooter/>
+    <AppSidebar/>
+  </v-app>
 </template>
 
 <script>
