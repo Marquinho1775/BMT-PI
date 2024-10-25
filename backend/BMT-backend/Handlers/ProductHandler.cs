@@ -56,7 +56,7 @@ namespace BMT_backend.Handlers
              "values(@EnterpriseId, @Name, @Description, @Price, @Weight);";
 
             var createProductCommand = new SqlCommand(createProductQuery, _conection);
-            createProductCommand.Parameters.AddWithValue("@EnterpriseId", GetEnterpriseIdByUsername(product.Username));
+            createProductCommand.Parameters.AddWithValue("@EnterpriseId", product.EnterpriseId);
             createProductCommand.Parameters.AddWithValue("@Name", product.Name);
             createProductCommand.Parameters.AddWithValue("@Description", product.Description);
             createProductCommand.Parameters.AddWithValue("@Price", product.Price);
@@ -66,22 +66,6 @@ namespace BMT_backend.Handlers
             var productId = createProductCommand.ExecuteScalar()?.ToString();
             _conection.Close();
             return productId;
-        }
-
-        private string GetEnterpriseIdByUsername(string username)
-        {
-            string getEnterpriseIdFromUsernameQuery = "SELECT e.Id " +
-                "FROM Enterprises e " +
-                "JOIN Entrepreneurs_Enterprises ee ON e.Id = ee.EnterpriseId " +
-                "JOIN Entrepreneurs en ON ee.EntrepreneurId = en.Id " +
-                "JOIN Users u ON en.UserId = u.Id " +
-                "WHERE u.UserName = @UserName and ee.Administrator = 1;";
-            var getEnterpriseIdFromUernameCommand = new SqlCommand(getEnterpriseIdFromUsernameQuery, _conection);
-            getEnterpriseIdFromUernameCommand.Parameters.AddWithValue("@UserName", username);
-            _conection.Open();
-            var enterpriseIdentification = getEnterpriseIdFromUernameCommand.ExecuteScalar()?.ToString();
-            _conection.Close();
-            return enterpriseIdentification ?? string.Empty;
         }
 
         public bool CreateNonPerishableProduct(string ProductId, int Stock)

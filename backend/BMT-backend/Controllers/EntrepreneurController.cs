@@ -79,7 +79,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost("my-registered-enterprises")]
-        public async Task<ActionResult<bool>> ConsultRegisteredEnterprises(EntrepreneurModel entrepeneur)
+        public async Task<ActionResult<bool>> ConsultRegisteredEnterprises(string Identification)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace BMT_backend.Controllers
                     BadRequest();
                 }
 
-                var result = _entrepreneurHandler.GetEnterprisesOfEntrepreneur(entrepeneur);
+                var result = _entrepreneurHandler.GetEnterprisesOfEntrepreneur(Identification);
                 return new JsonResult(result);
 
             } catch
@@ -97,8 +97,8 @@ namespace BMT_backend.Controllers
             }
         }
 
-        [HttpPost("ObtainEntrepreneurBasedOnUser")]
-        public async Task<ActionResult<bool>> EntrepreneurBasedOnUser(UserModel user)
+        [HttpPost("GetEntrepreneurByUserId")]
+        public async Task<ActionResult<bool>> GetEntrepreneurByUserId(string id)
         {
             try
             {
@@ -107,13 +107,13 @@ namespace BMT_backend.Controllers
                     BadRequest();
                 }
 
-                var result = _entrepreneurHandler.GetEntrepreneurBasedOnAUser(user);
+                var result = _entrepreneurHandler.GetEntrepreneurByUserId(id);
                 return new JsonResult(result);
 
             }
             catch
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las empresas registradas");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error obteniendo el emprendedor");
             }
         }
 

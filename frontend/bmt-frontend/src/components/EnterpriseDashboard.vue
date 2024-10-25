@@ -1,37 +1,6 @@
 <template>
   <v-app class="d-flex flex-column">
-    <!-- HEADER -->
-    <v-app-bar :elevation="10" app color="#9FC9FC" scroll-behavior="hide" dark>
-      <v-btn icon @click="menuDrawer = !menuDrawer">
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
-      <v-toolbar-title>Business Tracker</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" @click="goBack">Volver</v-btn>
-    </v-app-bar>
-
-    <!-- SIDEBAR -->
-    <v-navigation-drawer v-model="menuDrawer" app color="#39517B">
-      <v-list dense>
-        <v-list-item @click="handleProfileInfo">
-          <v-list-item-title>Mi perfil</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="handleEntrepreneurEnterprises">
-          <v-list-item-title>Mis emprendimientos</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="handleCollaboratorRegister">
-          <v-list-item-title>Registrar Colaborador</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="handleRegisterEnterprise">
-          <v-list-item-title>Registrar Emprendimiento</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="handleProductRegister">
-          <v-list-item-title>Registrar Producto</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
-
-    <!-- MAIN CONTENT -->
+    <AppHeader/>
     <v-main class="flex-grow-1">
       <v-container>
         <v-card class="pa-5 mb-4">
@@ -44,8 +13,11 @@
             <p><strong>Cédula del emprendimiento:</strong> {{ enterprise.identificationNumber ? formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
             <p><strong>Correo empresarial:</strong> {{ enterprise.email || 'N/A' }}</p>
             <p><strong>Número de teléfono:</strong> {{ enterprise.phoneNumber || 'N/A' }}</p>
+            <h3>Emprendedores asociados</h3>
+            <v-btn append-icon="mdi-plus" variant="outlined" @click="handleInviteEntrepreneur">
+              Invitar colaborador 
+            </v-btn>
             <div v-if="enterprise.staff && enterprise.staff.length">
-              <h3>Emprendedores asociados</h3>
               <ul>
                 <li v-for="staff in enterprise.staff" :key="staff.id">
                   {{ staff.name }} {{ staff.lastName }}
@@ -57,8 +29,10 @@
             <h3 class="text-left">Productos</h3>
           </v-card-title>
           <v-card-text>
+            <v-btn append-icon="mdi-plus" variant="outlined" @click="handleRegisterProduct">
+              Registrar nuevo producto
+            </v-btn>
             <div v-if="products.length">
-              <!-- Display Products with Pagination -->
               <v-row>
                 <v-col cols="12" sm="6" md="4" v-for="product in paginatedProducts" :key="product.id">
                   <v-card class="product-card">
@@ -81,8 +55,7 @@
                             :key="index"
                             class="ma-1"
                             color="primary"
-                            outlined
-                          >
+                            outlined>
                             {{ tag }}
                           </v-chip>
                         </v-chip-group>
@@ -91,7 +64,6 @@
                   </v-card>
                 </v-col>
               </v-row>
-              <!-- Paginación -->
               <div class="pagination-container">
                 <v-btn icon @click="prevPage" :disabled="currentPage === 1">
                   <v-icon>mdi-chevron-left</v-icon>
@@ -106,13 +78,8 @@
         </v-card>
       </v-container>
     </v-main>
-
-    <!-- FOOTER -->
-    <v-footer app padless color="#9FC9FC" dark>
-      <v-col class="text-center white--text">
-        &copy; 2024 Business Tracker. Todos los derechos reservados.
-      </v-col>
-    </v-footer>
+    <AppFooter/>
+    <AppSidebar/>
   </v-app>
 </template>
 
@@ -124,11 +91,7 @@ import { getToken } from '@/helpers/auth';
 export default {
   data() {
     return {
-      menuDrawer: false,
-      enterprise: {
-        administrator: {},
-        staff: []
-      },
+      enterprise: {},
       products: [],
       currentPage: 1,
       productsPerPage: 3
@@ -187,7 +150,6 @@ export default {
           console.warn(`El producto con ID ${product.id} no tiene una propiedad imagesURLs válida.`);
         }
       });
-      console.log('Productos con URLs actualizadas:', this.products);
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
@@ -198,6 +160,12 @@ export default {
       if (this.currentPage > 1) {
         this.currentPage -= 1;
       }
+    },
+    handleInviteEntrepreneur() {
+      this.$router.push(`/enterprise/${this.enterprise.id}/invite`);
+    },
+    handleRegisterProduct() {
+      this.$router.push(`${this.enterprise.id}/new-product`);
     }
   }
 };
