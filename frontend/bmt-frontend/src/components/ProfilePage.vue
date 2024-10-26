@@ -1,80 +1,89 @@
 <template>
-  <div class="profile-container d-flex justify-content-center align-items-center vh-100">
-    <div class="card profile-card" style="max-width: 900px; width: 100%;">
-      <!-- Header with Profile Picture and Name -->
-      <div class="card-header profile-card-header d-flex align-items-center">
-        <b-avatar :src="imageURL" size="7rem" class="mr-3"></b-avatar>
-        <div class="profile-name-container">
-          <h2 class="mb-0">{{ user.name }} {{ user.lastName }}</h2>
-        </div>
-      </div>
+  <v-container class="fill-height d-flex justify-center align-center">
+    <v-card max-width="900" width="100%" class="profile-card pa-6">
+      <!-- Header with Profile Picture, Name, and Username -->
+      <v-row class="align-center">
+        <v-avatar :size="112" class="mr-4">
+          <v-img :src="imageURL"></v-img>
+        </v-avatar>
+
+        <v-col class="d-flex flex-column">
+          <h2 class="mb-1">{{ user.name }} {{ user.lastName }}</h2>
+          <span class="text-body-2 grey--text">@{{ user.username }}</span>
+        </v-col>
+      </v-row>
 
       <!-- Profile Information Section -->
-      <div class="card-body">
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <h4>Nombre</h4>
-            <p>{{ user.name }} {{ user.lastName }}</p>
-          </div>
-          <div class="col-md-6">
-            <h4>Email</h4>
-            <p>{{ user.email }}</p>
-          </div>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <h4>Username</h4>
-            <p>{{ user.username }}</p>
-          </div>
-          <div class="col-md-6">
-            <h4>Contraseña</h4>
-            <p>
-              <span v-if="showPassword">{{ user.password }}</span>
-              <span v-else>••••••••</span>
-              <button @click="togglePasswordVisibility" class="btn btn-link p-0 ml-2">
-                {{ showPassword ? 'Ocultar' : 'Ver' }}
-              </button>
-            </p>
-          </div>
-        </div>
+      <v-row class="mt-6">
+        <!-- Email and Password Section -->
+        <v-col cols="12" md="6">
+          <v-row>
+            <v-col cols="12" class="mb-4">
+              <v-card-title>
+                <v-icon class="mr-2">mdi-email</v-icon>
+                Correo Electrónico
+              </v-card-title>
+              <v-card max-width="350">
+                {{ user.email }}
+              </v-card>
+            </v-col>
 
-        <!-- Address Section -->
-        <div class="row mb-3">
-          <div class="col-md-12">
-            <h4>Direcciones</h4>
-            <b-table striped hover :items="directions" :fields="fields" class="mt-3">
-              <template #cell(numDirection)="data">
-                {{ data.item.numDirection }}
-              </template>
-              <template #cell(province)="data">
-                {{ data.item.province }}
-              </template>
-              <template #cell(canton)="data">
-                {{ data.item.canton }}
-              </template>
-              <template #cell(district)="data">
-                {{ data.item.district }}
-              </template>
-              <template #cell(otherSigns)="data">
-                {{ data.item.otherSigns }}
-              </template>
-              <template #cell(coordinates)="data">
-                {{ data.item.coordinates }}
-              </template>
+            <v-col cols="12" class="mb-4">
+              <v-card-title>
+                <v-icon class="mr-2">mdi-lock</v-icon>
+                Contraseña
+              </v-card-title>
+              <v-card max-width="350">
+                <span v-if="showPassword">{{ user.password }}</span>
+                <span v-else>••••••••</span>
+                <v-btn @click="togglePasswordVisibility" icon size="x-small">
+                  <v-icon>{{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
+                </v-btn>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-col>
 
-            </b-table>
-          </div>
-        </div>
+        <!-- Address Section with Toggle Button -->
+        <v-col cols="12" md="6">
+          <v-btn @click="toggleAddressSection" color="primary">
+            <v-icon class="mr-2">mdi-map-marker</v-icon>
+            Mi libreta de direcciones
+            <v-icon>{{ isAddressOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+          </v-btn>
 
-        <div class="d-flex justify-content-between">
-          <b-button variant="secondary" @click="goBack">Volver</b-button>
-          <b-button variant="primary" @click="redirectToAddDirection">Agregar Dirección</b-button>
+          <v-expand-transition>
+            <div v-show="isAddressOpen">
+              <v-row>
+                <v-col v-for="(direction, index) in directions" :key="index" cols="12" class="mb-3">
+                  <v-card class="mx-auto custom-card" max-width="400" elevation="5" hover>
+                    <v-card-item>
+                      <v-card-title>{{ direction.numDirection }}</v-card-title>
+                      <v-card-subtitle>
+                        {{ direction.province }}, {{ direction.canton }}, {{ direction.district }}
+                      </v-card-subtitle>
+                    </v-card-item>
+                    <v-divider></v-divider>
+                    <v-card-text>{{ direction.otherSigns }}</v-card-text>
+                    <v-card-actions>
+                      <v-btn prepend-icon="mdi-pencil" size="x-small" color="primary">Editar</v-btn>
+                      <v-btn prepend-icon="mdi-delete" size="x-small" color="error">Borrar</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </div>
+          </v-expand-transition>
+        </v-col>
+      </v-row>
 
-
-        </div>
-      </div>
-    </div>
-  </div>
+      <!-- Action Buttons -->
+      <v-row class="d-flex justify-space-between mt-4">
+        <v-btn color="secondary" @click="goBack">Regresar</v-btn>
+        <v-btn color="primary" @click="redirectToAddDirection">Agregar Dirección</v-btn>
+      </v-row>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -99,14 +108,7 @@ export default {
       },
       directions: [],
       showPassword: false,
-      fields: [
-        { key: 'numDirection', label: 'Nombre de la Dirección' },
-        { key: 'province', label: 'Provincia' },
-        { key: 'canton', label: 'Cantón' },
-        { key: 'district', label: 'Distrito' },
-        { key: 'otherSigns', label: 'Otras señas' },
-        { key: 'coordinates', label: 'Coordenadas' }
-      ],
+      isAddressOpen: false, // Controla si se muestra la sección de direcciones
     };
   },
   created() {
@@ -119,20 +121,18 @@ export default {
     }
   },
   methods: {
-    CreateURLImage() {
-      this.imageURL = this.user.profilePicture.map(image => `${URL}${image}`);
-    } ,
     goBack() {
       this.$router.push('/');
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
-
+    toggleAddressSection() {
+      this.isAddressOpen = !this.isAddressOpen;
+    },
     redirectToAddDirection() {
       this.$router.push('/register-address');
     },
-
     async GetDirectionsOfUser() {
       const token = getToken();
       const user = JSON.parse(localStorage.getItem('user'));
@@ -140,14 +140,13 @@ export default {
         if (!user || !user.id) {
           throw new Error('El usuario no tiene todos los campos requeridos');
         }
-
         const response = await axios.post(
           API_URL + '/Direction/ObtainDirectionsFromUser',
           user,
           {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         this.directions = response.data;
@@ -155,41 +154,23 @@ export default {
         console.error('Error al obtener las direcciones del usuario:', error);
       }
     },
-
   }
 };
 </script>
 
 <style scoped>
-.col-md-6 {
-  border-bottom: #FFFFFF;
-}
-
-.btn-link {
-  color: #007BFF;
-  text-decoration: none;
-  cursor: pointer;
-  margin-left: 20px;
-}
-
-.profile-name-container {
-  margin-left: 20px;
-}
-
-.profile-container {
-  background-color: #D1E4FF;
-}
-
-.profile-card-header {
-  background-color: #36618E;
-  color: white;
-  padding: 20px;
-  border-radius: 20px 20px 0 0;
-}
-
 .profile-card {
   background-color: #9FC9FC;
   border-radius: 20px;
-  margin: 0;
+}
+
+.custom-card {
+  border-left: 5px solid #4e88e6;
+  background-color: #FFFFFF;
+}
+
+.text-body-2 {
+  font-size: 14px;
+  color: #6c757d;
 }
 </style>
