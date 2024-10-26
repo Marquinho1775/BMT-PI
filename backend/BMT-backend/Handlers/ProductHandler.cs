@@ -158,6 +158,112 @@ namespace BMT_backend.Handlers
             return true;
         }
 
+        public ProductModel GetProduct(string productId)
+        {
+            string query = "SELECT p.Id p.Name, p.Description, p.Weight, p.Price, e.Id AS EnterpriseId " +
+                           "FROM Products p " +
+                           "JOIN Enterprises e ON p.EnterpriseId = e.Id " +
+                           "WHERE p.Id = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable resultTable = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(resultTable);
+            _conection.Close();
+            DataRow row = resultTable.Rows[0];
+            ProductModel product = new ProductModel
+            {
+                Name = Convert.ToString(row["Name"]),
+                Description = Convert.ToString(row["Description"]),
+                Weight = Convert.ToDouble(row["Weight"]),
+                Price = Convert.ToDouble(row["Price"]),
+                EnterpriseId = Convert.ToString(row["EnterpriseId"]),
+                Tags = GetProductTags(productId),
+                ImagesURLs = GetProductImages(productId),
+                Type = GetProductType(productId),
+            };
+            if (product.Type == "NonPerishable")
+            {
+                product.Stock = GetNonPerishableStock(productId);
+            }
+            else if (product.Type == "Perishable")
+            {
+                product.Limit = GetPerishableLimit(productId);
+                product.WeekDaysAvailable = GetPerishableWeekDays(productId);
+            }
+            return product;
+        }
+
+        private string GetProductType(string productId)
+        {
+            string query = "SELECT COUNT(*) FROM NonPerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int nonPerishableCount = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            if (nonPerishableCount > 0)
+            {
+                return "NonPerishable";
+            }
+            query = "SELECT COUNT(*) FROM PerishableProducts WHERE ProductId = @productId";
+            queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int perishableCount = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            if (perishableCount > 0)
+            {
+                return "Perishable";
+            }
+            return string.Empty;
+        }
+
+        private int GetNonPerishableStock(string productId)
+        {
+            string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int stock = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            return stock;
+        }
+
+        private int GetPerishableLimit(string productId)
+        {
+            string query = "SELECT Limit FROM PerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int limit = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            return limit;
+        }
+
+        private string GetPerishableWeekDays(string productId)
+        {
+            string query = "SELECT WeekDaysAvailable FROM PerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            string weekDays = queryCommand.ExecuteScalar().ToString();
+            _conection.Close();
+            return weekDays;
+        }
+
+        public double GetProductPrice(string productId)
+        {
+            string query = "SELECT Price FROM Products WHERE Id = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            double price = (double)queryCommand.ExecuteScalar();
+            _conection.Close();
+            return price;
+        }
+
         public List<ProductViewModel> GetProducts()
             {
             List<ProductViewModel> products = new List<ProductViewModel>();
