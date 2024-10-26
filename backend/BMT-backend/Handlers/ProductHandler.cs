@@ -56,7 +56,7 @@ namespace BMT_backend.Handlers
              "values(@EnterpriseId, @Name, @Description, @Price, @Weight);";
 
             var createProductCommand = new SqlCommand(createProductQuery, _conection);
-            createProductCommand.Parameters.AddWithValue("@EnterpriseId", GetEnterpriseIdByUsername(product.Username));
+            createProductCommand.Parameters.AddWithValue("@EnterpriseId", product.EnterpriseId);
             createProductCommand.Parameters.AddWithValue("@Name", product.Name);
             createProductCommand.Parameters.AddWithValue("@Description", product.Description);
             createProductCommand.Parameters.AddWithValue("@Price", product.Price);
@@ -66,22 +66,6 @@ namespace BMT_backend.Handlers
             var productId = createProductCommand.ExecuteScalar()?.ToString();
             _conection.Close();
             return productId;
-        }
-
-        private string GetEnterpriseIdByUsername(string username)
-        {
-            string getEnterpriseIdFromUsernameQuery = "SELECT e.Id " +
-                "FROM Enterprises e " +
-                "JOIN Entrepreneurs_Enterprises ee ON e.Id = ee.EnterpriseId " +
-                "JOIN Entrepreneurs en ON ee.EntrepreneurId = en.Id " +
-                "JOIN Users u ON en.UserId = u.Id " +
-                "WHERE u.UserName = @UserName and ee.Administrator = 1;";
-            var getEnterpriseIdFromUernameCommand = new SqlCommand(getEnterpriseIdFromUsernameQuery, _conection);
-            getEnterpriseIdFromUernameCommand.Parameters.AddWithValue("@UserName", username);
-            _conection.Open();
-            var enterpriseIdentification = getEnterpriseIdFromUernameCommand.ExecuteScalar()?.ToString();
-            _conection.Close();
-            return enterpriseIdentification ?? string.Empty;
         }
 
         public bool CreateNonPerishableProduct(string ProductId, int Stock)
@@ -280,6 +264,40 @@ namespace BMT_backend.Handlers
                     });
             }
             return devProducts;
+        }
+
+        public List<ProductViewModel> GetProductsByEnterprise(string enterpriseName)
+        {
+            List<ProductViewModel> productsOfEnterprise = new List<ProductViewModel>();
+
+            var query = "select p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
+                        "from Products p " +
+                        "join Enterprises e on p.EnterpriseId = e.Id " +
+                        "where e.Name = @EnterpriseName;";
+            var queryCommand = new SqlCommand(query, _conection);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
+            queryCommand.Parameters.AddWithValue("@enterpriseName", enterpriseName);
+
+            _conection.Open();
+            tableAdapter.Fill(tableFormatQuery);
+            _conection.Close();
+
+            foreach (DataRow row in tableFormatQuery.Rows)
+            {
+                productsOfEnterprise.Add(new ProductViewModel
+                {
+                    Id = Convert.ToString(row["Id"]),
+                    Name = Convert.ToString(row["Name"]),
+                    Description = Convert.ToString(row["Description"]),
+                    Weight = Convert.ToDouble(row["Weight"]),
+                    Price = Convert.ToDouble(row["Price"]),
+                    EnterpriseName = Convert.ToString(row["EnterpriseName"]),
+                    Tags = GetProductTags(Convert.ToString(row["Id"])),
+                    ImagesURLs = GetProductImages(Convert.ToString(row["Id"]))
+                });
+            }
+            return productsOfEnterprise;
         }
     }
 }

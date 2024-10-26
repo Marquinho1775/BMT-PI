@@ -3,7 +3,7 @@
     public class ProductModel
     {
         public string Id { get; set; } = null!;
-        public string Username { get; set; }
+        public string EnterpriseId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public double Weight { get; set; } 
