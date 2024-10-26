@@ -15,9 +15,9 @@
       </v-list-item-group>
       <v-list-item-group v-if="userRole === 'dev'">
         <v-list-item @click="goToEnterprises" prepend-icon="mdi-domain" title="Emprendimientos"></v-list-item>
-        <v-list-item @click="goToProducts" prepend-icon="mdi-package-variant" title="Productos"></v-list-item>ø
-        <v-list-item @click="goToUsers" prepend-icon="mdi-account-multiple" title="Usuarios"
-        ></v-list-item>
+        <v-list-item @click="goToProducts" prepend-icon="mdi-package-variant" title="Productos"></v-list-item>
+        <v-list-item @click="goToUsers" prepend-icon="mdi-account-multiple" title="Usuarios"></v-list-item>
+        <v-list-item @click="goToProductConfirmation" prepend-icon="mdi-list-status" title="Solicitudes de Pedidos"></v-list-item>
       </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
@@ -65,6 +65,9 @@ export default {
     },
     goToUsers() {
       this.$router.push('/developer-users');
+    },
+    goToProductConfirmation() {
+      this.$router.push('/products-confirmation');
     },
     closeDrawer() {
       this.sidebarDrawer = false;
