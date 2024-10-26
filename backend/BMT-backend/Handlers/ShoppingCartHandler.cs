@@ -31,7 +31,7 @@ namespace BMT_backend.Handlers
 
         public bool CreateShoppingCart(string userId)
         {
-            string cartQuery = "INSERT INTO ShoppingCart (UserId, Total) " +
+            string cartQuery = "INSERT INTO ShoppingCarts (UserId, Total) " +
                                "VALUES (@userId, 0)";
             SqlCommand cartCommand = new SqlCommand(cartQuery, _conection);
             cartCommand.Parameters.AddWithValue("@userId", userId);
@@ -44,8 +44,13 @@ namespace BMT_backend.Handlers
         public ShoppingCartModel GetShoppingCart(string userId)
         {
             string cartQuery = "SELECT Id, UserId, Total " +
-                               "FROM ShoppingCart WHERE UserId = @userId";
-            DataTable cartTable = CreateQueryTable(cartQuery);
+                               "FROM ShoppingCarts WHERE UserId = @userId";
+            SqlCommand cartCommand = new SqlCommand(cartQuery, _conection);
+            cartCommand.Parameters.AddWithValue("@userId", userId);
+            _conection.Open();
+            DataTable cartTable = new DataTable();
+            cartTable.Load(cartCommand.ExecuteReader());
+            _conection.Close();
             if (cartTable.Rows.Count == 0)
             {
                 return null;
@@ -65,7 +70,7 @@ namespace BMT_backend.Handlers
         {
             List<CartProductModel> cartProducts = new List<CartProductModel>();
             string cartProductQuery = "SELECT ProductId, Quantity, Subtotal " +
-                                      "FROM ShoppingCartProduct WHERE ShoppingCartId = @shoppingCartId";
+                                      "FROM ShoppingCartProducts WHERE ShoppingCartId = @shoppingCartId";
             DataTable cartProductsTable = CreateQueryTable(cartProductQuery);
             foreach (DataRow row in cartProductsTable.Rows)
             {
@@ -82,7 +87,7 @@ namespace BMT_backend.Handlers
 
         public string GetCartId(string userId)
         {
-            string cartQuery = "SELECT Id FROM ShoppingCart WHERE UserId = @userId";
+            string cartQuery = "SELECT Id FROM ShoppingCarts WHERE UserId = @userId";
             SqlCommand cartCommand = new SqlCommand(cartQuery, _conection);
             cartCommand.Parameters.AddWithValue("@userId", userId);
             _conection.Open();
@@ -95,7 +100,7 @@ namespace BMT_backend.Handlers
         {
             double productPrice = _productHandler.GetProductPrice(productId);
             double subtotal = productPrice;
-            string cartProductQuery = "INSERT INTO ShoppingCartProduct (ShoppingCartId, ProductId, Quantity, Subtotal) " +
+            string cartProductQuery = "INSERT INTO ShoppingCartProducts (ShoppingCartId, ProductId, Quantity, Subtotal) " +
                                       "VALUES (@shoppingCartId, @productId, @quantity, @subtotal)";
             SqlCommand cartProductCommand = new SqlCommand(cartProductQuery, _conection);
             cartProductCommand.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);
@@ -105,6 +110,15 @@ namespace BMT_backend.Handlers
             _conection.Open();
             int rowsAffected = cartProductCommand.ExecuteNonQuery();
             _conection.Close();
+
+            string cartTotalQuery = "UPDATE ShoppingCarts SET Total = Total + @subtotal " +
+                                    "WHERE Id = @shoppingCartId";
+            SqlCommand cartTotalCommand = new SqlCommand(cartTotalQuery, _conection);
+            cartTotalCommand.Parameters.AddWithValue("@subtotal", subtotal);
+            cartTotalCommand.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);
+            _conection.Open();
+            rowsAffected += cartTotalCommand.ExecuteNonQuery();
+            _conection.Close();
             return rowsAffected > 0;
         }
 
@@ -112,7 +126,7 @@ namespace BMT_backend.Handlers
         {
             double pruductPrice = _productHandler.GetProductPrice(productId);
             double subtotal = pruductPrice * quantity;
-            string cartProductQuery = "UPDATE ShoppingCartProduct SET Quantity = @quantity, Subtotal = @subtotal " +
+            string cartProductQuery = "UPDATE ShoppingCartProducts SET Quantity = @quantity, Subtotal = @subtotal " +
                                       "WHERE ShoppingCartId = @shoppingCartId AND ProductId = @productId";
             SqlCommand cartProductCommand = new SqlCommand(cartProductQuery, _conection);
             cartProductCommand.Parameters.AddWithValue("@quantity", quantity);
@@ -127,7 +141,7 @@ namespace BMT_backend.Handlers
 
         public bool DeleteProductFromCart(string shoppingCartId, string productId)
         {
-            string cartProductQuery = "DELETE FROM ShoppingCartProduct " +
+            string cartProductQuery = "DELETE FROM ShoppingCartProducts " +
                                       "WHERE ShoppingCartId = @shoppingCartId AND ProductId = @productId";
             SqlCommand cartProductCommand = new SqlCommand(cartProductQuery, _conection);
             cartProductCommand.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);
@@ -140,7 +154,7 @@ namespace BMT_backend.Handlers
 
         public bool ClearShoppingCart(string shoppingCartId)
         {
-            string cartProductQuery = "DELETE FROM ShoppingCartProduct " +
+            string cartProductQuery = "DELETE FROM ShoppingCartProducts " +
                                       "WHERE ShoppingCartId = @shoppingCartId";
             SqlCommand cartProductCommand = new SqlCommand(cartProductQuery, _conection);
             cartProductCommand.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);

@@ -65,7 +65,7 @@ namespace BMT_backend.Controllers
         {
             try
             {
-                var result = _shoppingCartHandler.AddProductToCart(shoppingCartId, produtcId)
+                var result = _shoppingCartHandler.AddProductToCart(shoppingCartId, produtcId);
                 return new JsonResult(result);
             }
             catch (Exception ex) {
@@ -77,7 +77,7 @@ namespace BMT_backend.Controllers
         {
             try
             {
-                var result = _shoppingCartHandler.ChangeProductQuantity(shoppingCartId, productId, quantity)
+                var result = _shoppingCartHandler.ChangeProductQuantity(shoppingCartId, productId, quantity);
                 return new JsonResult(result);
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace BMT_backend.Controllers
         public ActionResult<bool> DeleteProductFromCart(string shoppingCartId, string productId) {
             try
             {
-                var result = _shoppingCartHandler.DeleteProductFromCart(shoppingCartId, productId)
+                var result = _shoppingCartHandler.DeleteProductFromCart(shoppingCartId, productId);
                 return new JsonResult(result);
             }
             catch (Exception ex)
