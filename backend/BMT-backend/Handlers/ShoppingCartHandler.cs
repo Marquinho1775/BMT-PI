@@ -29,12 +29,12 @@ namespace BMT_backend.Handlers
             return tableFormatQuery;
         }
 
-        public bool CreateShoppingCart(string userId)
+        public bool CreateShoppingCart(string userName)
         {
             string cartQuery = "INSERT INTO ShoppingCarts (UserId, Total) " +
-                               "VALUES (@userId, 0)";
+                   "SELECT Id, 0 FROM Users WHERE UserName = @userName";
             SqlCommand cartCommand = new SqlCommand(cartQuery, _conection);
-            cartCommand.Parameters.AddWithValue("@userId", userId);
+            cartCommand.Parameters.AddWithValue("@userName", userName);
             _conection.Open();
             int rowsAffected = cartCommand.ExecuteNonQuery();
             _conection.Close();

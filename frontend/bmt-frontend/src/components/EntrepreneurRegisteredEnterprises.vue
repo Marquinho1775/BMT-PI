@@ -105,7 +105,6 @@ export default {
         console.error('El ID de la empresa es undefined');
         return;
       }
-      console.log(enterpriseId);
       this.$router.push(`/enterprise/${enterpriseId}`);
     }
   }
