@@ -17,15 +17,15 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> CreateShoppingCart(string userId)
+        public async Task<ActionResult<string>> CreateShoppingCart(string userName)
         {
             try
             {
-                if (userId == null)
+                if (userName == null)
                 {
                     return BadRequest("User Id is not valid.");
                 }
-                var result = _shoppingCartHandler.CreateShoppingCart(userId);
+                var result = _shoppingCartHandler.CreateShoppingCart(userName);
                 return result ? Ok("Shopping cart created successfully.") : StatusCode(StatusCodes.Status500InternalServerError, "Error creating the shopping cart.");
             }
             catch (Exception)
@@ -52,8 +52,8 @@ namespace BMT_backend.Controllers
         {
             try
             {
-                var shoppingCart = _shoppingCartHandler.GetShoppingCart(userId);
-                return Ok(shoppingCart.Id);
+                var shoppingCartId = _shoppingCartHandler.GetCartId(userId);
+                return Ok(shoppingCartId);
             }
             catch (Exception)
             {
@@ -61,11 +61,11 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPut("AddProductToCart")]
-        public ActionResult<bool> AddProductToCart(string shoppingCartId, string produtcId)
+        public ActionResult<bool> AddProductToCart(string shoppingCartId, string productId)
         {
             try
             {
-                var result = _shoppingCartHandler.AddProductToCart(shoppingCartId, produtcId);
+                var result = _shoppingCartHandler.AddProductToCart(shoppingCartId, productId);
                 return new JsonResult(result);
             }
             catch (Exception ex) {

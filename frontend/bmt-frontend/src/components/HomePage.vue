@@ -41,7 +41,6 @@ export default {
           console.warn(`El producto con ID ${product.id} no tiene una propiedad imagesURLs válida.`);
         }
       });
-      console.log('Productos con URLs actualizadas:', this.products);
     },
   },
 };

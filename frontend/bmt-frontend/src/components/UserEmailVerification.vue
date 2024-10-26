@@ -59,10 +59,8 @@ export default {
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
-              console.log('Verificación exitosa');
               return axios.post(API_URL + '/Email/verifyaccount', codeTaken);
             }).then(() => {
-              console.log('Cuenta verificada');
               this.$router.push('/');
             });
           })

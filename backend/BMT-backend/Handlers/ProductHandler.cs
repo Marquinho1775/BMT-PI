@@ -160,7 +160,7 @@ namespace BMT_backend.Handlers
 
         public ProductModel GetProduct(string productId)
         {
-            string query = "SELECT p.Id p.Name, p.Description, p.Weight, p.Price, e.Id AS EnterpriseId " +
+            string query = "SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Id AS EnterpriseId " +
                            "FROM Products p " +
                            "JOIN Enterprises e ON p.EnterpriseId = e.Id " +
                            "WHERE p.Id = @productId";
@@ -174,6 +174,7 @@ namespace BMT_backend.Handlers
             DataRow row = resultTable.Rows[0];
             ProductModel product = new ProductModel
             {
+                Id = Convert.ToString(row["Id"]),
                 Name = Convert.ToString(row["Name"]),
                 Description = Convert.ToString(row["Description"]),
                 Weight = Convert.ToDouble(row["Weight"]),
@@ -259,7 +260,7 @@ namespace BMT_backend.Handlers
             var queryCommand = new SqlCommand(query, _conection);
             queryCommand.Parameters.AddWithValue("@productId", productId);
             _conection.Open();
-            double price = (double)queryCommand.ExecuteScalar();
+            double price = Convert.ToDouble(queryCommand.ExecuteScalar());
             _conection.Close();
             return price;
         }
