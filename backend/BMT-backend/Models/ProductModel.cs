@@ -13,7 +13,7 @@
         public List<string>? ImagesURLs { get; set; }
         public int? Stock { get; set; }
         public int? Limit { get; set; }
-        public string? WeekDaysAvailable { get; set; } 
+        public string? WeekDaysAvailable { get; set; }
     }
 
     public class ProductViewModel

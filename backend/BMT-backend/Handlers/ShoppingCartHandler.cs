@@ -152,7 +152,7 @@ namespace BMT_backend.Handlers
         }
 
         public bool ChangeProductQuantity(string shoppingCartId, string productId, int quantity)
-        {  
+        {
             CartProductModel cartProductModel = GetCartProduct(shoppingCartId, productId);
             double subtotal = cartProductModel.Product.Price * quantity;
             double difference = subtotal - cartProductModel.Subtotal;

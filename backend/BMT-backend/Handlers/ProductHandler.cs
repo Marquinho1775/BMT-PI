@@ -373,36 +373,50 @@ namespace BMT_backend.Handlers
             return devProducts;
         }
 
-        public List<ProductViewModel> GetProductsByEnterprise(string enterpriseName)
+        public List<ProductModel> GetProductsByEnterprise(string enterpriseName)
         {
-            List<ProductViewModel> productsOfEnterprise = new List<ProductViewModel>();
+            List<ProductModel> productsOfEnterprise = new List<ProductModel>();
 
-            var query = "select p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
-                        "from Products p " +
-                        "join Enterprises e on p.EnterpriseId = e.Id " +
-                        "where e.Name = @EnterpriseName;";
+            var query = "SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
+                        "FROM Products p " +
+                        "JOIN Enterprises e ON p.EnterpriseId = e.Id " +
+                        "WHERE e.Name = @EnterpriseName;";
             var queryCommand = new SqlCommand(query, _conection);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
-            DataTable tableFormatQuery = new DataTable();
             queryCommand.Parameters.AddWithValue("@enterpriseName", enterpriseName);
 
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
             _conection.Open();
             tableAdapter.Fill(tableFormatQuery);
             _conection.Close();
 
             foreach (DataRow row in tableFormatQuery.Rows)
             {
-                productsOfEnterprise.Add(new ProductViewModel
+                var productId = Convert.ToString(row["Id"]);
+                var productType = GetProductType(productId);
+
+                var product = new ProductModel
                 {
-                    Id = Convert.ToString(row["Id"]),
+                    Id = productId,
                     Name = Convert.ToString(row["Name"]),
                     Description = Convert.ToString(row["Description"]),
                     Weight = Convert.ToDouble(row["Weight"]),
                     Price = Convert.ToDouble(row["Price"]),
-                    EnterpriseName = Convert.ToString(row["EnterpriseName"]),
-                    Tags = GetProductTags(Convert.ToString(row["Id"])),
-                    ImagesURLs = GetProductImages(Convert.ToString(row["Id"]))
-                });
+                    Tags = GetProductTags(productId),
+                    ImagesURLs = GetProductImages(productId),
+                    Type = productType
+                };
+                if (productType == "NonPerishable")
+                {
+                    product.Stock = GetNonPerishableStock(productId);
+                }
+                else if (productType == "Perishable")
+                {
+                    product.Limit = GetPerishableLimit(productId);
+                    product.WeekDaysAvailable = GetPerishableWeekDays(productId);
+                }
+
+                productsOfEnterprise.Add(product);
             }
             return productsOfEnterprise;
         }

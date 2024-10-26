@@ -1,5 +1,6 @@
 ﻿using BMT_backend.Handlers;
 using BMT_backend.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BMT_backend.Controllers
@@ -9,10 +10,12 @@ namespace BMT_backend.Controllers
     public class ShoppingCartController : ControllerBase
     {
         private readonly ShoppingCartHandler _shoppingCartHandler;
+
         public ShoppingCartController()
         {
             _shoppingCartHandler = new ShoppingCartHandler();
         }
+
         [HttpPost]
         public async Task<ActionResult<string>> CreateShoppingCart(string userName)
         {

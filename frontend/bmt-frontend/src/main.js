@@ -16,6 +16,7 @@ import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
 
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
+import EnterpriseInventory from './components/EnterpriseInventory.vue';
 
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
@@ -70,6 +71,7 @@ const router = createRouter({
 
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
+    { path: '/enterprise/:id/inventory', name: "EnterpriseInventory", component: EnterpriseInventory },
 
     { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
     { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
