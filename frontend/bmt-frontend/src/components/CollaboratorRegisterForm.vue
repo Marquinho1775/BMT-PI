@@ -1,136 +1,159 @@
 <template>
-	<div class="enterprise-register-container">
-		<div class="d-flex justify-content-center align-items-center vh-100">
-			<div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
-				<h3 id="title" class="text-center card-header-custom">Registro de Colaboradores</h3>
-				<div class="card-body">
-					<b-form @submit.prevent="registerEnterpriseCollab" @reset="onReset">
-						<!-- Enterprise Identification number -->
-						<b-form-group 
-							id="input-group-input-box" 
-							label="Número de identificación de la empresa" 
-							label-for="input-box">
-							<b-form-input 
-								id="input-box" 
-								v-model="collaboratorData.enterpriseCollab" 
-								placeholder="Ingresar número de identificación de la empresa" required>
-							</b-form-input> 
-						</b-form-group>
-						<!-- username -->
-						<b-form-group 
-							id="input-group-input-box" 
-							label="Nombre de Usuario del colaborador" 
-							label-for="input-box">
-							<b-form-input 
-								id="input-box" 
-								v-model="collaboratorData.username" 
-								placeholder="Ingresar nombre de usuario del colaborador" required>
-							</b-form-input>
-						</b-form-group>
-						<!-- Submit and Reset Buttons -->
-						<div class="d-flex justify-content-between">
-							<b-button variant="secondary" @click="goBack">Volver</b-button>
-							<b-button variant="secondary" @click="onReset">Limpiar</b-button>
-							<b-button type="submit" class="button">Registrar</b-button>
-						</div>
-					</b-form>
-				</div>
-			</div>
-		</div>
-	</div>
+<v-app>
+	<v-app-bar :elevation="5" app color="#9FC9FC" scroll-behavior="hide" dark>
+      <v-toolbar-title>Business Tracker</v-toolbar-title>
+      <v-spacer></v-spacer>
+	</v-app-bar>
+  <v-container class="d-flex justify-center align-center" style="min-height: 100vh;">
+		<v-form @submit.prevent="handleSubmit">
+			<h1 v-if="title" class="text-center mb-5">{{ title }}</h1>
+			<v-text-field
+        v-model="selectedEnterprise"
+        label="ID de la empresa"
+        required
+      ></v-text-field>
+      <v-text-field
+        v-model="collaboratorId"
+        label="ID del usuario a invitar"
+        required
+      ></v-text-field>
+      <v-btn type="submit" color="primary">Enviar Invitación</v-btn>
+    </v-form>
+    <v-alert v-if="successMessage" type="success">
+      {{ successMessage }}
+    </v-alert>
+    <v-alert v-if="errorMessage" type="error">
+      {{ errorMessage }}
+    </v-alert>
+  </v-container>
+
+	<v-footer app padless color="#9FC9FC" dark>
+      <v-col class="text-center white--text">
+        &copy; 2024 Business Tracker. Todos los derechos reservados.
+      </v-col>
+  </v-footer>
+</v-app>
 </template>
-	
+
 <script>
 	import axios from 'axios';
-	
+	import { API_URL } from '@/main.js';
+	import { getToken } from '@/helpers/auth';
+
 	export default {
 		data() {
 			return {
-				collaboratorData: {
-					username: '',
-					enterpriseCollab: '',
+				title: 'Invitar colaborador',
+				selectedEnterprise: '',
+				collaboratorId: '',
+				entrepreneur: {
+					Id: '',
+					Username: '',
+					Identification: '',
 				}
 			};
 		},
+		mounted() {
+			this.GetEnterprisesOfEntrepreneur();
+		},
 		methods: {
-			async registerEnterpriseCollab() {
-        try {
-					const user = JSON.parse(localStorage.getItem(this.collaboratorData.username));
-					const correo = user.email;
-					axios.post('https:/localhost:7189/api/Email/sendcollabmail', correo);
-          await this.$swal.fire({
-            title: 'Registro exitoso',
-            text: '¡Su empresa ha sido registrada correctamente!',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
-          this.$router.push('/entrepeneur-home');
-        } catch (error) {
-          this.$swal.fire({
-            title: 'Error',
-            text: 'Hubo un error al registrar a su colaborador. Inténtalo de nuevo.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
-          console.log(error);
-        }
-      }, 
-			onReset(event) {
-				event.preventDefault();
-				this.collaboratorData.username = null;
-				this.collaboratorData.enterpriseCollab = '';
+			async GetEnterprisesOfEntrepreneur() {
+				try {
+					const token = getToken();
+					const user = JSON.parse(localStorage.getItem('user'));
+
+					if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
+						console.error('Faltan datos del usuario');
+						return;
+					}
+					const obtainEntrepreneurResponse = await axios.post(
+						API_URL + '/Entrepreneur/ObtainEntrepreneurBasedOnUser',
+						{
+							Id: user.id,
+							Name: user.name,
+							LastName: user.lastName,
+							Username: user.username,
+							Email: user.email,
+							Password: user.password,
+							IsVerified: user.isVerified
+						},
+						{
+							headers: {
+								Authorization: `Bearer ${token}`
+							}
+						}
+					);
+					const entrepreneur = obtainEntrepreneurResponse.data;
+					const enterprisesResponse = await axios.post(
+						API_URL + '/Entrepreneur/my-registered-enterprises',
+						entrepreneur,
+						{
+							headers: {
+								Authorization: `Bearer ${token}`
+							}
+						}
+					);
+					this.enterprises = enterprisesResponse.data;
+					console.log(this.enterprises);
+
+				} catch (error) {
+					console.error('Error al obtener las empresas:', error);
+					if (error.response) {
+						console.error('Datos de la respuesta del servidor:', error.response.data);
+					}
+				}
 			},
 			goBack() {
-				window.location.href = "/entrepeneur-home";
+				window.location.href = "/";
+			},
+			async handleSubmit() {
+				try {
+					const userDetailsResponse = await axios.get(`${API_URL}/User/Unity/${this.collaboratorId}`); // Asegúrate de que este endpoint exista y devuelva los detalles del usuario
+					const collabUser = userDetailsResponse.data;
+
+					// Ahora, usamos el correo electrónico para enviar la invitación
+					await axios.post(`${API_URL}/email/sendcollabmail`, {
+						Email: collabUser.Email,
+						Id: this.selectedEnterprise
+					});
+
+					this.successMessage = 'Correo de invitación enviado exitosamente';
+					this.errorMessage = '';
+				} catch (error) {
+					console.error('Error al enviar la invitación:', error);
+					this.errorMessage = 'No se pudo enviar la invitación';
+					this.successMessage = '';
+				}
+			},
+			getuserId() {
+				const user = JSON.parse(localStorage.getItem('user')) || {};
+				return user.Id;
 			}
 		}
 	};
 </script>
-	
-<style >
-	.enterprise-register-container {
-		background-color: #D1E4FF;
+
+<style scoped>
+	.v-container {
+		max-width: 600px;
+		margin: 0 auto;
+	}
+	.v-application {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 	}
 
-	div.custom-card {
-	width: 650px;
-	background-color: #9FC9FC;
-	border-radius: 20px;
-	margin: 0px;
-	}
-
-	.card-header-custom {
-		background-color: #36618E;
-		color: white;
-		padding: 20px;
-		border-radius: 20px 20px 0 0;
-		width: 100%;
-		height: 100%;
-	}
-	
-	.button {
-		background-color: #39517B;
-	}
-	
-	.button:hover {
-		background-color: #02174B;
-	}
-	
-	#form {
+	.v-footer {
+		height: 50px;
 		background-color: #9FC9FC;
 	}
-	
-	#title {
-		color: white;
-		background-color: #39517B;
+
+	.flex-grow-1 {
+		flex-grow: 1;
 	}
 
-	.form-input {
-		background-color: #D0EDA0;
+	.v-card {
+		margin-bottom: 16px;
 	}
-
-	#input-box {
-		background-color: #D0EDA0;
-	}
-
 </style>

@@ -19,6 +19,8 @@ import DeveloperUsers from './components/DeveloperUsers.vue';
 import RegisterAddressForm from './components/RegisterAddress.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
+import CollaboratorRegisterForm from './components/CollaboratorRegisterForm.vue';
+import AcceptInvitation from './components/AcceptInvitation.vue';
 
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
@@ -66,6 +68,8 @@ const router = createRouter({
     { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
     { path: '/product', name: "ProductRegisterForm", component: ProductRegisterForm },
+    { path: '/collaborator-register', name: "CollaboratorRegisterForm", component: CollaboratorRegisterForm },
+    { path: '/accept-invitation', name: "AcceptInvitation", component: AcceptInvitation },
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },

@@ -127,7 +127,7 @@ export default {
       this.$router.push('/profile');
     },
     handleCollaboratorRegister() {
-      this.$router.push('/collab-register');
+      this.$router.push('/collaborator-register');
     },
     handleRegisterEnterprise() {
       this.$router.push('/enterprise-register');

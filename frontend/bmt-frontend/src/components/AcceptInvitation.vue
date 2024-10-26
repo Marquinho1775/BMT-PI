@@ -1,124 +1,78 @@
 <template>
-  <div class="enterprise-register-container d-flex justify-content-center align-items-center vh-100">
-    <b-form @submit.prevent="registerCollab" @reset="onReset">
-      <div id="form" class="card custom-card my-4">
-        <h3 id="title" class="text-center card-header-custom">Datos del emprendedor</h3>
-        <div class="card-body"> 
-          <b-form-group
-            id="group-identification-number-e"
-            label="Número de identificación" 
-            label-for="identification-number-e">
-            <b-form-input 
-              id="identification-number-e" 
-              class="form-input"
-              v-model="collabData.identification" 
-              placeholder="Ingrese su número de cédula" required>
-            </b-form-input> 
-          </b-form-group>
-					<b-form-group
-            id="group-identification-number-e"
-            label="Código de la empresa" 
-            label-for="identification-number-e">
-            <b-form-input 
-              id="identification-number-e" 
-              class="form-input"
-              v-model="collabData.collabEnterprise" 
-              placeholder="Ingrese el código que le enviamos" required>
-            </b-form-input> 
-          </b-form-group>
-					<div class="d-flex justify-content-between">
-						<b-button type="submit" class="button">Registrar</b-button>
-					</div>
-        </div>
-      </div>
-    </b-form>
-  </div>
+  <v-app>
+    <v-app-bar :elevation="5" app color="#9FC9FC" scroll-behavior="hide" dark>
+      <v-toolbar-title>Business Tracker</v-toolbar-title>
+      <v-spacer></v-spacer>
+    </v-app-bar>
+
+    <v-container class="d-flex justify-center align-center" style="min-height: 100vh;">
+      <v-form @submit.prevent="handleSubmit" style="width: 100%; max-width: 500px;">
+        <h1 v-if="title" class="text-center mb-5">{{ title }}</h1>
+        <v-text-field
+          v-model="verificationCode"
+          label="Ingresa tu código"
+          required
+        ></v-text-field>
+        <v-btn @click="goBack" color="secondary" class="mr-2">Volver</v-btn>
+        <v-btn type="submit" color="primary">Verificar Código</v-btn>
+        <v-alert v-if="successMessage" type="success" class="mt-4">
+          {{ successMessage }}
+        </v-alert>
+        <v-alert v-if="errorMessage" type="error" class="mt-4">
+          {{ errorMessage }}
+        </v-alert>
+      </v-form>
+    </v-container>
+
+    <v-footer app padless color="#9FC9FC" dark>
+      <v-col class="text-center white--text">
+        &copy; 2024 Business Tracker. Todos los derechos reservados.
+      </v-col>
+    </v-footer>
+  </v-app>
 </template>
-	
+
 <script>
-import Bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
+import { API_URL } from '@/main.js';
+
 export default {
-	data() {
-		return {
-			collabData: {
-				identification: '',
-				collabEnterprise: '',
-			}
-		};
-	},
-	methods: {
-		mounted() {
-			Bootstrap();
-		},
-		async registerCollab() {
-			try {
-				const addToEnterpriseResponse = await axios.post('https://localhost:7189/api/Entrepreneur/add-to-enterprise', {
-					entrepreneurIdentification: this.collabData.identification.trim(),
-					enterpriseIdentification: this.collabData.collabEnterprise.trim(),
-					isAdmin: false,
-				});
-				console.log(addToEnterpriseResponse);
-				await this.$swal.fire({
-					title: 'Registro exitoso',
-					text: '¡Su empresa ha sido registrada correctamente!',
-					icon: 'success',
-					confirmButtonText: 'Ok'
-				});
-				this.$router.push('/entrepeneurhome');
-			} catch (error) {
-				this.$swal.fire({
-					title: 'Error',
-					text: 'Hubo un error al registrar su empresa. Inténtalo de nuevo.',
-					icon: 'error',
-					confirmButtonText: 'Ok'
-				});
-				console.log(error);
-			}
-		}, 
-	}
-}
+  data() {
+    return {
+      title: 'Verificación de Código',
+      verificationCode: '',
+      successMessage: '',
+      errorMessage: ''
+    };
+  },
+  methods: {
+    goBack() {
+      window.location.href = "/";
+    },
+    async handleSubmit() {
+      try {
+        const response = await axios.post(`${API_URL}/email/verifycode`, {
+          Code: this.verificationCode,
+          Id: this.selectedEnterprise 
+        });
+
+        if (response.status === 200) {
+          this.successMessage = 'Código verificado exitosamente';
+          this.errorMessage = '';
+        }
+      } catch (error) {
+        console.error('Error al verificar el código:', error);
+        this.errorMessage = 'No se pudo verificar el código';
+        this.successMessage = '';
+      }
+    }
+  }
+};
 </script>
-	
-<style >
-  .enterprise-register-container {
-    background-color: #D1E4FF;
-  }
 
-  div.custom-card {
-  max-width: 600px;
-  background-color: #9FC9FC;
-  border-radius: 20px;
-  margin: 0px;
-  }
-
-  .card-header-custom {
-    background-color: #36618E;
-    color: white;
-    padding: 20px;
-    border-radius: 20px 20px 0 0;
-    width: 100%;
-    height: 100%;
-  }
-  
-  .button {
-    background-color: #39517B;
-  }
-  
-  .button:hover {
-    background-color: #02174B;
-  }
-  
-  #form {
-    background-color: #9FC9FC;
-  }
-  
-  #title {
-    color: white;
-    background-color: #39517B;
-  }
-
-  .form-input {
-    background-color: #D0EDA0;
+<style scoped>
+  .v-container {
+    max-width: 600px;
+    margin: 0 auto;
   }
 </style>
