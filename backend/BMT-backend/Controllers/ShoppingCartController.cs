@@ -52,8 +52,8 @@ namespace BMT_backend.Controllers
         {
             try
             {
-                var shoppingCart = _shoppingCartHandler.GetShoppingCart(userId);
-                return Ok(shoppingCart.Id);
+                var shoppingCartId = _shoppingCartHandler.GetCartId(userId);
+                return Ok(shoppingCartId);
             }
             catch (Exception)
             {
