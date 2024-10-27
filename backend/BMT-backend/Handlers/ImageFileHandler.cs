@@ -48,6 +48,15 @@ namespace BMT_backend.Handlers
             _conection.Close();
         }
 
+        public bool ChangeProfilePicture(string ImageURL)
+        {
+            if (ImageURL == "uploads/default.png")
+            {
+                return true;
+            }
+            return false;
+        }
+
         public List<string> GetProductImages(string productId)
         {
             List<string> images = new List<string>();
