@@ -174,9 +174,23 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.imageURL = e.target.result;
-          // Aquí puedes realizar la lógica para subir la nueva imagen al servidor si es necesario.
+          const formData = new FormData();
+          formData.append("ownerId", this.user.id);
+          formData.append("ownerType", "User");
+          formData.append('images', file);
+
+          axios.post(API_URL + "/ImageFile/upload",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
         };
         reader.readAsDataURL(file);
+        this.imageURL = URL + file.name;
+        this.user.profilePictureURL = file.name;
       }
     },
   }
