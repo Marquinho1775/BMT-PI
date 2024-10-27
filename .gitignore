@@ -7,6 +7,9 @@
 *.user
 *.suo
 
+# Ignore all local env files
+.env*
+
 # Ignore build results
 bin/
 obj/
