@@ -126,9 +126,9 @@
         if (!weekDaysString) {
             return "Disponible todos los días";
         }
-        
-        const daysMap = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-        
+
+        const daysMap = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+
         return weekDaysString
             .split("")
             .map(day => daysMap[Number(day.trim())])
