@@ -1,6 +1,8 @@
 <template>
   <v-app-bar :elevation="0" app color="#9FC9FC" scroll-behavior="hide" dark>
-    <v-toolbar-title>Business Tracker</v-toolbar-title>
+    <v-toolbar-title>
+      <v-btn variant="text" @click="handleHome">Business Tracker</v-btn>
+    </v-toolbar-title>
     <v-spacer></v-spacer>
     <v-btn v-if="!isLoggedIn" color="primary" @click="handleLogin">Iniciar Sesión</v-btn>
     <v-btn v-if="!isLoggedIn" color="secondary" @click="handleRegister">Registrarse</v-btn>
@@ -39,10 +41,11 @@ export default {
     handleRegister() {
       this.$router.push('/register');
     },
+    handleHome() {
+      this.$router.push('/');
+    },
   },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

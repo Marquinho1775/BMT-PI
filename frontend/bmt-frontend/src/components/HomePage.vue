@@ -1,13 +1,13 @@
 <template>
   <v-app class="d-flex flex-column">
-    <AppHeader/>
+    <AppHeader />
     <v-main class="flex-grow-1">
       <v-container>
         <productSearchGrid :products="products" />
       </v-container>
     </v-main>
-    <AppFooter/>
-    <AppSidebar/>
+    <AppFooter />
+    <AppSidebar />
   </v-app>
 </template>
 
@@ -48,15 +48,6 @@ export default {
 </script>
 
 <style scoped>
-.v-application {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.v-footer {
-  height: 50px;
-  background-color: #9FC9FC;
-}
 .flex-grow-1 {
   flex-grow: 1;
 }
