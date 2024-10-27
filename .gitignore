@@ -31,3 +31,4 @@ Release/
 *.GeneratedMSBuildEditorConfig.editorconfig
 *.assets.cache
 *.g.cs
+/frontend/bmt-frontend/env
