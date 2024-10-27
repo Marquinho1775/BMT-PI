@@ -10,6 +10,7 @@ import UserLoginForm from './components/UserLoginForm.vue';
 import UserEmailVerification from './components/UserEmailVerification.vue';
 import UserProfilePage from './components/UserProfilePage.vue';
 import UserRegisterAddress from './components/UserRegisterAddress.vue';
+import UserShoppingCart from './components/UserShoppingCart.vue';
 
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
@@ -66,6 +67,7 @@ const router = createRouter({
     { path: '/email-verification', name: "VerifyEmail", component: UserEmailVerification },
     { path: '/profile', name: "Profile", component: UserProfilePage },
     { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress },
+    {path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart},
 
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
