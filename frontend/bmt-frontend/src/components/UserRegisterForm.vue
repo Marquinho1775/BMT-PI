@@ -126,11 +126,7 @@ export default {
             console.log(error);
           });
       }
-      axios.post(API_URL + '/ShoppingCart?userName=' + this.formData.Username, null, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
+      axios.post(API_URL + '/ShoppingCart?userName=' + this.formData.Username, null)
         .then((response) => {
           console.log("Shopping cart created: ", response);
         })
