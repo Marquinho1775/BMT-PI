@@ -94,9 +94,9 @@ export default {
     },
   },
   methods: {
-    registerUser() {
+    async registerUser() {
       if (!this.passwordMismatch) {
-        axios.post(API_URL + '/User', {
+        await axios.post(API_URL + '/User', {
           Id: this.formData.Id,
           Name: this.formData.Name,
           LastName: this.formData.LastName,
@@ -126,7 +126,7 @@ export default {
             console.log(error);
           });
       }
-      axios.post(API_URL + '/ShoppingCart?userName=' + this.formData.Username, null)
+      await axios.post(API_URL + '/ShoppingCart?userName=' + this.formData.Username, null)
         .then((response) => {
           console.log("Shopping cart created: ", response);
         })
