@@ -1,80 +1,100 @@
 <template>
-  <div class="register-address-container d-flex justify-content-center align-items-center vh-100">
-    <b-form @submit.prevent="registerAddress" @reset="onReset">
-      <div id="form" class="card custom-card my-4">
-        <h3 id="title" class="text-center card-header-custom">Registrar Dirección</h3>
-        <div class="card-body">
+  <v-app class="d-flex flex-column">
+    <AppHeader />
+    <v-main class="flex-grow-1">
+      <v-container>
+        <v-card class="pa-5 mb-4">
+          <v-row>
+            <v-col cols="12" sm="12" md="8" class="mx-auto">
+              <h3 class="text-center">Registrar Dirección</h3>
 
-          <b-form-group label="Nombre de la direccion" label-for="numDirection">
-            <b-form-input id="Nombre de la direccion" v-model="addressData.numDirection" placeholder="Ingrese el nombre"
-              required></b-form-input>
-          </b-form-group>
+              <v-form @submit.prevent="registerAddress" @reset="onReset">
+                <v-text-field
+                  label="Nombre de la dirección"
+                  v-model="addressData.numDirection"
+                  placeholder="Ingrese el nombre"
+                  required
+                ></v-text-field>
 
-          <b-form-group label="Provincia" label-for="province">
-            <b-form-input id="province" v-model="addressData.province" placeholder="Ingrese la provincia"
-              required></b-form-input>
-          </b-form-group>
+                <!-- Google Maps API Interactive Map -->
+                <v-row class="my-4">
+                  <v-col>
+                    <GMapMap
+                      :center="mapCenter"
+                      :zoom="12"
+                      style="width: 100%; height: 400px"
+                      @click="addMarker"
+                    >
+                      <Marker
+                        v-for="(marker, index) in markers"
+                        :key="index"
+                        :position="marker.position"
+                      />
+                    </GMapMap>
+                  </v-col>
+                </v-row>
 
-          <b-form-group label="Cantón" label-for="canton">
-            <b-form-input id="canton" v-model="addressData.canton" placeholder="Ingrese el cantón"
-              required></b-form-input>
-          </b-form-group>
+                <v-text-field
+                  label="Coordenadas"
+                  v-model="addressData.coordinates"
+                  placeholder="Las coordenadas se completarán automáticamente"
+                  readonly
+                ></v-text-field>
 
-          <b-form-group label="Distrito" label-for="district">
-            <b-form-input id="district" v-model="addressData.district" placeholder="Ingrese el distrito"
-              required></b-form-input>
-          </b-form-group>
+                <v-text-field
+                  label="Otras señas"
+                  v-model="addressData.otherSigns"
+                  placeholder="Ingrese otras señas o referencias"
+                ></v-text-field>
 
-          <b-form-group label="Otras señales" label-for="otherSigns">
-            <b-form-textarea id="otherSigns" v-model="addressData.otherSigns" placeholder="Ingrese otras señales"
-              rows="3"></b-form-textarea>
-          </b-form-group>
-
-          <b-form-group label="Coordenadas" label-for="coordinates">
-            <b-form-input id="coordinates" v-model="addressData.coordinates" placeholder="Ingrese las coordenadas"
-              required></b-form-input>
-          </b-form-group>
-        </div>
-      </div>
-      <div class="d-flex justify-content-between">
-        <b-button variant="secondary" @click="goBack">Volver</b-button>
-        <b-button type="submit" class="button">Registrar Dirección</b-button>
-      </div>
-    </b-form>
-  </div>
+                <div class="d-flex justify-content-between">
+                  <v-btn color="secondary" @click="goBack">Volver</v-btn>
+                  <v-btn type="submit" color="primary">Registrar Dirección</v-btn>
+                </div>
+              </v-form>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-container>
+    </v-main>
+    <AppFooter />
+    <AppSidebar />
+  </v-app>
 </template>
 
 <script>
 import axios from 'axios';
 import { API_URL } from '@/main.js';
+import { GMapMap, Marker } from '@fawmi/vue-google-maps';
 
 export default {
+  components: {
+    GMapMap,
+    Marker,
+  },
   data() {
     return {
       addressData: {
         username: JSON.parse(localStorage.getItem('user')).username,
         numDirection: '',
-        province: '',
-        canton: '',
-        district: '',
+        coordinates: '',
         otherSigns: '',
-        coordinates: ''
-      }
+      },
+      mapCenter: { lat: 9.935901499999423, lng: -84.05064582824707 }, // Default coordinates, Universidad de Costa Rica
+      markers: [],
     };
   },
   methods: {
     async registerAddress() {
       try {
-        const response = await axios.post(API_URL + '/Direction/CreateDirection', this.addressData);
+        const response = await axios.post(`${API_URL}/Direction/CreateDirection`, this.addressData);
         console.log(response);
         await this.$swal.fire({
           title: 'Registro exitoso',
           text: '¡Su dirección ha sido registrada correctamente!',
           icon: 'success',
-          confirmButtonText: 'Ok'
+          confirmButtonText: 'Ok',
         });
-
-        // Después de la confirmación, redirigir al perfil
         this.$router.push('/profile');
       } catch (error) {
         console.error('Error al registrar la dirección:', error);
@@ -82,52 +102,50 @@ export default {
           title: 'Error',
           text: 'Hubo un error al registrar su dirección. Inténtelo de nuevo.',
           icon: 'error',
-          confirmButtonText: 'Ok'
+          confirmButtonText: 'Ok',
         });
       }
     },
+    addMarker(event) {
+      const { latLng } = event;
+      const position = { lat: latLng.lat(), lng: latLng.lng() };
+      this.markers = [{ position }];
+      this.addressData.coordinates = `${position.lat}, ${position.lng}`;
+    },
     onReset(event) {
       event.preventDefault();
-      this.addressData = {
-        username: JSON.parse(localStorage.getItem('user')).username,
-        province: '',
-        canton: '',
-        district: '',
-        otherSigns: '',
-        coordinates: ''
-      };
+      this.addressData.numDirection = '';
+      this.addressData.coordinates = '';
+      this.addressData.otherSigns = '';
+      this.markers = [];
     },
     goBack() {
       this.$router.push('/profile');
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
-.register-address-container {
-  background-color: #D1E4FF;
-}
-
-div.custom-card {
-  max-width: 600px;
+.v-app-bar {
   background-color: #9FC9FC;
-  border-radius: 20px;
-  margin: 0px;
 }
 
-.card-header-custom {
-  background-color: #36618E;
-  color: white;
-  padding: 20px;
-  border-radius: 20px 20px 0 0;
+.v-footer {
+  height: 50px;
+  background-color: #9FC9FC;
 }
 
-.button {
-  background-color: #39517B;
+.v-card {
+  background-color: #ffffff;
 }
 
-.button:hover {
-  background-color: #02174B;
+.text-center {
+  text-align: center;
+}
+
+.my-4 {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 </style>
