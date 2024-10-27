@@ -4,6 +4,9 @@
       <v-btn variant="text" @click="handleHome">Business Tracker</v-btn>
     </v-toolbar-title>
     <v-spacer></v-spacer>
+      <v-btn v-if="role !== dev" icon color="primary" @click="goToCart">
+            <v-icon>mdi-cart</v-icon>
+      </v-btn>
     <v-btn v-if="!isLoggedIn" color="primary" @click="handleLogin">Iniciar Sesión</v-btn>
     <v-btn v-if="!isLoggedIn" color="secondary" @click="handleRegister">Registrarse</v-btn>
     <v-btn v-if="isLoggedIn" color="primary" @click="handleLogout">Cerrar Sesión</v-btn>
@@ -11,11 +14,13 @@
 </template>
 
 <script>
+
 export default {
   name: 'AppHeader',
 
   data() {
     return {
+      role: '',
       isLoggedIn: false,
     };
   },
@@ -27,7 +32,11 @@ export default {
   methods: {
     getUserStatus() {
       const user = JSON.parse(localStorage.getItem('user')) || {};
+      this.role = user.role;
       this.isLoggedIn = !!user.username;
+    },
+    goToCart() {
+      this.$router.push('/shopping-cart');
     },
     handleLogin() {
       this.$router.push('/login');

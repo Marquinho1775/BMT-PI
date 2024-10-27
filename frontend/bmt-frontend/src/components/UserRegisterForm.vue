@@ -126,6 +126,17 @@ export default {
             console.log(error);
           });
       }
+      axios.post(API_URL + '/ShoppingCart?userName=' + this.formData.Username, null, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+        .then((response) => {
+          console.log("Shopping cart created: ", response);
+        })
+        .catch((error) => {
+          console.error("Error creating shopping cart: ", error);
+        });
     },
     onReset(event) {
       event.preventDefault();
