@@ -25,6 +25,7 @@ import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
 
+import CheckOut from './components/CheckOut.vue';
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
 import AppHeader from './components/AppHeader.vue';
@@ -68,7 +69,7 @@ const router = createRouter({
     { path: '/email-verification', name: "VerifyEmail", component: UserEmailVerification },
     { path: '/profile', name: "Profile", component: UserProfilePage },
     { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress },
-    {path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart},
+    { path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart },
 
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
@@ -78,6 +79,7 @@ const router = createRouter({
     { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
 
     { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },
+    { path: '/checkout', name: "CheckOut", component: CheckOut },
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },

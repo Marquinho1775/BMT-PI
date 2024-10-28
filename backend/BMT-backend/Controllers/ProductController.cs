@@ -62,5 +62,19 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los productos de la empresa.");
             }
         }
+
+
+        [HttpPut("inventory")]
+        public async Task<ActionResult<string>> UpdateStock(string id, int newStock){
+            try
+            {
+                var result = _productHandler.UpdateStock(id, newStock);
+                return result;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the stock");
+            }
+        }
     }
 }

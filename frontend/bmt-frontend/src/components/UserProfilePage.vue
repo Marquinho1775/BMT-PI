@@ -1,100 +1,95 @@
 <template>
-  <v-app class="d-flex flex-column">
-    <AppHeader />
-    <v-main class="flex-grow-1">
-      <v-container class="d-flex justify-center align-center">
-        <v-card max-width="900" width="100%" class="profile-card pa-6">
+  <v-main class="flex-grow-1">
+    <v-container class="d-flex justify-center align-center">
+      <v-card max-width="900" width="100%" class="profile-card pa-6">
 
-          <!-- Header with Profile Picture, Name, and Username -->
-          <v-row class="align-center custom-header">
-            <div class="avatar-container" @click="triggerFileInput">
-              <v-avatar :size="112" class="mr-4">
-                <v-img :src="imageURL" class="profile-image"></v-img>
-                <div class="overlay">
-                  <v-icon class="edit-icon">mdi-pencil</v-icon>
-                </div>
-              </v-avatar>
-            </div>
-            <input type="file" ref="fileInput" accept="image/*" @change="onFileChange" class="d-none" />
-            <v-col class="d-flex flex-column">
-              <h2 class="mb-1">{{ user.name }} {{ user.lastName }}</h2>
-              <span class="text-body-2 grey--text">@{{ user.username }}</span>
-            </v-col>
-          </v-row>
+        <!-- Header with Profile Picture, Name, and Username -->
+        <v-row class="align-center custom-header">
+          <div class="avatar-container" @click="triggerFileInput">
+            <v-avatar :size="112" class="mr-4">
+              <v-img :src="imageURL" class="profile-image"></v-img>
+              <div class="overlay">
+                <v-icon class="edit-icon">mdi-pencil</v-icon>
+              </div>
+            </v-avatar>
+          </div>
+          <input type="file" ref="fileInput" accept="image/*" @change="onFileChange" class="d-none" />
+          <v-col class="d-flex flex-column">
+            <h2 class="mb-1">{{ user.name }} {{ user.lastName }}</h2>
+            <span class="text-body-2 grey--text">@{{ user.username }}</span>
+          </v-col>
+        </v-row>
 
-          <!-- Email and Password Section -->
-          <v-row class="mt-6">
-            <v-col cols="12" md="6">
-              <v-col cols="12" class="mb-4">
-                <v-card-title>
-                  <v-icon class="mr-2">mdi-email</v-icon>
-                  Correo Electrónico
-                </v-card-title>
-                <v-card max-width="350">
-                  {{ user.email }}
-                </v-card>
-              </v-col>
-            </v-col>
-
-            <v-col cols="12" md="6">
+        <!-- Email and Password Section -->
+        <v-row class="mt-6">
+          <v-col cols="12" md="6">
+            <v-col cols="12" class="mb-4">
               <v-card-title>
-                <v-icon class="mr-2">mdi-lock</v-icon>
-                Contraseña
+                <v-icon class="mr-2">mdi-email</v-icon>
+                Correo Electrónico
               </v-card-title>
               <v-card max-width="350">
-                <v-btn @click="togglePasswordVisibility" variant="plain" icon size="x-small">
-                  <v-icon>{{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
-                </v-btn>
-                <span v-if="showPassword">{{ user.password }}</span>
-                <span v-else>•••••••••••••</span>
+                {{ user.email }}
               </v-card>
             </v-col>
-          </v-row>
+          </v-col>
 
-          <!-- Address Section with Toggle Button -->
-          <v-card-actions>
+          <v-col cols="12" md="6">
+            <v-card-title>
+              <v-icon class="mr-2">mdi-lock</v-icon>
+              Contraseña
+            </v-card-title>
+            <v-card max-width="350">
+              <v-btn @click="togglePasswordVisibility" variant="plain" icon size="x-small">
+                <v-icon>{{ showPassword ? 'mdi-eye-off' : 'mdi-eye' }}</v-icon>
+              </v-btn>
+              <span v-if="showPassword">{{ user.password }}</span>
+              <span v-else>•••••••••••••</span>
+            </v-card>
+          </v-col>
+        </v-row>
 
-            <v-btn @click="toggleAddressSection" color="primary">
-              <v-icon class="mr-2">mdi-map-marker</v-icon>
-              Mi libreta de direcciones
-              <v-icon>{{ isAddressOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-            </v-btn>
-            <v-btn color="primary" @click="redirectToAddDirection">Agregar Dirección</v-btn>
-          </v-card-actions>
+        <!-- Address Section with Toggle Button -->
+        <v-card-actions>
+
+          <v-btn @click="toggleAddressSection" color="primary">
+            <v-icon class="mr-2">mdi-map-marker</v-icon>
+            Mi libreta de direcciones
+            <v-icon>{{ isAddressOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+          </v-btn>
+          <v-btn color="primary" @click="redirectToAddDirection">Agregar Dirección</v-btn>
+        </v-card-actions>
 
 
-          <v-expand-transition>
-            <div v-show="isAddressOpen">
-              <v-col v-for="(direction, index) in directions" :key="index" cols="12" class="mb-3">
-                <v-card class="mx-auto custom-card" width="100%" max-width="700" elevation="5" hover>
-                  <v-card-item>
-                    <v-card-title>{{ direction.numDirection }}</v-card-title>
-                    <v-card-subtitle>
-                      {{ direction.province }}, {{ direction.canton }}, {{ direction.district }}
-                    </v-card-subtitle>
-                  </v-card-item>
-                  <v-divider></v-divider>
-                  <v-card-text>{{ direction.otherSigns }}</v-card-text>
-                  <v-card-actions>
-                    <v-btn prepend-icon="mdi-pencil" size="x-small" color="primary">Editar</v-btn>
-                    <v-btn prepend-icon="mdi-delete" size="x-small" color="error">Borrar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-col>
-            </div>
-          </v-expand-transition>
+        <v-expand-transition>
+          <div v-show="isAddressOpen">
+            <v-col v-for="(direction, index) in directions" :key="index" cols="12" class="mb-3">
+              <v-card class="mx-auto custom-card" width="100%" max-width="700" elevation="5" hover>
+                <v-card-item>
+                  <v-card-title>{{ direction.numDirection }}</v-card-title>
+                  <v-card-subtitle>
+                    {{ direction.coordinates }}
+                  </v-card-subtitle>
+                </v-card-item>
+                <v-divider></v-divider>
+                <v-card-text>{{ direction.otherSigns }}</v-card-text>
+                <v-card-actions>
+                  <v-btn prepend-icon="mdi-pencil" size="x-small" color="primary">Editar</v-btn>
+                  <v-btn prepend-icon="mdi-delete" size="x-small" color="error">Borrar</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </div>
+        </v-expand-transition>
 
-          <!-- Action Buttons -->
-          <v-row class="d-flex justify-space-between mt-4">
-            <v-btn color="secondary" @click="goBack">Volver</v-btn>
-            <v-btn color="primary">Editar Perfil</v-btn>
-          </v-row>
-        </v-card>
-      </v-container>
-    </v-main>
-    <AppFooter />
-    <AppSidebar />
-  </v-app>
+        <!-- Action Buttons -->
+        <v-row class="d-flex justify-space-between mt-4">
+          <v-btn color="secondary" @click="goBack">Volver</v-btn>
+          <v-btn color="primary">Editar Perfil</v-btn>
+        </v-row>
+      </v-card>
+    </v-container>
+  </v-main>
 </template>
 
 <script>

@@ -1,65 +1,40 @@
 <template>
-  <v-app class="d-flex flex-column">
-    <AppHeader />
-    <v-main class="flex-grow-1">
-      <v-container>
-        <v-card class="pa-5 mb-4">
-          <v-row>
-            <v-col cols="12" sm="12" md="8" class="mx-auto">
-              <h3 class="text-center">Registrar Dirección</h3>
+  <v-main class="flex-grow-1">
+    <v-container>
+      <v-card class="pa-5 mb-4">
+        <v-row>
+          <v-col cols="12" sm="12" md="8" class="mx-auto">
+            <h3 class="text-center">Registrar Dirección</h3>
 
-              <v-form @submit.prevent="registerAddress" @reset="onReset">
-                <v-text-field
-                  label="Nombre de la dirección"
-                  v-model="addressData.numDirection"
-                  placeholder="Ingrese el nombre"
-                  required
-                ></v-text-field>
+            <v-form @submit.prevent="registerAddress" @reset="onReset">
+              <v-text-field label="Nombre de la dirección" v-model="addressData.numDirection"
+                placeholder="Ingrese el nombre" required></v-text-field>
 
-                <!-- Google Maps API Interactive Map -->
-                <v-row class="my-4">
-                  <v-col>
-                    <GMapMap
-                      :center="mapCenter"
-                      :zoom="12"
-                      style="width: 100%; height: 400px"
-                      @click="addMarker"
-                    >
-                      <Marker
-                        v-for="(marker, index) in markers"
-                        :key="index"
-                        :position="marker.position"
-                      />
-                    </GMapMap>
-                  </v-col>
-                </v-row>
+              <!-- Google Maps API Interactive Map -->
+              <v-row class="my-4">
+                <v-col>
+                  <GMapMap :center="mapCenter" :zoom="12" style="width: 100%; height: 400px" @click="addMarker">
+                    <Marker v-for="(marker, index) in markers" :key="index" :position="marker.position" />
+                  </GMapMap>
+                </v-col>
+              </v-row>
 
-                <v-text-field
-                  label="Coordenadas"
-                  v-model="addressData.coordinates"
-                  placeholder="Las coordenadas se completarán automáticamente"
-                  readonly
-                ></v-text-field>
+              <v-text-field label="Coordenadas" v-model="addressData.coordinates"
+                placeholder="Las coordenadas se completarán automáticamente" readonly></v-text-field>
 
-                <v-text-field
-                  label="Otras señas"
-                  v-model="addressData.otherSigns"
-                  placeholder="Ingrese otras señas o referencias"
-                ></v-text-field>
+              <v-text-field label="Otras señas" v-model="addressData.otherSigns"
+                placeholder="Ingrese otras señas o referencias"></v-text-field>
 
-                <div class="d-flex justify-content-between">
-                  <v-btn color="secondary" @click="goBack">Volver</v-btn>
-                  <v-btn type="submit" color="primary">Registrar Dirección</v-btn>
-                </div>
-              </v-form>
-            </v-col>
-          </v-row>
-        </v-card>
-      </v-container>
-    </v-main>
-    <AppFooter />
-    <AppSidebar />
-  </v-app>
+              <div class="d-flex justify-content-between">
+                <v-btn color="secondary" @click="goBack">Volver</v-btn>
+                <v-btn type="submit" color="primary">Registrar Dirección</v-btn>
+              </div>
+            </v-form>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-container>
+  </v-main>
 </template>
 
 <script>

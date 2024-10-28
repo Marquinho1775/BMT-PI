@@ -1,53 +1,49 @@
 <template>
-  <v-app class="d-flex flex-column">
-    <AppHeader />
-    <v-main class="flex-grow-1">
-      <v-container>
-        <v-card class="pa-5 mb-4">
+  <v-main class="flex-grow-1">
+    <v-container>
+      <v-card class="pa-5 mb-4">
+        <v-row>
+          <v-col>
+            <h2 class="text-center">{{ enterprise.name }}</h2>
+          </v-col>
+        </v-row>
+        <v-card-text>
+          <p><strong>Cédula del emprendimiento:</strong> {{ enterprise.identificationNumber ?
+            formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
+          <p><strong>Correo empresarial:</strong> {{ enterprise.email || 'N/A' }}</p>
+          <p><strong>Número de teléfono:</strong> {{ enterprise.phoneNumber || 'N/A' }}</p>
+          <h3>Emprendedores asociados</h3>
+          <v-btn append-icon="mdi-plus" variant="outlined" @click="handleInviteEntrepreneur">
+            Invitar colaborador
+          </v-btn>
+          <div v-if="enterprise.staff && enterprise.staff.length">
+            <ul>
+              <li v-for="staff in enterprise.staff" :key="staff.id">
+                {{ staff.name }} {{ staff.lastName }}
+              </li>
+            </ul>
+          </div>
+        </v-card-text>
+        <v-card-title>
+          <h3 class="text-left">Productos</h3>
+        </v-card-title>
+        <v-card-text>
           <v-row>
-            <v-col>
-              <h2 class="text-center">{{ enterprise.name }}</h2>
+            <v-col cols="6">
+              <v-btn append-icon="mdi-plus" variant="outlined" @click="handleRegisterProduct">
+                Registrar nuevo producto
+              </v-btn>
+            </v-col>
+            <v-col cols="6" class="d-flex justify-end">
+              <v-btn variant="outlined" @click="handleInventoryView">
+                Ver Inventario
+              </v-btn>
             </v-col>
           </v-row>
-          <v-card-text>
-            <p><strong>Cédula del emprendimiento:</strong> {{ enterprise.identificationNumber ? formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
-            <p><strong>Correo empresarial:</strong> {{ enterprise.email || 'N/A' }}</p>
-            <p><strong>Número de teléfono:</strong> {{ enterprise.phoneNumber || 'N/A' }}</p>
-            <h3>Emprendedores asociados</h3>
-            <v-btn append-icon="mdi-plus" variant="outlined" @click="handleInviteEntrepreneur">
-              Invitar colaborador 
-            </v-btn>
-            <div v-if="enterprise.staff && enterprise.staff.length">
-              <ul>
-                <li v-for="staff in enterprise.staff" :key="staff.id">
-                  {{ staff.name }} {{ staff.lastName }}
-                </li>
-              </ul>
-            </div>
-          </v-card-text>
-          <v-card-title>
-            <h3 class="text-left">Productos</h3>
-          </v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="6">
-                <v-btn append-icon="mdi-plus" variant="outlined" @click="handleRegisterProduct">
-                  Registrar nuevo producto
-                </v-btn>
-              </v-col>
-              <v-col cols="6" class="d-flex justify-end">
-                <v-btn variant="outlined" @click="handleInventoryView">
-                  Ver Inventario
-                </v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-container>
-    </v-main>
-    <AppFooter />
-    <AppSidebar />
-  </v-app>
+        </v-card-text>
+      </v-card>
+    </v-container>
+  </v-main>
 </template>
 
 <script>

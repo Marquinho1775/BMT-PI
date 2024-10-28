@@ -1,39 +1,34 @@
 <template>
-  <v-app class="d-flex flex-column">
-    <AppHeader/>
-    <v-main class="flex-grow-1">
-      <v-container>
-            <h2 class="text-center">Emprendimientos asociados</h2>
-            <v-card class="mb-4">
-              <v-data-table height="600px" fixed header>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Cédula</th>
-                    <th>Administrador</th>
-                    <th>Correo</th>
-                    <th>Número de teléfono</th>
-                    <th>Descripción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber" @click="goToEnterprise(enterprise.id)">
-                    <td>{{ enterprise.enterpriseName }}</td>
-                    <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
-                    <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
-                    <td>{{ enterprise.email }}</td>
-                    <td>{{ enterprise.phoneNumber }}</td>
-                    <td>{{ enterprise.description }}</td>
-                  </tr>
-                </tbody>
-              </v-data-table>
-            </v-card>
-      </v-container>
-    </v-main>
-
-    <AppFooter/>
-    <AppSidebar/>
-  </v-app>
+  <v-main class="flex-grow-1">
+    <v-container>
+      <h2 class="text-center">Emprendimientos asociados</h2>
+      <v-card class="mb-4">
+        <v-data-table height="600px" fixed header>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Cédula</th>
+              <th>Administrador</th>
+              <th>Correo</th>
+              <th>Número de teléfono</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber"
+              @click="goToEnterprise(enterprise.id)">
+              <td>{{ enterprise.enterpriseName }}</td>
+              <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
+              <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
+              <td>{{ enterprise.email }}</td>
+              <td>{{ enterprise.phoneNumber }}</td>
+              <td>{{ enterprise.description }}</td>
+            </tr>
+          </tbody>
+        </v-data-table>
+      </v-card>
+    </v-container>
+  </v-main>
 </template>
 
 <script>
@@ -140,7 +135,7 @@ export default {
 }
 
 .v-data-table tbody tr:hover {
-  background-color: #e0e0e0; 
+  background-color: #e0e0e0;
 }
 
 .v-main {
@@ -151,4 +146,3 @@ export default {
   background-color: #39517B;
 }
 </style>
-

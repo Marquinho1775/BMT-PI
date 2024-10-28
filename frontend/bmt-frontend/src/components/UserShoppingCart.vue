@@ -1,76 +1,61 @@
 <template>
-  <v-card flat>
-    <v-card-title>
-      <v-icon left>mdi-cart</v-icon>
-      Your Shopping Cart
-    </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="cartProducts"
-      class="elevation-1">
-      
-      <!-- Template for the quantity column -->
-      <template #[`item.quantity`]="{ item }">
-        <div class="d-flex align-center">
-          <v-text-field
-            v-model.number="item.newQuantity"
-            type="number"
-            min="1"
-            hide-details
-            dense
-            solo
-            style="width: 50px;"
-          ></v-text-field>
-          <!-- Confirmation button that only appears when there are changes -->
-          <v-btn
-            icon
-            x-small
-            color="green"
-            @click="updateQuantity(item)"
-            class="ml-1"
-            v-if="item.newQuantity !== item.quantity"
-            :disabled="item.newQuantity < 1"
-          >
-            <v-icon x-small>mdi-check</v-icon>
-          </v-btn>
-        </div>
-      </template>
+  <v-main>
+    <v-card flat>
+      <v-card-title>
+        <v-icon left>mdi-cart</v-icon>
+        Your Shopping Cart
+      </v-card-title>
+      <v-data-table :headers="headers" :items="cartProducts" class="elevation-1">
 
-      <!-- Template for the actions column -->
-      <template #[`item.actions`]="{ item }">
-        <v-btn icon x-small color="red" @click="confirmDelete(item)">
-          <v-icon x-small>mdi-delete</v-icon>
-        </v-btn>
-      </template>
-    </v-data-table>
+        <!-- Template for the quantity column -->
+        <template #[`item.quantity`]="{ item }">
+          <div class="d-flex align-center">
+            <v-text-field v-model.number="item.newQuantity" type="number" min="1" hide-details dense solo
+              style="width: 50px;"></v-text-field>
+            <!-- Confirmation button that only appears when there are changes -->
+            <v-btn icon x-small color="green" @click="updateQuantity(item)" class="ml-1"
+              v-if="item.newQuantity !== item.quantity" :disabled="item.newQuantity < 1">
+              <v-icon x-small>mdi-check</v-icon>
+            </v-btn>
+          </div>
+        </template>
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
-      <v-btn color="primary">Checkout</v-btn>
-    </v-card-actions>
+        <!-- Template for the actions column -->
+        <template #[`item.actions`]="{ item }">
+          <v-btn icon x-small color="red" @click="confirmDelete(item)">
+            <v-icon x-small>mdi-delete</v-icon>
+          </v-btn>
+        </template>
+      </v-data-table>
 
-    <!-- Confirmation dialog for deletion -->
-    <v-dialog v-model="dialog" max-width="500">
-      <v-card>
-        <v-card-title class="headline">
-          Confirm Deletion
-        </v-card-title>
-        <v-card-text>
-          Are you sure you want to remove this product from your cart?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">
-            Cancel
-          </v-btn>
-          <v-btn color="blue darken-1" text @click="deleteProduct">
-            Confirm
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
+        <v-btn color="primary">Checkout</v-btn>
+      </v-card-actions>
+
+      <!-- Confirmation dialog for deletion -->
+      <v-dialog v-model="dialog" max-width="500">
+        <v-card>
+          <v-card-title class="headline">
+            Confirm Deletion
+          </v-card-title>
+          <v-card-text>
+            Are you sure you want to remove this product from your cart?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancel
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="deleteProduct">
+              Confirm
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card>
+  </v-main>
 </template>
 
 <script>
@@ -181,6 +166,7 @@ export default {
 .v-data-table th {
   text-align: center;
 }
+
 .ml-1 {
   margin-left: 4px;
 }

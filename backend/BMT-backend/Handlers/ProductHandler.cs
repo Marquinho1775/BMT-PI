@@ -420,5 +420,21 @@ namespace BMT_backend.Handlers
             }
             return productsOfEnterprise;
         }
+
+        public string UpdateStock(string id, int newStock)
+        {
+            string updateStockQuery = "update NonPerishableProducts set Stock = @newStock where ProductId = @id";
+            var updateStockCommand = new SqlCommand(updateStockQuery, _conection);
+            updateStockCommand.Parameters.AddWithValue("@newStock", newStock);
+            updateStockCommand.Parameters.AddWithValue("@id", id);
+            _conection.Open();
+            int rowsAffected = updateStockCommand.ExecuteNonQuery();
+            _conection.Close();
+            if (rowsAffected > 0)
+            {
+                return "Stock updated successfully.";
+            }
+            return "Error updating stock.";
+        }
     }
 }
