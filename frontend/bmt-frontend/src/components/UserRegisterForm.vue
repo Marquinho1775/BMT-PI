@@ -155,7 +155,7 @@ export default {
       this.lastnameValid = regex.test(this.formData.LastName);
     },
     validateUsername() {
-      const regex = /^[a-zA-Z0-9-_´.]{1,20}$/;
+      const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9-_´.]{1,20}$/;
       this.usernameValid = regex.test(this.formData.Username);
     },
     validateEmail() {

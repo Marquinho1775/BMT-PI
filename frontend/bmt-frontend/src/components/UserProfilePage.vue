@@ -70,7 +70,7 @@
                   <v-card-item>
                     <v-card-title>{{ direction.numDirection }}</v-card-title>
                     <v-card-subtitle>
-                      {{ direction.province }}, {{ direction.canton }}, {{ direction.district }}
+                      {{ direction.coordinates }}
                     </v-card-subtitle>
                   </v-card-item>
                   <v-divider></v-divider>
@@ -87,7 +87,7 @@
           <!-- Action Buttons -->
           <v-row class="d-flex justify-space-between mt-4">
             <v-btn color="secondary" @click="goBack">Volver</v-btn>
-            <v-btn color="primary">Editar Perfil</v-btn>
+            <v-btn color="primary" @click="handleEditInfo">Editar Perfil</v-btn>
           </v-row>
         </v-card>
       </v-container>
@@ -128,7 +128,7 @@ export default {
     } else {
       this.user = JSON.parse(localStorage.getItem('user')) || this.user;
       this.GetDirectionsOfUser();
-      this.imageURL = URL + this.user.profilePictureURL;
+      this.imageURL = this.user.profilePictureURL ? URL + this.user.profilePictureURL : ''; // Asegura la sincronización
     }
   },
   methods: {
@@ -143,6 +143,9 @@ export default {
     },
     redirectToAddDirection() {
       this.$router.push('/register-address');
+    },
+    handleEditInfo() {
+      this.$router.push(`profile/edit`);
     },
     async GetDirectionsOfUser() {
       const token = getToken();
@@ -172,25 +175,30 @@ export default {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           this.imageURL = e.target.result;
+          
           const formData = new FormData();
           formData.append("ownerId", this.user.id);
           formData.append("ownerType", "User");
-          formData.append('images', file);
+          formData.append("images", file);
 
-          axios.post(API_URL + "/ImageFile/upload",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          try {
+            const response = await axios.post(API_URL + "/ImageFile/upload", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+            const uploadedImageURL = response.data.imageURL;
+            this.imageURL = URL + uploadedImageURL;
+
+            let user = JSON.parse(localStorage.getItem('user')) || {};
+            user.profilePictureURL = uploadedImageURL;
+            localStorage.setItem('user', JSON.stringify(user));
+
+          } catch (error) {
+            console.error("Error al subir la imagen:", error);
+          }
         };
         reader.readAsDataURL(file);
-        this.imageURL = URL + file.name;
-        this.user.profilePictureURL = file.name;
       }
     },
   }
