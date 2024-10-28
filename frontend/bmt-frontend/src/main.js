@@ -13,6 +13,7 @@ import UserRegisterAddress from './components/UserRegisterAddress.vue';
 import UserShoppingCart from './components/UserShoppingCart.vue';
 
 import EditProfileInfo from './components/EditProfileInfo.vue';
+import EditEnterpriseInfo from './components/EditEnterpriseInfo.vue';
 
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
@@ -75,6 +76,7 @@ const router = createRouter({
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
     { path: '/enterprise/:id/inventory', name: "EnterpriseInventory", component: EnterpriseInventory },
+    { path: '/enterprise/:id/edit', name: "EditEnterpriseInfo", component: EditEnterpriseInfo },
 
     { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
     { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
