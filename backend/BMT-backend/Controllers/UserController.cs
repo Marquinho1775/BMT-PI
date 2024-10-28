@@ -102,5 +102,34 @@ namespace BMT_backend.Controllers
 
             return Unauthorized("Invalid email or password");
         }
+
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileModel updatedUser)
+        {
+            try
+            {
+                if (updatedUser == null || string.IsNullOrEmpty(updatedUser.Id))
+                {
+                    return BadRequest("Datos de usuario inválidos");
+                }
+
+                var result = _userHandler.UpdateUserProfile(updatedUser);
+
+                if (result)
+                {
+                    return Ok("Perfil actualizado correctamente");
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo actualizar el perfil");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al actualizar el perfil: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al actualizar el perfil");
+            }
+        }
+
     }
 }

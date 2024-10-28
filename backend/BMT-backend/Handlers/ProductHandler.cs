@@ -56,7 +56,7 @@ namespace BMT_backend.Handlers
              "values(@EnterpriseId, @Name, @Description, @Price, @Weight);";
 
             var createProductCommand = new SqlCommand(createProductQuery, _conection);
-            createProductCommand.Parameters.AddWithValue("@EnterpriseId", GetEnterpriseIdByUsername(product.Username));
+            createProductCommand.Parameters.AddWithValue("@EnterpriseId", product.EnterpriseId);
             createProductCommand.Parameters.AddWithValue("@Name", product.Name);
             createProductCommand.Parameters.AddWithValue("@Description", product.Description);
             createProductCommand.Parameters.AddWithValue("@Price", product.Price);
@@ -66,22 +66,6 @@ namespace BMT_backend.Handlers
             var productId = createProductCommand.ExecuteScalar()?.ToString();
             _conection.Close();
             return productId;
-        }
-
-        private string GetEnterpriseIdByUsername(string username)
-        {
-            string getEnterpriseIdFromUsernameQuery = "SELECT e.Id " +
-                "FROM Enterprises e " +
-                "JOIN Entrepreneurs_Enterprises ee ON e.Id = ee.EnterpriseId " +
-                "JOIN Entrepreneurs en ON ee.EntrepreneurId = en.Id " +
-                "JOIN Users u ON en.UserId = u.Id " +
-                "WHERE u.UserName = @UserName and ee.Administrator = 1;";
-            var getEnterpriseIdFromUernameCommand = new SqlCommand(getEnterpriseIdFromUsernameQuery, _conection);
-            getEnterpriseIdFromUernameCommand.Parameters.AddWithValue("@UserName", username);
-            _conection.Open();
-            var enterpriseIdentification = getEnterpriseIdFromUernameCommand.ExecuteScalar()?.ToString();
-            _conection.Close();
-            return enterpriseIdentification ?? string.Empty;
         }
 
         public bool CreateNonPerishableProduct(string ProductId, int Stock)
@@ -172,6 +156,113 @@ namespace BMT_backend.Handlers
             }
             _conection.Close();
             return true;
+        }
+
+        public ProductModel GetProduct(string productId)
+        {
+            string query = "SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Id AS EnterpriseId " +
+                           "FROM Products p " +
+                           "JOIN Enterprises e ON p.EnterpriseId = e.Id " +
+                           "WHERE p.Id = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable resultTable = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(resultTable);
+            _conection.Close();
+            DataRow row = resultTable.Rows[0];
+            ProductModel product = new ProductModel
+            {
+                Id = Convert.ToString(row["Id"]),
+                Name = Convert.ToString(row["Name"]),
+                Description = Convert.ToString(row["Description"]),
+                Weight = Convert.ToDouble(row["Weight"]),
+                Price = Convert.ToDouble(row["Price"]),
+                EnterpriseId = Convert.ToString(row["EnterpriseId"]),
+                Tags = GetProductTags(productId),
+                ImagesURLs = GetProductImages(productId),
+                Type = GetProductType(productId),
+            };
+            if (product.Type == "NonPerishable")
+            {
+                product.Stock = GetNonPerishableStock(productId);
+            }
+            else if (product.Type == "Perishable")
+            {
+                product.Limit = GetPerishableLimit(productId);
+                product.WeekDaysAvailable = GetPerishableWeekDays(productId);
+            }
+            return product;
+        }
+
+        private string GetProductType(string productId)
+        {
+            string query = "SELECT COUNT(*) FROM NonPerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int nonPerishableCount = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            if (nonPerishableCount > 0)
+            {
+                return "NonPerishable";
+            }
+            query = "SELECT COUNT(*) FROM PerishableProducts WHERE ProductId = @productId";
+            queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int perishableCount = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            if (perishableCount > 0)
+            {
+                return "Perishable";
+            }
+            return string.Empty;
+        }
+
+        private int GetNonPerishableStock(string productId)
+        {
+            string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int stock = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            return stock;
+        }
+
+        private int GetPerishableLimit(string productId)
+        {
+            string query = "SELECT Limit FROM PerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            int limit = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            return limit;
+        }
+
+        private string GetPerishableWeekDays(string productId)
+        {
+            string query = "SELECT WeekDaysAvailable FROM PerishableProducts WHERE ProductId = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            string weekDays = queryCommand.ExecuteScalar().ToString();
+            _conection.Close();
+            return weekDays;
+        }
+
+        public double GetProductPrice(string productId)
+        {
+            string query = "SELECT Price FROM Products WHERE Id = @productId";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@productId", productId);
+            _conection.Open();
+            double price = Convert.ToDouble(queryCommand.ExecuteScalar());
+            _conection.Close();
+            return price;
         }
 
         public List<ProductViewModel> GetProducts()
@@ -280,6 +371,54 @@ namespace BMT_backend.Handlers
                     });
             }
             return devProducts;
+        }
+
+        public List<ProductModel> GetProductsByEnterprise(string enterpriseName)
+        {
+            List<ProductModel> productsOfEnterprise = new List<ProductModel>();
+
+            var query = "SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
+                        "FROM Products p " +
+                        "JOIN Enterprises e ON p.EnterpriseId = e.Id " +
+                        "WHERE e.Name = @EnterpriseName;";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@enterpriseName", enterpriseName);
+
+            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
+            DataTable tableFormatQuery = new DataTable();
+            _conection.Open();
+            tableAdapter.Fill(tableFormatQuery);
+            _conection.Close();
+
+            foreach (DataRow row in tableFormatQuery.Rows)
+            {
+                var productId = Convert.ToString(row["Id"]);
+                var productType = GetProductType(productId);
+
+                var product = new ProductModel
+                {
+                    Id = productId,
+                    Name = Convert.ToString(row["Name"]),
+                    Description = Convert.ToString(row["Description"]),
+                    Weight = Convert.ToDouble(row["Weight"]),
+                    Price = Convert.ToDouble(row["Price"]),
+                    Tags = GetProductTags(productId),
+                    ImagesURLs = GetProductImages(productId),
+                    Type = productType
+                };
+                if (productType == "NonPerishable")
+                {
+                    product.Stock = GetNonPerishableStock(productId);
+                }
+                else if (productType == "Perishable")
+                {
+                    product.Limit = GetPerishableLimit(productId);
+                    product.WeekDaysAvailable = GetPerishableWeekDays(productId);
+                }
+
+                productsOfEnterprise.Add(product);
+            }
+            return productsOfEnterprise;
         }
     }
 }

@@ -216,12 +216,67 @@ namespace BMT_backend.Handlers
                 IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
                 Name = Convert.ToString(row["Name"]),
                 Description = Convert.ToString(row["Description"]),
+                Email = Convert.ToString(row["Email"]),
+                PhoneNumber = Convert.ToString(row["PhoneNumber"]),
                 Administrator = GetEnterpriseAdministrator(enterpriseId),
                 Staff = GetEnterpriseStaff(enterpriseId)
             };
 
             return enterprise;
         }
+
+        public bool UpdateEnterpriseProfile(UpdateEnterpriseModel updatedEnterprise)
+        {
+            var fieldsToUpdate = new List<string>();
+            
+            if (!string.IsNullOrEmpty(updatedEnterprise.Name))
+            {
+                fieldsToUpdate.Add("Name = @Name");
+            }
+            if (!string.IsNullOrEmpty(updatedEnterprise.Description))
+            {
+                fieldsToUpdate.Add("Description = @Description");
+            }
+            if (!string.IsNullOrEmpty(updatedEnterprise.Email))
+            {
+                fieldsToUpdate.Add("Email = @Email");
+            }
+            if (!string.IsNullOrEmpty(updatedEnterprise.PhoneNumber))
+            {
+                fieldsToUpdate.Add("PhoneNumber = @PhoneNumber");
+            }
+
+            if (fieldsToUpdate.Count == 0)
+            {
+                throw new ArgumentException("No hay campos válidos para actualizar.");
+            }
+
+            var updateQuery = $"UPDATE Enterprises SET {string.Join(", ", fieldsToUpdate)} WHERE Id = @Id";
+
+            using (var updateCommand = new SqlCommand(updateQuery, _conection))
+            {
+                updateCommand.Parameters.AddWithValue("@Id", updatedEnterprise.Id);
+
+                if (!string.IsNullOrEmpty(updatedEnterprise.Name))
+                    updateCommand.Parameters.AddWithValue("@Name", updatedEnterprise.Name);
+
+                if (!string.IsNullOrEmpty(updatedEnterprise.Description))
+                    updateCommand.Parameters.AddWithValue("@Description", updatedEnterprise.Description);
+
+                if (!string.IsNullOrEmpty(updatedEnterprise.Email))
+                    updateCommand.Parameters.AddWithValue("@Email", updatedEnterprise.Email);
+
+                if (!string.IsNullOrEmpty(updatedEnterprise.PhoneNumber))
+                    updateCommand.Parameters.AddWithValue("@PhoneNumber", updatedEnterprise.PhoneNumber);
+
+                _conection.Open();
+                bool result = updateCommand.ExecuteNonQuery() >= 1;
+                _conection.Close();
+
+                return result;
+            }
+        }
+
 
     }
 }

@@ -197,5 +197,59 @@ namespace BMT_backend.Handlers
 
             return devUsers;
         }
+
+        public bool UpdateUserProfile(UpdateUserProfileModel updatedUser)
+        {
+            var fieldsToUpdate = new List<string>();
+
+            if (!string.IsNullOrEmpty(updatedUser.Username))
+            {
+                fieldsToUpdate.Add("Username = @Username");
+            }
+            if (!string.IsNullOrEmpty(updatedUser.Name))
+            {
+                fieldsToUpdate.Add("Name = @Name");
+            }
+            if (!string.IsNullOrEmpty(updatedUser.LastName))
+            {
+                fieldsToUpdate.Add("LastName = @LastName");
+            }
+            if (!string.IsNullOrEmpty(updatedUser.Password))
+            {
+                fieldsToUpdate.Add("Password = @Password");
+            }
+
+            if (fieldsToUpdate.Count == 0)
+            {
+                throw new ArgumentException("No hay campos válidos para actualizar.");
+            }
+
+            var updateQuery = $"UPDATE dbo.Users SET {string.Join(", ", fieldsToUpdate)} WHERE Id = @Id";
+
+            using (var updateCommand = new SqlCommand(updateQuery, Connection))
+            {
+                updateCommand.Parameters.AddWithValue("@Id", updatedUser.Id);
+
+                if (!string.IsNullOrEmpty(updatedUser.Username))
+                    updateCommand.Parameters.AddWithValue("@Username", updatedUser.Username);
+
+                if (!string.IsNullOrEmpty(updatedUser.Name))
+                    updateCommand.Parameters.AddWithValue("@Name", updatedUser.Name);
+
+                if (!string.IsNullOrEmpty(updatedUser.LastName))
+                    updateCommand.Parameters.AddWithValue("@LastName", updatedUser.LastName);
+
+                if (!string.IsNullOrEmpty(updatedUser.Password))
+                    updateCommand.Parameters.AddWithValue("@Password", updatedUser.Password);
+
+                Connection.Open();
+                bool result = updateCommand.ExecuteNonQuery() >= 1;
+                Connection.Close();
+
+                return result;
+            }
+        }
+
+
     }
 }

@@ -1,40 +1,39 @@
 <template>
+  <v-app class="d-flex flex-column">
+    <AppHeader/>
+    <v-main class="flex-grow-1">
+      <v-container>
+            <h2 class="text-center">Emprendimientos asociados</h2>
+            <v-card class="mb-4">
+              <v-data-table height="600px" fixed header>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Cédula</th>
+                    <th>Administrador</th>
+                    <th>Correo</th>
+                    <th>Número de teléfono</th>
+                    <th>Descripción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber" @click="goToEnterprise(enterprise.id)">
+                    <td>{{ enterprise.enterpriseName }}</td>
+                    <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
+                    <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
+                    <td>{{ enterprise.email }}</td>
+                    <td>{{ enterprise.phoneNumber }}</td>
+                    <td>{{ enterprise.description }}</td>
+                  </tr>
+                </tbody>
+              </v-data-table>
+            </v-card>
+      </v-container>
+    </v-main>
 
-  <body>
-    <div class="entrepreneur-enterprises">
-      <div class="content">
-        <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 10vh;">
-          <div>
-            <h2 class="title">Emprendimientos asociados</h2>
-          </div>
-        </div>
-        <div class="table-container">
-          <table class="enterprise-table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Cédula</th>
-                <th>Administrador</th>
-                <th>Descripción</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber"
-                @click="goToEnterprise(enterprise.id)">
-                <td>{{ enterprise.enterpriseName }}</td>
-                <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
-                <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
-                <td>{{ enterprise.description }}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="button-container">
-            <button class="button" @click="goBack">Volver</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+    <AppFooter/>
+    <AppSidebar/>
+  </v-app>
 </template>
 
 <script>
@@ -45,6 +44,7 @@ import { API_URL } from '@/main.js';
 export default {
   data() {
     return {
+      menuDrawer: false,
       enterprises: [],
       entrepreneur: {
         Id: '',
@@ -66,17 +66,7 @@ export default {
           console.error('Faltan datos del usuario');
           return;
         }
-        const obtainEntrepreneurResponse = await axios.post(
-          API_URL + '/Entrepreneur/ObtainEntrepreneurBasedOnUser',
-          {
-            Id: user.id,
-            Name: user.name,
-            LastName: user.lastName,
-            Username: user.username,
-            Email: user.email,
-            Password: user.password,
-            IsVerified: user.isVerified
-          },
+        const obtainEntrepreneurResponse = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -85,16 +75,13 @@ export default {
         );
         const entrepreneur = obtainEntrepreneurResponse.data;
         const enterprisesResponse = await axios.post(
-          API_URL + '/Entrepreneur/my-registered-enterprises',
-          entrepreneur,
+          API_URL + '/Entrepreneur/my-registered-enterprises?Identification=' + entrepreneur.identification,
           {
             headers: {
               Authorization: `Bearer ${token}`
             }
-          }
-        );
+          });
         this.enterprises = enterprisesResponse.data;
-        console.log(this.enterprises);
 
       } catch (error) {
         console.error('Error al obtener las empresas:', error);
@@ -118,102 +105,50 @@ export default {
         console.error('El ID de la empresa es undefined');
         return;
       }
-      console.log(enterpriseId);
       this.$router.push(`/enterprise/${enterpriseId}`);
     }
   }
 };
 </script>
-
 <style scoped>
-.entrepreneur-enterprises {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #D1E4FF;
-  justify-content: flex-start;
-  align-items: center;
-  padding-top: 20px;
+.v-app-bar {
+  background-color: #9FC9FC;
 }
 
-.content {
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.v-footer {
+  height: 50px;
+  background-color: #9FC9FC;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-h2 {
-  margin-bottom: 10px;
-  margin-top: 0;
-}
-
-.table-container {
-  background-color: #A9C5FF;
-  padding: 20px;
-  border-radius: 15px;
-  width: 100%;
-  min-height: 60vh;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.enterprise-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0 auto;
-}
-
-.enterprise-table th,
-.enterprise-table td {
-  padding: 10px;
-  text-align: left;
-}
-
-.enterprise-table th {
-  background-color: #39517B;
-  font-weight: bold;
-  color: white;
-}
-
-.enterprise-table td {
-  background-color: #D0EDA0;
-  border-bottom: 1px solid #ddd;
-}
-
-.title {
-  background-color: #D0EDA0;
-  color: #02174B;
-  padding: 15px;
-  border-radius: 100px;
+.text-center {
   text-align: center;
 }
 
-.button-container {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
+.v-card {
+  background-color: #A9C5FF;
 }
 
-.button {
+.v-data-table th {
   background-color: #39517B;
   color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
 }
 
-.button:hover {
-  background-color: #2d3f5a;
+.v-data-table tbody tr {
+  background-color: #FFF;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.v-data-table tbody tr:hover {
+  background-color: #e0e0e0; 
+}
+
+.v-main {
+  background-color: #FFF;
+}
+
+.v-navigation-drawer {
+  background-color: #39517B;
 }
 </style>
+

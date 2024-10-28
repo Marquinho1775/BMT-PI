@@ -1,36 +1,56 @@
 <template>
-  <div class="enterprise-dashboard">
-    <div class="content">
-      <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 10vh;">
-        <div>
-          <h2 class="title">{{ enterprise.name }}</h2>
-        </div>
-      </div>
-      <div class="details-container">
-        <div class="enterprise-details">
-          <p><strong>Cédula del emprendimiento:</strong> {{ enterprise.identificationNumber ?
-            formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
-          <p><strong>Correo del administrador:</strong> {{ enterprise.administrator?.email || 'N/A' }}</p>
-        </div>
-
-        <div class="staff-list" v-if="enterprise.staff && enterprise.staff.length">
-          <h3>Emprendedores asociados</h3>
-          <ul>
-            <li v-for="staff in enterprise.staff" :key="staff.id">{{ staff.name }} {{ staff.lastName }}</li>
-          </ul>
-        </div>
-
-        <div class="product-list">
-          <h3>Productos</h3>
-          <p>Productos no disponibles por el momento</p>
-        </div>
-
-        <div class="button-container">
-          <button class="button" @click="goBack">Volver</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <v-app class="d-flex flex-column">
+    <AppHeader />
+    <v-main class="flex-grow-1">
+      <v-container>
+        <v-card class="pa-5 mb-4">
+          <v-row>
+            <v-col>
+              <h2 class="text-center">{{ enterprise.name }}</h2>
+            </v-col>
+          </v-row>
+          <v-card-text>
+            <p><strong>Cédula del emprendimiento:</strong> {{ enterprise.identificationNumber ? formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
+            <p><strong>Correo empresarial:</strong> {{ enterprise.email || 'N/A' }}</p>
+            <p><strong>Número de teléfono:</strong> {{ enterprise.phoneNumber || 'N/A' }}</p>
+            <v-btn append-icon="mdi-pencil" variant="outlined" @click="handleEditEnterprise">
+              Editar Emprendimiento
+            </v-btn>
+            <h3>Emprendedores asociados</h3>
+            <v-btn append-icon="mdi-plus" variant="outlined" @click="handleInviteEntrepreneur">
+              Invitar colaborador 
+            </v-btn>
+            <div v-if="enterprise.staff && enterprise.staff.length">
+              <ul>
+                <li v-for="staff in enterprise.staff" :key="staff.id">
+                  {{ staff.name }} {{ staff.lastName }}
+                </li>
+              </ul>
+            </div>
+          </v-card-text>
+          <v-card-title>
+            <h3 class="text-left">Productos</h3>
+          </v-card-title>
+          <v-card-text>
+            <v-row>
+              <v-col cols="6">
+                <v-btn append-icon="mdi-plus" variant="outlined" @click="handleRegisterProduct">
+                  Registrar nuevo producto
+                </v-btn>
+              </v-col>
+              <v-col cols="6" class="d-flex justify-end">
+                <v-btn variant="outlined" @click="handleInventoryView">
+                  Ver Inventario
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-container>
+    </v-main>
+    <AppFooter />
+    <AppSidebar />
+  </v-app>
 </template>
 
 <script>
@@ -41,10 +61,7 @@ import { getToken } from '@/helpers/auth';
 export default {
   data() {
     return {
-      enterprise: {
-        administrator: {},
-        staff: []
-      }
+      enterprise: {}
     };
   },
   async created() {
@@ -69,68 +86,43 @@ export default {
       }
       return identification || 'N/A';
     },
-    goBack() {
-      this.$router.push('/enterprises');
+    handleInviteEntrepreneur() {
+      this.$router.push(`/enterprise/${this.enterprise.id}/invite`);
+    },
+    handleRegisterProduct() {
+      this.$router.push(`${this.enterprise.id}/new-product`);
+    },
+    handleInventoryView() {
+      this.$router.push(`${this.enterprise.id}/inventory`);
+    },
+    handleEditEnterprise() {
+      this.$router.push(`/enterprise/${this.enterprise.id}/edit`);
     }
   }
 };
 </script>
 
 <style scoped>
-.enterprise-dashboard {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #D1E4FF;
-  justify-content: flex-start;
-  align-items: center;
-  padding-top: 20px;
+.v-app-bar {
+  background-color: #9FC9FC;
 }
 
-.content {
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.v-footer {
+  height: 50px;
+  background-color: #9FC9FC;
 }
 
-.title {
-  background-color: #D0EDA0;
-  color: #02174B;
-  padding: 15px;
-  border-radius: 100px;
+.v-card {
+  background-color: #A9C5FF;
+}
+
+.text-center {
   text-align: center;
 }
 
-.details-container {
-  background-color: #A9C5FF;
-  padding: 20px;
-  border-radius: 15px;
-  width: 100%;
-  min-height: 60vh;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-button {
-  background-color: #39517B;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #2d3f5a;
-}
-
-.staff-list,
-.product-list {
-  margin-top: 20px;
-}
-
-.staff-list h3,
-.product-list h3 {
-  margin-bottom: 10px;
+ul {
+  padding-left: 20px;
+  list-style-type: disc;
+  margin-top: 10px;
 }
 </style>
