@@ -3,6 +3,8 @@ using System.Data;
 using BMT_backend.Models;
 using BMT_backend.Controllers;
 using System.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Data.Common;
 
 namespace BMT_backend.Handlers
 {
@@ -92,12 +94,6 @@ namespace BMT_backend.Handlers
             _conection.Open();
             bool exit = createPerishableProductCommand.ExecuteNonQuery() >= 1;
             _conection.Close();
-
-            bool disponibilityCreated = CreateDateDisponibility(ProductId, WeekDaysAvailable);
-            if (!disponibilityCreated)
-            {
-                return false;
-            }
             return exit;
         }
 
@@ -371,6 +367,38 @@ namespace BMT_backend.Handlers
                     });
             }
             return devProducts;
+        }
+
+        public string UpdateDateDisponibility(string PerishableProductId, string DateString, int Quantity)
+        {
+            DateTime Date = DateTime.Parse(DateString);
+            string query = @"
+            IF EXISTS (SELECT 1 FROM DateDisponibility WHERE ProductId = @ProductId AND Date = @Date)
+            BEGIN
+                -- Si existe, actualizar el Stock
+                UPDATE DateDisponibility 
+                SET Stock = Stock - @Quantity
+                WHERE ProductId = @ProductId AND Date = @Date;
+            END
+            ELSE
+            BEGIN
+                -- Si no existe, insertar una nueva entrada con el Stock calculado
+                INSERT INTO DateDisponibility (ProductId, Date, Stock) 
+                VALUES (
+                    @ProductId, 
+                    @Date, 
+                    (SELECT [Limit] FROM PerishableProducts WHERE ProductId = @ProductId) - @Quantity
+                );
+            END
+            ";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@ProductId", PerishableProductId);
+            queryCommand.Parameters.AddWithValue("@Date", Date);
+            queryCommand.Parameters.AddWithValue("@Quantity", Quantity);
+            _conection.Open();
+            queryCommand.ExecuteNonQuery();
+            _conection.Close();
+            return "Date disponibility updated successfully.";
         }
 
         public List<ProductModel> GetProductsByEnterprise(string enterpriseName)

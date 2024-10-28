@@ -12,6 +12,9 @@
             formatIdentification(enterprise.identificationNumber) : 'N/A' }}</p>
           <p><strong>Correo empresarial:</strong> {{ enterprise.email || 'N/A' }}</p>
           <p><strong>Número de teléfono:</strong> {{ enterprise.phoneNumber || 'N/A' }}</p>
+          <v-btn append-icon="mdi-pencil" variant="outlined" @click="handleEditEnterprise">
+              Editar Emprendimiento
+          </v-btn>
           <h3>Emprendedores asociados</h3>
           <v-btn append-icon="mdi-plus" variant="outlined" @click="handleInviteEntrepreneur">
             Invitar colaborador
@@ -87,6 +90,9 @@ export default {
     },
     handleInventoryView() {
       this.$router.push(`${this.enterprise.id}/inventory`);
+    },
+    handleEditEnterprise() {
+      this.$router.push(`/enterprise/${this.enterprise.id}/edit`);
     }
   }
 };

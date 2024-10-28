@@ -8,8 +8,8 @@ namespace BMT_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase { 
-    
+    public class ProductController : ControllerBase {
+
         private readonly ProductHandler _productHandler;
 
         public ProductController()
@@ -74,6 +74,23 @@ namespace BMT_backend.Controllers
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the stock");
+            }
+        }
+        [HttpPost("updateDateDisponibility")]
+        public ActionResult<string> UpdateDateDisponibility(string PerishableProductId, string Date, int Quantity)
+        {
+            try
+            {
+                if (PerishableProductId == null || Date == null || Quantity == 0)
+                {
+                    return BadRequest("Product information is not valid.");
+                }
+                var result = _productHandler.UpdateDateDisponibility(PerishableProductId, Date, Quantity);
+                return result;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the product");
             }
         }
     }

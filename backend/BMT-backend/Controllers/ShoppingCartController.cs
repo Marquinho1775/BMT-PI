@@ -37,7 +37,7 @@ namespace BMT_backend.Controllers
         public ActionResult<ShoppingCartModel> GetShoppingCart(string userId)
         {
             try
-            { 
+            {
                 var shoppingCart = _shoppingCartHandler.GetShoppingCart(userId);
                 return Ok(shoppingCart);
             }
@@ -68,7 +68,8 @@ namespace BMT_backend.Controllers
                 var result = _shoppingCartHandler.AddProductToCart(shoppingCartId, productId);
                 return new JsonResult(result);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error agregando producto al carrito");
             }
         }
@@ -86,7 +87,8 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpDelete("DeleteProductFromCart")]
-        public ActionResult<bool> DeleteProductFromCart(string shoppingCartId, string productId) {
+        public ActionResult<bool> DeleteProductFromCart(string shoppingCartId, string productId)
+        {
             try
             {
                 var result = _shoppingCartHandler.DeleteProductFromCart(shoppingCartId, productId);

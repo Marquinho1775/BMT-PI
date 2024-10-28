@@ -61,41 +61,86 @@
         </v-card-actions>
 
 
-        <v-expand-transition>
-          <div v-show="isAddressOpen">
-            <v-col v-for="(direction, index) in directions" :key="index" cols="12" class="mb-3">
-              <v-card class="mx-auto custom-card" width="100%" max-width="700" elevation="5" hover>
-                <v-card-item>
-                  <v-card-title>{{ direction.numDirection }}</v-card-title>
-                  <v-card-subtitle>
-                    {{ direction.coordinates }}
-                  </v-card-subtitle>
-                </v-card-item>
-                <v-divider></v-divider>
-                <v-card-text>{{ direction.otherSigns }}</v-card-text>
-                <v-card-actions>
-                  <v-btn prepend-icon="mdi-pencil" size="x-small" color="primary">Editar</v-btn>
-                  <v-btn prepend-icon="mdi-delete" size="x-small" color="error">Borrar</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </div>
-        </v-expand-transition>
+          <v-expand-transition>
+            <div v-show="isAddressOpen">
+              <v-col v-for="(direction, index) in directions" :key="index" cols="12" class="mb-3">
+                <v-card class="mx-auto custom-card" width="100%" max-width="700" elevation="5" hover>
+                  <v-card-item>
+                    <v-card-title>{{ direction.numDirection }}</v-card-title>
+                    <v-card-subtitle>
+                      {{ direction.coordinates }}
+                    </v-card-subtitle>
+                  </v-card-item>
+                  <v-divider></v-divider>
+                  <v-card-text>{{ direction.otherSigns }}</v-card-text>
+                  <v-card-actions>
+                    <v-btn prepend-icon="mdi-pencil" size="x-small" color="primary" @click="openEditDialog(direction)">Editar</v-btn>
+                    <v-btn prepend-icon="mdi-delete" size="x-small" color="error">Borrar</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-col>
+            </div>
+          </v-expand-transition>
 
-        <!-- Action Buttons -->
-        <v-row class="d-flex justify-space-between mt-4">
-          <v-btn color="secondary" @click="goBack">Volver</v-btn>
-          <v-btn color="primary">Editar Perfil</v-btn>
-        </v-row>
-      </v-card>
-    </v-container>
-  </v-main>
+          <!-- Edit Address Dialog -->
+          <v-dialog v-model="isEditDialogOpen" max-width="600">
+            <v-card>
+              <v-card-title>Editar Dirección</v-card-title>
+              <v-card-text>
+                <v-form @submit.prevent="saveEditedDirection">
+                  <v-text-field
+                    label="Nombre de la dirección"
+                    v-model="currentDirection.numDirection"
+                    required
+                  ></v-text-field>
+
+                  <v-row class="my-4">
+                    <v-col>
+                      <GMapMap
+                        :center="editMapCenter"
+                        :zoom="12"
+                        style="width: 100%; height: 400px"
+                        @click="updateMarker"
+                      >
+                        <Marker v-if="editMarker" :position="editMarker.position" />
+                      </GMapMap>
+                    </v-col>
+                  </v-row>
+                  
+                  <v-text-field
+                    label="Coordenadas"
+                    v-model="currentDirection.coordinates"
+                    readonly
+                  ></v-text-field>
+                  
+                  <v-text-field
+                    label="Otras señas"
+                    v-model="currentDirection.otherSigns"
+                  ></v-text-field>
+                </v-form>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="secondary" @click="closeEditDialog">Cancelar</v-btn>
+                <v-btn color="primary" @click="saveEditedDirection">Guardar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <!-- Action Buttons -->
+          <v-row class="d-flex justify-space-between mt-4">
+            <v-btn color="secondary" @click="goBack">Volver</v-btn>
+            <v-btn color="primary" @click="handleEditInfo">Editar Perfil</v-btn>
+          </v-row>
+        </v-card>
+      </v-container>
+    </v-main>
 </template>
 
 <script>
 import axios from 'axios';
 import { API_URL, URL } from '@/main.js';
 import { getToken } from '@/helpers/auth';
+import { GMapMap, Marker } from '@fawmi/vue-google-maps'; // eslint-disable-line no-unused-vars
 
 export default {
   data() {
@@ -114,7 +159,14 @@ export default {
       },
       directions: [],
       showPassword: false,
-      isAddressOpen: false, // Controla si se muestra la sección de direcciones
+      isAddressOpen: false,
+      isEditDialogOpen: false,
+      editAddressData: { numDirection: '', coordinates: '', otherSigns: '' },
+      currentDirection: { numDirection: '', coordinates: '', otherSigns: '' },
+      editMapCenter: { lat: 9.9359015, lng: -84.0506458 },
+      editMarker: null,
+    
+
     };
   },
   created() {
@@ -123,7 +175,7 @@ export default {
     } else {
       this.user = JSON.parse(localStorage.getItem('user')) || this.user;
       this.GetDirectionsOfUser();
-      this.imageURL = URL + this.user.profilePictureURL;
+      this.imageURL = this.user.profilePictureURL ? URL + this.user.profilePictureURL : '';
     }
   },
   methods: {
@@ -139,6 +191,9 @@ export default {
     redirectToAddDirection() {
       this.$router.push('/register-address');
     },
+    handleEditInfo() {
+      this.$router.push(`profile/edit`);
+    },
     async GetDirectionsOfUser() {
       const token = getToken();
       const user = JSON.parse(localStorage.getItem('user'));
@@ -147,13 +202,9 @@ export default {
           throw new Error('El usuario no tiene todos los campos requeridos');
         }
         const response = await axios.post(
-          API_URL + '/Direction/ObtainDirectionsFromUser',
+          `${API_URL}/Direction/ObtainDirectionsFromUser`,
           user,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         this.directions = response.data;
       } catch (error) {
@@ -167,26 +218,81 @@ export default {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           this.imageURL = e.target.result;
+          
           const formData = new FormData();
           formData.append("ownerId", this.user.id);
           formData.append("ownerType", "User");
-          formData.append('images', file);
+          formData.append("images", file);
 
-          axios.post(API_URL + "/ImageFile/upload",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          try {
+            const response = await axios.post(API_URL + "/ImageFile/upload", formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
+            const uploadedImageURL = response.data.imageURL;
+            this.imageURL = URL + uploadedImageURL;
+
+            let user = JSON.parse(localStorage.getItem('user')) || {};
+            user.profilePictureURL = uploadedImageURL;
+            localStorage.setItem('user', JSON.stringify(user));
+
+          } catch (error) {
+            console.error("Error al subir la imagen:", error);
+          }
         };
         reader.readAsDataURL(file);
-        this.imageURL = URL + file.name;
-        this.user.profilePictureURL = file.name;
       }
+    },
+    openEditDialog(direction) {
+      this.isEditDialogOpen = true;
+      this.currentDirection = { ...direction };
+      
+      // Parse coordinates for map center
+      const [lat, lng] = direction.coordinates.split(', ');
+      this.editMapCenter = { lat: parseFloat(lat), lng: parseFloat(lng) };
+      this.editMarker = { position: this.editMapCenter };
+    },
+    updateMarker(event) {
+      const position = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+      this.editMarker = { position };
+      this.currentDirection.coordinates = `${position.lat}, ${position.lng}`;
+    },
+    async saveEditedDirection() {
+      const token = getToken();
+      try {
+        const response = await axios.put(
+          `${API_URL}/Direction/UpdateDirection/${this.currentDirection.id}`,  // Cambiar numDirection por Id
+          this.currentDirection,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data) {
+          this.GetDirectionsOfUser();
+          this.isEditDialogOpen = false;
+
+          await this.$swal.fire({
+            title: 'Dirección actualizada',
+            text: '¡Su dirección ha sido actualizada correctamente!',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          });
+        } else {
+          console.error('Error: No se pudo actualizar la dirección.');
+        }
+      } catch (error) {
+        console.error('Error al guardar la dirección:', error);
+
+        this.$swal.fire({
+          title: 'Error',
+          text: 'Hubo un error al actualizar su dirección. Inténtelo de nuevo.',
+          icon: 'error',
+          confirmButtonText: 'Ok',
+        });
+      }
+    },
+    closeEditDialog() {
+      this.isEditDialogOpen = false;
     },
   }
 };

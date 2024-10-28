@@ -27,14 +27,12 @@ namespace BMT_backend.Controllers
 
                 var result = _directionHandler.GetDirectionsFromUser(user);
                 return Ok(result);
-
             }
             catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las direcciones de un usuario");
             }
         }
-
 
         [HttpPost("CreateDirection")]
         public async Task<ActionResult<bool>> createDirection(DirectionModel direction)
@@ -43,16 +41,41 @@ namespace BMT_backend.Controllers
             {
                 if (Request == null)
                 {
-                    BadRequest();
+                    return BadRequest();
                 }
 
                 var result = _directionHandler.CreateDirection(direction);
                 return new JsonResult(result);
-
             }
             catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error registrando direcciones");
+            }
+        }
+
+        [HttpPut("UpdateDirection/{id}")]
+        public async Task<ActionResult<bool>> UpdateDirection(string id, [FromBody] DirectionModel updatedDirection)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id) || updatedDirection == null)
+                {
+                    return BadRequest("ID y datos de actualización son requeridos.");
+                }
+
+                updatedDirection.Id = id;
+                var result = _directionHandler.UpdateDirection(updatedDirection);
+
+                if (!result)
+                {
+                    return NotFound("Dirección no encontrada o no se pudo actualizar.");
+                }
+
+                return Ok(result);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error actualizando la dirección");
             }
         }
     }
