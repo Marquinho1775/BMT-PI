@@ -114,7 +114,7 @@ namespace BMT_backend.Controllers
         {
             try
             {
-                string code = userData.Id
+                string code = userData.Id;
                 string link = "http://localhost:8080/accept-invitation/";
 
                 string title = "Invitación a colaborar en Business Tracker";
