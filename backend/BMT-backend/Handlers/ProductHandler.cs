@@ -531,13 +531,13 @@ namespace BMT_backend.Handlers
                 UpdateProductTags(updatedProduct.Id, updatedProduct.Tags);
             }
 
-            // Si se han enviado nuevas URLs de imágenes, se actualizan
+
             if (updatedProduct.ImagesURLs != null && updatedProduct.ImagesURLs.Count > 0)
             {
                 UpdateProductImages(updatedProduct.Id, updatedProduct.ImagesURLs);
             }
 
-            // Finaliza la construcción del query
+
             query.Length -= 2;
             query.Append(" WHERE Id = @Id AND EnterpriseId = @EnterpriseId");
             parameters.Add(new SqlParameter("@Id", updatedProduct.Id));

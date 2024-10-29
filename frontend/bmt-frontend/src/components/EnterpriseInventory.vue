@@ -69,7 +69,7 @@
           </table>
         </v-card>
 
-        <!-- Dialog for Editing Product -->
+        <!-- Diálogo para edición de producto -->
         <v-dialog v-model="isEditDialogOpen" max-width="600px">
           <v-card>
             <v-card-title>
@@ -198,7 +198,7 @@
     },
     async created() {
       const enterpriseId = this.$route.params.id;
-      this.enterpriseId = enterpriseId; // Almacena enterpriseId
+      this.enterpriseId = enterpriseId;
       try {
         const token = getToken();
         const enterpriseResponse = await axios.get(API_URL + `/Enterprise/${enterpriseId}`, {
@@ -249,12 +249,12 @@
         return type === "NonPerishable" ? "No perecedero" : type === "Perishable" ? "Perecedero" : "Desconocido";
       },
       openEditDialog(product) {
-        this.editProductData = { ...product }; // Clona el producto seleccionado
+        this.editProductData = { ...product }; 
         this.isEditDialogOpen = true;
       },
       closeEditDialog() {
         this.isEditDialogOpen = false;
-        this.editProductData = {}; // Limpia los datos de edición
+        this.editProductData = {}; 
       },
       async getTagIdsByNames(tags) {
         const token = getToken();
@@ -274,13 +274,13 @@
       async uploadImages() {
         try {
           const formData = new FormData();
-          formData.append("ownerId", this.editProductData.id); // Asigna el ProductId del producto en edición
+          formData.append("ownerId", this.editProductData.id);
           formData.append("ownerType", "Product");
 
 
           console.log("Imágenes seleccionadas:", this.editProductData.newImages);
           this.editProductData.newImages.forEach((file) => {
-            formData.append("images", file); // Agrega cada imagen al formData
+            formData.append("images", file);
           });
 
           await axios.post(
@@ -303,20 +303,16 @@
       },
       async updateProduct() {
         try {
-            console.log(this.editProductData); // Verificar datos
+            console.log(this.editProductData);
 
-            // Subir imágenes solo si hay nuevas imágenes seleccionadas
             if (this.editProductData.newImages && this.editProductData.newImages.length > 0) {
-              // Limpia la URL actual antes de subir la nueva imagen
               this.editProductData.imagesURLs = [];
               console.log("Subiendo nuevas imágenes...");
               await this.uploadImages();
             }
 
-            // Obtener IDs de los tags antes de enviar los datos
             this.editProductData.tags = await this.getTagIdsByNames(this.editProductData.tags);
 
-            // Crear un objeto limpio de los datos a actualizar
             const updatedProductData = {
                 ...this.editProductData,
                 enterpriseId: this.enterpriseId,
@@ -325,7 +321,7 @@
                 limit: this.editProductData.limit ? Number(this.editProductData.limit) : null
             };
 
-            // Si no se seleccionaron nuevas imágenes, eliminamos `imagesURLs` y `newImages` del payload
+
             if (!this.editProductData.newImages || this.editProductData.newImages.length === 0) {
                 delete updatedProductData.imagesURLs;
                 delete updatedProductData.newImages;
