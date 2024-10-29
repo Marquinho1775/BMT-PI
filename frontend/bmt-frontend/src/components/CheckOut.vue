@@ -363,46 +363,31 @@ export default {
             confirmButtonText: 'Ok',
           });
           return;
-        } else {
-          if (item.product.type === 'Perishable') {
-            const response = await axios.post(`${API_URL}/Product/updateDateDisponibility`, {
-              PerishableProductId: item.product.id,
-              Date: item.deliveryDate,
-              Quantity: item.quantity,
-            });
-            if (!response.data.success) {
-              this.$swal.fire({
-                title: 'Error',
-                text: `No se pudo reservar el stock para el producto ${item.product.name}`,
-                icon: 'error',
-                confirmButtonText: 'Ok',
-              });
-              return;
-            }
-          }
-          else if (item.product.type === 'NonPerishable') {
-            const response = await axios.post(`${API_URL}/Product/inventory`, {
-              id: item.product.id,
-              newStock: item.quantity,
-            });
-            if (!response.data.success) {
-              this.$swal.fire({
-                title: 'Error',
-                text: `No se pudo actualizar el stock para el producto ${item.product.name}`,
-                icon: 'error',
-                confirmButtonText: 'Ok',
-              });
-              return;
-            }
-          }
         }
       }
 
       //post pedido de barbo
       //!TODO barbo
 
-      this.resetForm();
 
+      this.clearCart();
+      this.resetForm();
+      this.$router.push('/');
+
+    },
+
+    clearCart() {
+      axios
+        .delete(`${API_URL}/ShoppingCart/ClearShoppingCart`, {
+          params: { shoppingCartId: this.shoppingCartId },
+          headers: { Accept: 'text/plain' },
+        })
+        .then(() => {
+          this.cartProducts = [];
+        })
+        .catch((error) => {
+          console.error('Error al vaciar el carrito:', error);
+        });
     },
 
     getToday() {

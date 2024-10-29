@@ -30,6 +30,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'
 import { API_URL } from '@/main';
 
 export default {
@@ -44,6 +45,7 @@ export default {
         });
 
         const isValid = ref(false);
+        const router = useRouter();
 
         // Al montar el componente, obtenemos el userID del localStorage
         onMounted(() => {
@@ -62,7 +64,7 @@ export default {
             /^\d{2}\/\d{2}$/.test(value) || 'Formato inválido. Use MM/AA';
 
         const handleBack = () => {
-            this.$router.push('/profile');
+            router.push('/profile');
         };
 
         const submitForm = () => {
