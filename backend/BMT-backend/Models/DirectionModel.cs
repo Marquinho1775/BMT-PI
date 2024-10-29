@@ -2,7 +2,7 @@
 {
     public class DirectionModel
     {
-        public string Id { get; set; }
+        public string? Id { get; set; }
         public string Username { get; set; }
         public string NumDirection { get; set; }
         public string? OtherSigns { get; set; }
