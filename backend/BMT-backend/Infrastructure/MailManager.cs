@@ -28,72 +28,83 @@ namespace BMT_backend.Infrastructure
         public void SendConfirmationEmails(OrderModel order)
         {
             string title = "Confirmación de orden";
-            string body = "<h1>Confirmación de orden</h1>";
-            body += "Hola!<br><br>Gracias por tu orden en Business Tracker.<br>";
-            body += "Tu orden ha sido confirmada.<br><br>";
-            body += "Detalles de la orden:<br>";
+            string body = "<h1>Confirmación de orden</h1>" +
+                          "Hola!<br><br>Gracias por tu orden en Business Tracker.<br>" +
+                          "Tu orden ha sido confirmada.<br><br>" +
+                          "Detalles de la orden:<br>";
+
             foreach (var product in order.Products)
             {
-                body += "<b>Empresa:</b> " + product.EnterpriseName + "<br>";
-                body += "<b>Producto:</b> " + product.ProductName + "<br>";
-                body += "<b>Cantidad:</b> " + product.Quantity + "<br>";
-                body += "<b>Fecha del producto:</b> " + product.ProductDate + "<br><br>";
+                body += $"<b>Empresa:</b> {product.EnterpriseName}<br>" +
+                        $"<b>Producto:</b> {product.ProductName}<br>" +
+                        $"<b>Cantidad:</b> {product.Quantity}<br>" +
+                        $"<b>Fecha del producto:</b> {product.ProductDate}<br><br>";
             }
-            body += "<b>Fecha de orden:</b> " + order.OrderDate + "<br>";
-            body += "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>";
-            body += "¡Gracias por confiar en nosotros!<br><br>";
-            body += "Saludos,<br>";
-            body += "El equipo de Business Tracker";
 
-            // Creando el correo
-            MailMessage mailMessage = new MailMessage
+            body += $"<b>Fecha de orden:</b> {order.OrderDate}<br>" +
+                    "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>" +
+                    "¡Gracias por confiar en nosotros!<br><br>" +
+                    "Saludos,<br>" +
+                    "El equipo de Business Tracker";
+
+            try
             {
-                From = new MailAddress(email),
-                Subject = title,
-                Body = body,
-            };
-            mailMessage.IsBodyHtml = true;
-            mailMessage.To.Add(order.UserEmail);
-
-            // Enviando el correo
-            SmtpClient smtpClient = new SmtpClient(host, port)
-            {
-                Credentials = new NetworkCredential(email, password),
-                EnableSsl = true,
-            };
-            smtpClient.Send(mailMessage);
-
-            // Agrupar productos por empresa
-            var productsByEnterprise = order.Products.GroupBy(p => new { p.EnterpriseName, p.EnterpriseEmail });
-
-            // Enviar correo a cada empresa
-            foreach (var group in productsByEnterprise)
-            {
-                string enterpriseBody = "<h1>Productos a preparar</h1>";
-                enterpriseBody += "Hola!<br><br>Tienes nuevos productos para preparar.<br><br>";
-                enterpriseBody += "Detalles de los productos:<br>";
-                foreach (var product in group)
+                // Enviar correo de confirmación al usuario
+                using (var mailMessage = new MailMessage())
+                using (var smtpClient = new SmtpClient(host, port))
                 {
-                    enterpriseBody += "<b>Producto:</b> " + product.ProductName + "<br>";
-                    enterpriseBody += "<b>Cantidad:</b> " + product.Quantity + "<br>";
-                    enterpriseBody += "<b>Fecha del producto:</b> " + product.ProductDate + "<br><br>";
+                    mailMessage.From = new MailAddress(email);
+                    mailMessage.Subject = title;
+                    mailMessage.Body = body;
+                    mailMessage.IsBodyHtml = true;
+                    mailMessage.To.Add(order.UserEmail);
+
+                    smtpClient.Credentials = new NetworkCredential(email, password);
+                    smtpClient.EnableSsl = true;
+
+                    smtpClient.Send(mailMessage);
                 }
-                enterpriseBody += "Saludos,<br>";
-                enterpriseBody += "El equipo de Business Tracker";
 
-                // Creando el correo para la empresa
-                MailMessage enterpriseMailMessage = new MailMessage
+                // Agrupar productos por empresa y enviar correos a cada empresa
+                var productsByEnterprise = order.Products.GroupBy(p => new { p.EnterpriseName, p.EnterpriseEmail });
+
+                foreach (var group in productsByEnterprise)
                 {
-                    From = new MailAddress(email),
-                    Subject = "Productos a preparar",
-                    Body = enterpriseBody,
-                };
-                enterpriseMailMessage.IsBodyHtml = true;
-                enterpriseMailMessage.To.Add(group.Key.EnterpriseEmail);
+                    string enterpriseBody = "<h1>Productos a preparar</h1>" +
+                                            "Hola!<br><br>Tienes nuevos productos para preparar.<br><br>" +
+                                            "Detalles de los productos:<br>";
 
-                // Enviando el correo a la empresa
-                smtpClient.Send(enterpriseMailMessage);
+                    foreach (var product in group)
+                    {
+                        enterpriseBody += $"<b>Producto:</b> {product.ProductName}<br>" +
+                                          $"<b>Cantidad:</b> {product.Quantity}<br>" +
+                                          $"<b>Fecha del producto:</b> {product.ProductDate}<br><br>";
+                    }
+                    enterpriseBody += "Saludos,<br>" +
+                                      "El equipo de Business Tracker";
+
+                    using (var enterpriseMailMessage = new MailMessage())
+                    using (var smtpClient = new SmtpClient(host, port))
+                    {
+                        enterpriseMailMessage.From = new MailAddress(email);
+                        enterpriseMailMessage.Subject = "Productos a preparar";
+                        enterpriseMailMessage.Body = enterpriseBody;
+                        enterpriseMailMessage.IsBodyHtml = true;
+                        enterpriseMailMessage.To.Add(group.Key.EnterpriseEmail);
+
+                        smtpClient.Credentials = new NetworkCredential(email, password);
+                        smtpClient.EnableSsl = true;
+
+                        smtpClient.Send(enterpriseMailMessage);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Aquí podrías registrar el error o lanzar una excepción controlada
+                Console.WriteLine($"Error al enviar correos: {ex.Message}");
             }
         }
+
     }
 }

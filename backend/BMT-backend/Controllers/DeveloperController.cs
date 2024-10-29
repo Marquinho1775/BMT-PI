@@ -17,7 +17,8 @@ namespace BMT_backend.Controllers
         private ProductHandler _productHandler;
         private OrderHandler _orderHandler;
         private MailManager _mailManager;
-        public DeveloperController(IConfiguration configuration) {
+        public DeveloperController(IConfiguration configuration)
+        {
             _userHandler = new UserHandler();
             _enterpriseHandler = new EnterpriseHandler();
             _productHandler = new ProductHandler();
@@ -53,10 +54,24 @@ namespace BMT_backend.Controllers
         {
             if (_orderHandler.ConfirmOrder(orderID))
             {
-                _mailManager.SendConfirmationEmails(_orderHandler.GetOrderById(orderID));
-                return Ok();
+                try
+                {
+                    var order = _orderHandler.GetOrderById(orderID);
+                    if (order == null)
+                    {
+                        return NotFound($"Order with ID {orderID} not found.");
+                    }
+
+                    _mailManager.SendConfirmationEmails(order);
+                    return Ok("Order confirmed and emails sent.");
+                }
+                catch (Exception ex)
+                {
+                    // Log exception (ex) as needed
+                    return StatusCode(500, "Error sending confirmation emails.");
+                }
             }
-            return BadRequest();
+            return BadRequest("Order confirmation failed.");
         }
     }
 }
