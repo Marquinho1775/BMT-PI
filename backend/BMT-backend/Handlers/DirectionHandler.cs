@@ -32,35 +32,29 @@ namespace BMT_backend.Handlers
 
         public List<DirectionModel> GetDirectionsFromUser(UserModel user)
         {
-            string query = "SELECT * FROM Directions WHERE Username = @Username";
+            string query = "SELECT Id, Username, NumDirection, OtherSigns, Coordinates FROM Directions WHERE Username = @Username";
             List<DirectionModel> directions = new List<DirectionModel>();
 
-            var queryCommand = new SqlCommand(query, _conection);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
-            DataTable tableFormatQuery = new DataTable();
-            queryCommand.Parameters.AddWithValue("@Username", user.Username);
-            _conection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            _conection.Close();
-
-            if (tableFormatQuery.Rows.Count == 0)
+            using (var queryCommand = new SqlCommand(query, _conection))
             {
-                return directions;
-            }
+                queryCommand.Parameters.AddWithValue("@Username", user.Username);
+                var tableAdapter = new SqlDataAdapter(queryCommand);
+                var tableFormatQuery = new DataTable();
+                _conection.Open();
+                tableAdapter.Fill(tableFormatQuery);
+                _conection.Close();
 
-            foreach (DataRow row in tableFormatQuery.Rows)
-            {
-                directions.Add(
-                    new DirectionModel
+                foreach (DataRow row in tableFormatQuery.Rows)
+                {
+                    directions.Add(new DirectionModel
                     {
+                        Id = Convert.ToString(row["Id"]),
                         Username = Convert.ToString(row["Username"]),
                         NumDirection = Convert.ToString(row["NumDirection"]),
-                        Province = Convert.ToString(row["Province"]),
-                        Canton = Convert.ToString(row["Canton"]),
-                        District = Convert.ToString(row["District"]),
-                        OtherSigns = Convert.ToString(row["OtherSigns"]),
+                        OtherSigns = row["OtherSigns"] == DBNull.Value ? null : Convert.ToString(row["OtherSigns"]),
                         Coordinates = Convert.ToString(row["Coordinates"])
                     });
+                }
             }
 
             return directions;
@@ -68,21 +62,37 @@ namespace BMT_backend.Handlers
 
         public bool CreateDirection(DirectionModel direction)
         {
-            var query = "INSERT INTO dbo.Directions (Username, NumDirection, Province, Canton, District, OtherSigns, Coordinates) VALUES (@Username, @NumDirection, @Province, @Canton, @District, @OtherSigns, @Coordinates)";
-            var querryCommand = new SqlCommand(query, Connection);
+            var query = "INSERT INTO dbo.Directions (Username, NumDirection, OtherSigns, Coordinates) VALUES (@Username, @NumDirection, @OtherSigns, @Coordinates)";
+            using (var queryCommand = new SqlCommand(query, Connection))
+            {
+                queryCommand.Parameters.AddWithValue("@Username", direction.Username);
+                queryCommand.Parameters.AddWithValue("@NumDirection", direction.NumDirection);
+                queryCommand.Parameters.AddWithValue("@OtherSigns", (object)direction.OtherSigns ?? DBNull.Value);
+                queryCommand.Parameters.AddWithValue("@Coordinates", direction.Coordinates);
 
-            querryCommand.Parameters.AddWithValue("@Username", direction.Username);
-            querryCommand.Parameters.AddWithValue("@NumDirection", direction.NumDirection);
-            querryCommand.Parameters.AddWithValue("@Province", direction.Province);
-            querryCommand.Parameters.AddWithValue("@Canton", direction.Canton);
-            querryCommand.Parameters.AddWithValue("@District", direction.District);
-            querryCommand.Parameters.AddWithValue("@OtherSigns", direction.OtherSigns);
-            querryCommand.Parameters.AddWithValue("@Coordinates", direction.Coordinates);
+                Connection.Open();
+                var result = queryCommand.ExecuteNonQuery();
+                Connection.Close();
+                return result > 0;
+            }
+        }
 
-            Connection.Open();
-            var result = querryCommand.ExecuteNonQuery();
-            Connection.Close();
-            return result > 0;
+        public bool UpdateDirection(DirectionModel direction)
+        {
+            var query = "UPDATE Directions SET NumDirection = @NumDirection, OtherSigns = @OtherSigns, Coordinates = @Coordinates WHERE Id = @Id";
+
+            using (var queryCommand = new SqlCommand(query, Connection))
+            {
+                queryCommand.Parameters.AddWithValue("@Id", direction.Id);  // Uso de Id como string
+                queryCommand.Parameters.AddWithValue("@NumDirection", direction.NumDirection);
+                queryCommand.Parameters.AddWithValue("@OtherSigns", (object)direction.OtherSigns ?? DBNull.Value);
+                queryCommand.Parameters.AddWithValue("@Coordinates", direction.Coordinates);
+
+                Connection.Open();
+                var result = queryCommand.ExecuteNonQuery();
+                Connection.Close();
+                return result > 0;
+            }
         }
     }
 }

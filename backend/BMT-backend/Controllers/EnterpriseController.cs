@@ -78,5 +78,32 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener la empresa");
             }
         }
+
+        [HttpPut("{enterpriseId}")]
+        public async Task<ActionResult<bool>> UpdateEnterprise(string enterpriseId, UpdateEnterpriseModel updatedEnterprise)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(enterpriseId) || updatedEnterprise == null)
+                {
+                    return BadRequest("Id de la empresa y datos de actualización son requeridos.");
+                }
+
+                updatedEnterprise.Id = enterpriseId;
+                var result = _entrepeneurshipHandler.UpdateEnterpriseProfile(updatedEnterprise);
+
+                if (!result)
+                {
+                    return NotFound("Empresa no encontrada o no se pudo actualizar.");
+                }
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error actualizando la empresa");
+            }
+        }
+
     }
 }

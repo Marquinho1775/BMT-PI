@@ -7,6 +7,9 @@
 *.user
 *.suo
 
+# Ignore all local env files
+.env*
+
 # Ignore build results
 bin/
 obj/
@@ -28,3 +31,4 @@ Release/
 *.GeneratedMSBuildEditorConfig.editorconfig
 *.assets.cache
 *.g.cs
+/frontend/bmt-frontend/env

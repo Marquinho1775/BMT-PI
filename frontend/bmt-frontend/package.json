@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fawmi/vue-google-maps": "^0.9.79",
     "@floating-ui/dom": "^1.6.11",
     "@mdi/font": "5.9.55",
     "axios": "^1.7.7",
