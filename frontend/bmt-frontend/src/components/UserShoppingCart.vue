@@ -1,5 +1,5 @@
 <template>
-    <v-main>
+  <v-main>
     <v-card flat>
       <v-card-title class="d-flex align-center pe-2">
         <v-icon icon="mdi-cart"></v-icon> &nbsp;
@@ -7,82 +7,41 @@
 
         <v-spacer></v-spacer>
 
-        <v-text-field
-          v-model="search"
-          density="compact"
-          label="Buscar"
-          prepend-inner-icon="mdi-magnify"
-          variant="solo-filled"
-          flat
-          hide-details
-          single-line
-        ></v-text-field>
+        <v-text-field v-model="search" density="compact" label="Buscar" prepend-inner-icon="mdi-magnify"
+          variant="solo-filled" flat hide-details single-line></v-text-field>
       </v-card-title>
 
       <v-divider></v-divider>
 
-      <v-data-table
-        v-model:search="search"
-        :items="cartProducts"
-        :headers="headers"
-        class="elevation-1"
-      >
+      <v-data-table v-model:search="search" :items="cartProducts" :headers="headers" class="elevation-1">
         <!-- Template para la columna de imagen -->
         <template #[`item.image`]="{ item }">
           <v-card class="my-2" elevation="2" rounded>
-            <v-img
-              :src="item.image"
-              height="64"
-              cover
-            ></v-img>
+            <v-img :src="item.image" height="64" cover></v-img>
           </v-card>
         </template>
 
         <!-- Template para la columna de calificación -->
         <template #[`item.rating`]="{ item }">
-          <v-rating
-            :model-value="item.product.rating"
-            color="orange-darken-2"
-            density="compact"
-            size="small"
-            readonly
-          ></v-rating>
+          <v-rating :model-value="item.product.rating" color="orange-darken-2" density="compact" size="small"
+            readonly></v-rating>
         </template>
 
         <!-- Template para la columna de stock -->
         <template #[`item.stock`]="{ item }">
           <div class="text-end">
-            <v-chip
-              :color="item.product.stock ? 'green' : 'red'"
-              :text="item.product.stock ? 'En stock' : 'Sin stock'"
-              class="text-uppercase"
-              size="small"
-              label
-            ></v-chip>
+            <v-chip :color="item.product.stock ? 'green' : 'red'" :text="item.product.stock ? 'En stock' : 'Sin stock'"
+              class="text-uppercase" size="small" label></v-chip>
           </div>
         </template>
 
         <!-- Template para la columna de cantidad -->
         <template #[`item.quantity`]="{ item }">
           <div class="d-flex align-center">
-            <v-text-field
-              v-model.number="item.newQuantity"
-              type="number"
-              min="1"
-              hide-details
-              dense
-              solo
-              style="width: 60px;"
-            ></v-text-field>
-            <v-btn
-              icon
-              x-small
-              color="green"
-              @click="updateQuantity(item)"
-              class="ml-1"
-              v-if="item.newQuantity !== item.quantity"
-              :disabled="item.newQuantity < 1"
-            >
+            <v-text-field v-model.number="item.newQuantity" type="number" min="1" hide-details dense solo
+              style="width: 60px;"></v-text-field>
+            <v-btn icon x-small color="green" @click="updateQuantity(item)" class="ml-1"
+              v-if="item.newQuantity !== item.quantity" :disabled="item.newQuantity < 1">
               <v-icon x-small>mdi-check</v-icon>
             </v-btn>
           </div>
@@ -99,7 +58,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="clearCart">Vaciar Carrito</v-btn>
-        <v-btn color="primary"  @click="checkOut">Pagar</v-btn>
+        <v-btn color="primary" @click="checkOut">Pagar</v-btn>
       </v-card-actions>
 
       <!-- Diálogo de confirmación para eliminación -->
@@ -122,8 +81,8 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-    </v-main>
     </v-card>
+  </v-main>
 </template>
 
 <script>
