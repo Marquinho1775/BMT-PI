@@ -1,94 +1,153 @@
 <template>
-  <v-card flat>
-    <v-card-title>
-      <v-icon left>mdi-cart</v-icon>
-      Your Shopping Cart
-    </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="cartProducts"
-      class="elevation-1">
-      
-      <!-- Template for the quantity column -->
-      <template #[`item.quantity`]="{ item }">
-        <div class="d-flex align-center">
-          <v-text-field
-            v-model.number="item.newQuantity"
-            type="number"
-            min="1"
-            hide-details
-            dense
-            solo
-            style="width: 50px;"
-          ></v-text-field>
-          <!-- Confirmation button that only appears when there are changes -->
-          <v-btn
-            icon
-            x-small
-            color="green"
-            @click="updateQuantity(item)"
-            class="ml-1"
-            v-if="item.newQuantity !== item.quantity"
-            :disabled="item.newQuantity < 1"
-          >
-            <v-icon x-small>mdi-check</v-icon>
-          </v-btn>
-        </div>
-      </template>
+  <v-app class="d-flex flex-column">
+    <AppHeader />
 
-      <!-- Template for the actions column -->
-      <template #[`item.actions`]="{ item }">
-        <v-btn icon x-small color="red" @click="confirmDelete(item)">
-          <v-icon x-small>mdi-delete</v-icon>
-        </v-btn>
-      </template>
-    </v-data-table>
+    <v-card flat>
+      <v-card-title class="d-flex align-center pe-2">
+        <v-icon icon="mdi-cart"></v-icon> &nbsp;
+        Tu Carrito de Compras
 
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
-      <v-btn color="primary">Checkout</v-btn>
-    </v-card-actions>
+        <v-spacer></v-spacer>
 
-    <!-- Confirmation dialog for deletion -->
-    <v-dialog v-model="dialog" max-width="500">
-      <v-card>
-        <v-card-title class="headline">
-          Confirm Deletion
-        </v-card-title>
-        <v-card-text>
-          Are you sure you want to remove this product from your cart?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">
-            Cancel
+        <v-text-field
+          v-model="search"
+          density="compact"
+          label="Buscar"
+          prepend-inner-icon="mdi-magnify"
+          variant="solo-filled"
+          flat
+          hide-details
+          single-line
+        ></v-text-field>
+      </v-card-title>
+
+      <v-divider></v-divider>
+
+      <v-data-table
+        v-model:search="search"
+        :items="cartProducts"
+        :headers="headers"
+        class="elevation-1"
+      >
+        <!-- Template para la columna de imagen -->
+        <template #[`item.image`]="{ item }">
+          <v-card class="my-2" elevation="2" rounded>
+            <v-img
+              :src="item.image"
+              height="64"
+              cover
+            ></v-img>
+          </v-card>
+        </template>
+
+        <!-- Template para la columna de calificación -->
+        <template #[`item.rating`]="{ item }">
+          <v-rating
+            :model-value="item.product.rating"
+            color="orange-darken-2"
+            density="compact"
+            size="small"
+            readonly
+          ></v-rating>
+        </template>
+
+        <!-- Template para la columna de stock -->
+        <template #[`item.stock`]="{ item }">
+          <div class="text-end">
+            <v-chip
+              :color="item.product.stock ? 'green' : 'red'"
+              :text="item.product.stock ? 'En stock' : 'Sin stock'"
+              class="text-uppercase"
+              size="small"
+              label
+            ></v-chip>
+          </div>
+        </template>
+
+        <!-- Template para la columna de cantidad -->
+        <template #[`item.quantity`]="{ item }">
+          <div class="d-flex align-center">
+            <v-text-field
+              v-model.number="item.newQuantity"
+              type="number"
+              min="1"
+              hide-details
+              dense
+              solo
+              style="width: 60px;"
+            ></v-text-field>
+            <v-btn
+              icon
+              x-small
+              color="green"
+              @click="updateQuantity(item)"
+              class="ml-1"
+              v-if="item.newQuantity !== item.quantity"
+              :disabled="item.newQuantity < 1"
+            >
+              <v-icon x-small>mdi-check</v-icon>
+            </v-btn>
+          </div>
+        </template>
+
+        <!-- Template para la columna de acciones -->
+        <template #[`item.actions`]="{ item }">
+          <v-btn icon x-small color="red" @click="confirmDelete(item)">
+            <v-icon x-small>mdi-delete</v-icon>
           </v-btn>
-          <v-btn color="blue darken-1" text @click="deleteProduct">
-            Confirm
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-card>
+        </template>
+      </v-data-table>
+
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="clearCart">Vaciar Carrito</v-btn>
+        <v-btn color="primary">Pagar</v-btn>
+      </v-card-actions>
+
+      <!-- Diálogo de confirmación para eliminación -->
+      <v-dialog v-model="dialog" max-width="500">
+        <v-card>
+          <v-card-title class="headline">
+            Confirmar Eliminación
+          </v-card-title>
+          <v-card-text>
+            ¿Estás seguro de que deseas eliminar este producto de tu carrito?
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="dialog = false">
+              Cancelar
+            </v-btn>
+            <v-btn color="blue darken-1" text @click="deleteProduct">
+              Confirmar
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-card>
+
+    <AppFooter />
+  </v-app>
 </template>
 
 <script>
 import axios from 'axios';
-import { API_URL } from '@/main';
+import { API_URL, URL } from '@/main';
 
 export default {
   data() {
     return {
+      search: '',
       userId: '',
       shoppingCartId: '',
       cartProducts: [],
       headers: [
-        { text: 'Product', value: 'product.name' },
-        { text: 'Price', value: 'product.price', align: 'right' },
-        { text: 'Quantity', value: 'quantity', align: 'center' },
+        { text: 'Imagen', value: 'image', sortable: false },
+        { text: 'Producto', value: 'product.name' },
+        { text: 'Precio', value: 'product.price', align: 'right' },
+        { text: 'Cantidad', value: 'quantity', align: 'center' },
         { text: 'Subtotal', value: 'subtotal', align: 'right' },
-        { text: 'Actions', value: 'actions', sortable: false, align: 'center' },
+        { text: 'Acciones', value: 'actions', sortable: false, align: 'center' },
       ],
       dialog: false,
       productToDelete: null,
@@ -108,12 +167,13 @@ export default {
           this.shoppingCartId = shoppingCart.id;
           this.cartProducts = shoppingCart.cartProducts.map((item) => ({
             ...item,
-            subtotal: item.subtotal.toFixed(2),
-            newQuantity: item.quantity, // Initialize newQuantity
+            subtotal: (item.product.price * item.quantity).toFixed(2),
+            newQuantity: item.quantity, // Inicializar newQuantity
+            image: URL + item.product.imagesURLs[0],
           }));
         })
         .catch((error) => {
-          console.error('Error fetching shopping cart', error);
+          console.error('Error al obtener el carrito de compras:', error);
         });
     },
     updateQuantity(item) {
@@ -133,7 +193,7 @@ export default {
           item.subtotal = (item.product.price * item.quantity).toFixed(2);
         })
         .catch((error) => {
-          console.error('Error updating quantity:', error);
+          console.error('Error al actualizar la cantidad:', error);
         });
     },
     confirmDelete(item) {
@@ -157,7 +217,7 @@ export default {
           this.productToDelete = null;
         })
         .catch((error) => {
-          console.error('Error deleting product:', error);
+          console.error('Error al eliminar el producto:', error);
         });
     },
     clearCart() {
@@ -170,7 +230,7 @@ export default {
           this.cartProducts = [];
         })
         .catch((error) => {
-          console.error('Error clearing cart:', error);
+          console.error('Error al vaciar el carrito:', error);
         });
     },
   },

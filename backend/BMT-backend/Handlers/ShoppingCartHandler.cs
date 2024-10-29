@@ -126,31 +126,57 @@ namespace BMT_backend.Handlers
             return cartId;
         }
 
-        public bool AddProductToCart(string shoppingCartId, string productId)
+        public string AddProductToCart(string shoppingCartId, string productId)
         {
-            double productPrice = _productHandler.GetProductPrice(productId);
-            double subtotal = productPrice;
-            string cartProductQuery = "INSERT INTO ShoppingCartProducts (ShoppingCartId, ProductId, Quantity, Subtotal) " +
-                                      "VALUES (@shoppingCartId, @productId, @quantity, @subtotal)";
-            SqlCommand cartProductCommand = new SqlCommand(cartProductQuery, _conection);
-            cartProductCommand.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);
-            cartProductCommand.Parameters.AddWithValue("@productId", productId);
-            cartProductCommand.Parameters.AddWithValue("@quantity", 1);
-            cartProductCommand.Parameters.AddWithValue("@subtotal", subtotal);
-            _conection.Open();
-            int rowsAffected = cartProductCommand.ExecuteNonQuery();
-            _conection.Close();
+            try
+            {
+                _conection.Open();
+                string checkQuery = @"
+                    IF EXISTS (
+                        SELECT 1 
+                        FROM ShoppingCartProducts 
+                        WHERE ShoppingCartId = @shoppingCartId 
+                          AND ProductId = @productId
+                    )
+                    SELECT 'ProductExists'
+                    ELSE
+                    BEGIN
+                        -- Obtener el precio del producto
+                        DECLARE @productPrice FLOAT = (SELECT Price FROM Products WHERE Id = @productId);
+                        DECLARE @subtotal FLOAT = @productPrice;
 
-            string cartTotalQuery = "UPDATE ShoppingCarts SET Total = Total + @subtotal " +
-                                    "WHERE Id = @shoppingCartId";
-            SqlCommand cartTotalCommand = new SqlCommand(cartTotalQuery, _conection);
-            cartTotalCommand.Parameters.AddWithValue("@subtotal", subtotal);
-            cartTotalCommand.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);
-            _conection.Open();
-            rowsAffected += cartTotalCommand.ExecuteNonQuery();
-            _conection.Close();
-            return rowsAffected > 0;
+                        -- Insertar el producto en el carrito
+                        INSERT INTO ShoppingCartProducts (ShoppingCartId, ProductId, Quantity, Subtotal)
+                        VALUES (@shoppingCartId, @productId, 1, @subtotal);
+
+                        -- Actualizar el total del carrito
+                        UPDATE ShoppingCarts 
+                        SET Total = Total + @subtotal 
+                        WHERE Id = @shoppingCartId;
+
+                        SELECT 'Success' AS Result;
+                    END
+                ";
+                using (SqlCommand command = new SqlCommand(checkQuery, _conection))
+                {
+                    command.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);
+                    command.Parameters.AddWithValue("@productId", productId);
+                    string result = (string)command.ExecuteScalar();
+                    return result;
+                }
+            }
+            catch (Exception ex) {
+                return $"Error: {ex.Message}";
+            }
+            finally
+            {
+                if (_conection.State == System.Data.ConnectionState.Open)
+                {
+                    _conection.Close();
+                }
+            }
         }
+
 
         public bool ChangeProductQuantity(string shoppingCartId, string productId, int quantity)
         {
