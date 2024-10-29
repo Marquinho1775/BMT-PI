@@ -4,10 +4,8 @@ CREATE TABLE Orders (
     DeliveryFee DECIMAL(18, 2) NOT NULL,
     Weight DECIMAL(18, 2) NOT NULL,
     UserId UNIQUEIDENTIFIER NOT NULL,
-    DirectionId UNIQUEIDENTIFIER NOT NULL,
     Status INT NOT NULL,
     CONSTRAINT FK_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
-    CONSTRAINT FK_DirectionId FOREIGN KEY (DirectionId) REFERENCES Directions(Id),
 );
 
 CREATE TABLE Order_Product (
