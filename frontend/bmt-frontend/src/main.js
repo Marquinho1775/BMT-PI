@@ -10,18 +10,24 @@ import UserLoginForm from './components/UserLoginForm.vue';
 import UserEmailVerification from './components/UserEmailVerification.vue';
 import UserProfilePage from './components/UserProfilePage.vue';
 import UserRegisterAddress from './components/UserRegisterAddress.vue';
+import UserShoppingCart from './components/UserShoppingCart.vue';
+
+import EditProfileInfo from './components/EditProfileInfo.vue';
+import EditEnterpriseInfo from './components/EditEnterpriseInfo.vue';
 
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
 
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
+import EnterpriseInventory from './components/EnterpriseInventory.vue';
 
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
+import ProductsConfirmationPage from './components/ProductsConfirmationPage.vue';
 
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
@@ -66,9 +72,12 @@ const router = createRouter({
     { path: '/email-verification', name: "VerifyEmail", component: UserEmailVerification },
     { path: '/profile', name: "Profile", component: UserProfilePage },
     { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress },
+    {path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart},
 
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
+    { path: '/enterprise/:id/inventory', name: "EnterpriseInventory", component: EnterpriseInventory },
+    { path: '/enterprise/:id/edit', name: "EditEnterpriseInfo", component: EditEnterpriseInfo },
 
     { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
     { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
@@ -78,6 +87,8 @@ const router = createRouter({
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
+    { path: '/products-confirmation', name: "ProductsConfirmation", component: ProductsConfirmationPage },
+    { path: '/profile/edit', name: "EditProfile", component: EditProfileInfo },
   ]
 });
 

@@ -90,7 +90,8 @@ namespace BMT_backend.Handlers
             return cartProducts;
         }
 
-        private CartProductModel GetCartProduct(string shoppingCartId, string productId) { 
+        private CartProductModel GetCartProduct(string shoppingCartId, string productId)
+        {
             CartProductModel cartProductModel = null;
             string cartProductQuery = "SELECT ProductId, Quantity, Subtotal " +
                                       "FROM ShoppingCartProducts WHERE ShoppingCartId = @shoppingCartId AND ProductId = @productId";
