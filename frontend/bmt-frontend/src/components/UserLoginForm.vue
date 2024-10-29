@@ -60,10 +60,11 @@ export default {
         if (response && response.data) {
           const { token, user } = response.data;
           if (token && user) {
-            const result = await axios.get(API_URL + '/ShoppingCart/GetCartId?userId=' + user.id,  {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },});
+            const result = await axios.get(API_URL + '/ShoppingCart/GetCartId?userId=' + user.id, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            });
             localStorage.setItem('shoppingCartId', result.data);
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));

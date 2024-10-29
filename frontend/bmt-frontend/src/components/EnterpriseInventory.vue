@@ -1,6 +1,4 @@
 <template>
-  <v-app class="d-flex flex-column">
-    <AppHeader />
     <v-main class="flex-grow-1">
       <v-container>
         <v-card flat>
@@ -147,9 +145,6 @@
         </v-dialog>
       </v-container>
     </v-main>
-    <AppFooter />
-    <AppSidebar />
-  </v-app>
 </template>
   
   
@@ -237,7 +232,7 @@
             return "Disponible todos los días";
         }
 
-        const daysMap = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      const daysMap = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
 
         return weekDaysString
             .split("")

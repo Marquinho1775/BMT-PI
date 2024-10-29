@@ -1,14 +1,9 @@
 <template>
-  <v-app class="d-flex flex-column">
-    <AppHeader />
-    <v-main class="flex-grow-1">
-      <v-container>
-        <productSearchGrid :products="products" />
-      </v-container>
-    </v-main>
-    <AppFooter />
-    <AppSidebar />
-  </v-app>
+  <v-main class="flex-grow-1">
+    <v-container>
+      <productSearchGrid :products="products" />
+    </v-container>
+  </v-main>
 </template>
 
 <script>

@@ -648,5 +648,51 @@ namespace BMT_backend.Handlers
 
             return tagsId;
         }
+
+        public string UpdateStock(string id, int newStock)
+        {
+            string updateStockQuery = "update NonPerishableProducts set Stock = @newStock where ProductId = @id";
+            var updateStockCommand = new SqlCommand(updateStockQuery, _conection);
+            updateStockCommand.Parameters.AddWithValue("@newStock", newStock);
+            updateStockCommand.Parameters.AddWithValue("@id", id);
+            _conection.Open();
+            int rowsAffected = updateStockCommand.ExecuteNonQuery();
+            _conection.Close();
+            if (rowsAffected > 0)
+            {
+                return "Stock updated successfully.";
+            }
+            return "Error updating stock.";
+        }
+
+        public int GetStock(string id)
+        {
+            string query = "select Stock from NonPerishableProducts where ProductId = @id";
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@id", id);
+            _conection.Open();
+            int stock = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+            return stock;
+        }
+
+        public int GetStockPerishable(string Id, string Date)
+        {
+            string query = @"
+        SELECT ISNULL(dd.Stock, pp.Limit) AS Stock
+        FROM PerishableProducts pp
+        LEFT JOIN DateDisponibility dd ON dd.ProductId = pp.ProductId AND dd.Date = @Date
+        WHERE pp.ProductId = @Id";
+
+            var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@Date", Date);
+            queryCommand.Parameters.AddWithValue("@Id", Id);
+
+            _conection.Open();
+            int stock = (int)queryCommand.ExecuteScalar();
+            _conection.Close();
+
+            return stock;
+        }
     }
 }
