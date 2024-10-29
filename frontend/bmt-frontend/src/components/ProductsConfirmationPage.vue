@@ -28,7 +28,7 @@
               <v-btn size="x-large" class="mb-3 custom-btn" :style="{ backgroundColor: '#d0eda0', color: 'black' }" @click="confirmOrder(item.OrderId)">
                 Aceptar pedido
               </v-btn>
-              <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }">
+              <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }" @click="denyOrder(item.OrderId)">
                 Rechazar pedido
               </v-btn>
             </v-col>
@@ -85,6 +85,25 @@ export default {
     getTotalProductQuantity(products) {
       return products.reduce((total, product) => total + product.Quantity, 0);
     }
+  },
+  async denyOrder(orderId) {
+    try {
+      const response = await axios.post(API_URL + '/Developer/DenyOrder', null, {
+        params: { orderID: orderId }
+      });
+      
+      if (response.status === 200) {
+        console.log('Order ${orderId} denied successfully');
+        this.orders = this.orders.filter(order => order.OrderId !== orderId);
+      } else {
+        console.error('Failed to deny order ${orderId}');
+      }
+    } catch (error) {
+      console.error("Error denying order:", error);
+    }
+  },
+  getTotalProductQuantity(products) {
+    return products.reduce((total, product) => total + product.Quantity, 0);
   },
   groupProductsByEnterprise(products) {
     return products.reduce((grouped, product) => {

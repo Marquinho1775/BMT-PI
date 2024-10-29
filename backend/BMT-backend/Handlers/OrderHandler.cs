@@ -187,5 +187,21 @@ namespace BMT_backend.Handlers
             Connection.Close();
             return products;
         }
+
+        public bool DenyOrder(string orderId)
+        {
+            string query = "UPDATE dbo.Orders SET Status = 5 WHERE OrderId = @OrderId";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderId);
+
+                connection.Open();
+                int rowsAffected = command.ExecuteNonQuery();
+
+                return rowsAffected > 0;
+            }
+        }
     }
 }
