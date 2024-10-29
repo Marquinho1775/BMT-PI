@@ -53,19 +53,26 @@ export default {
 		toggleShow() {
 			this.isShow = !this.isShow;
 		},
-		addToCart() {
+		async addToCart() {
 			console.log('Shopping cart ID:', this.shoppingCartId);
 			console.log('Adding product:', this.product.raw.id);
 			this.productId = this.product.raw.id;
-			let response = axios
+			let response = await axios
         .put(API_URL + '/ShoppingCart/AddProductToCart?shoppingCartId=' + this.shoppingCartId + '&productId=' + this.productId, null)
         .catch((error) => {
           console.error('Error adding product to cart:', error);
         });
-				if (response) {
+				if (response.data === "ProductExists") {
+					this.$swal.fire({
+						title: 'Ya está en el carrito',
+						text: 'Este producto ya está en el carrito',
+						icon: 'error',
+						confirmButtonText: 'Ok',
+					});
+				} else {
 					this.$swal.fire({
 						title: 'Producto añadido',
-						text: '¡El producto ha sido añadido al carrito correctamente!',
+						text: 'El producto se ha añadido al carrito',
 						icon: 'success',
 						confirmButtonText: 'Ok',
 					});

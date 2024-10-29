@@ -1,20 +1,24 @@
 CREATE TABLE Orders (
     OrderId UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT (newid()),
-    OrderDate DATETIME NOT NULL,
     OrderCost DECIMAL(18, 2) NOT NULL,
     DeliveryFee DECIMAL(18, 2) NOT NULL,
     Weight DECIMAL(18, 2) NOT NULL,
     UserId UNIQUEIDENTIFIER NOT NULL,
-    UserName VARCHAR(255) NOT NULL,
-    DirectionName VARCHAR(255) NOT NULL,
-    Province VARCHAR(255) NOT NULL,
-	Canton VARCHAR(255) NOT NULL,
-	District VARCHAR(255) NOT NULL,
-	OtherSigns VARCHAR(255) NULL,
-	Coordinates VARCHAR(255) NOT NULL,
-	Status INT NOT NULL,
-    Products NVARCHAR(MAX), -- JSON de productos
+    DirectionId UNIQUEIDENTIFIER NOT NULL,
+    Status INT NOT NULL,
     CONSTRAINT FK_UserId FOREIGN KEY (UserId) REFERENCES Users(Id),
-	CONSTRAINT FK_UserName FOREIGN KEY (UserName) REFERENCES Users(UserName),
-    CONSTRAINT FK_Direction FOREIGN KEY (UserName, DirectionName) REFERENCES Directions(UserName, NumDirection),
+    CONSTRAINT FK_DirectionId FOREIGN KEY (DirectionId) REFERENCES Directions(Id),
 );
+
+CREATE TABLE Order_Product (
+	OrderId UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+	ProductId UNIQUEIDENTIFIER NOT NULL,
+	Amount INT NOT NULL,
+	ProductsCost INT NOT NULL,
+	DeliveryDate DATE NOT NULL,
+	CONSTRAINT FK_OrderId FOREIGN KEY (OrderId) REFERENCES Orders(OrderId),
+	CONSTRAINT FK_ProductId FOREIGN KEY (ProductId) References Products(Id),
+);
+
+ALTER TABLE Orders
+ADD OrderDate DATETIME DEFAULT GETDATE() NOT NULL; 

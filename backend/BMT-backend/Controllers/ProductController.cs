@@ -125,5 +125,61 @@ namespace BMT_backend.Controllers
             }
             return cant;
         }
+
+        [HttpPut]
+        public ActionResult UpdateProduct([FromBody] ProductModel updatedProduct)
+        {
+            try
+            {
+                var updated = _productHandler.UpdateProduct(updatedProduct);
+
+                if (!updated)
+                    return NotFound("Producto no encontrado o no se pudo actualizar.");
+
+                return Ok("Producto actualizado exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al actualizar el producto: " + ex.Message);
+            }
+        }
+
+        [HttpGet("get-tags-by-product/{productId}")]
+        public ActionResult<List<string>> GetTagsByProductId(string productId)
+        {
+            try
+            {
+                var tags = _productHandler.GetTagsIDBasedOnProductID(productId);
+
+                if (tags == null || tags.Count == 0)
+                    return NotFound("No se encontraron tags asociados a este producto.");
+
+                return Ok(tags);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los tags: " + ex.Message);
+            }
+        }
+
+        [HttpGet("get-tags-by-name/{tagName}")]
+        public ActionResult<List<string>> GetTagsByName(string tagName)
+        {
+            try
+            {
+                var tags = _productHandler.GetTagsIDBasedOnTagName(tagName);
+
+                if (tags == null || tags.Count == 0)
+                    return NotFound("No se encontraron tags con ese nombre.");
+
+                return Ok(tags);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los IDs de los tags: " + ex.Message);
+            }
+        }
+
+
     }
 }

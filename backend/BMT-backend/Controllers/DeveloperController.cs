@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using BMT_backend.Models;
 using BMT_backend.Handlers;
+using BMT_backend.Infrastructure;
 using System.Reflection.Metadata;
 
 namespace BMT_backend.Controllers
@@ -14,10 +15,15 @@ namespace BMT_backend.Controllers
         private UserHandler _userHandler;
         private EnterpriseHandler _enterpriseHandler;
         private ProductHandler _productHandler;
-        public DeveloperController() {
+        private OrderHandler _orderHandler;
+        private MailManager _mailManager;
+        public DeveloperController(IConfiguration configuration)
+        {
             _userHandler = new UserHandler();
             _enterpriseHandler = new EnterpriseHandler();
             _productHandler = new ProductHandler();
+            _orderHandler = new OrderHandler();
+            _mailManager = new MailManager(configuration);
         }
         [HttpGet("getEnterprises")]
         public List<DevEnterpriseModel> GetEnterprises()
@@ -36,6 +42,58 @@ namespace BMT_backend.Controllers
         {
             List<DevUserModel> devUsers = _userHandler.GetDevUsers();
             return devUsers;
+        }
+        [HttpGet("getToConfirmOrders")]
+        public List<OrderModel> GetToConfirmOrders()
+        {
+            List<OrderModel> toConfirmOrders = _orderHandler.GetToConfirmOrders();
+            return toConfirmOrders;
+        }
+        [HttpPut("ConfirmOrder")]
+        public IActionResult ConfirmOrder(String orderID)
+        {
+            if (_orderHandler.ConfirmOrder(orderID))
+            {
+                try
+                {
+                    var order = _orderHandler.GetOrderById(orderID);
+                    if (order == null)
+                    {
+                        return NotFound($"Order with ID {orderID} not found.");
+                    }
+
+                    _mailManager.SendConfirmationEmails(order);
+                    return Ok("Order confirmed and emails sent.");
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Error sending confirmation emails.");
+                }
+            }
+            return BadRequest("Order confirmation failed.");
+        }
+        [HttpPut("DenyOrder")]
+        public IActionResult DenyOrder(String orderID)
+        {
+            if (_orderHandler.DenyOrder(orderID))
+            {
+                try
+                {
+                    var order = _orderHandler.GetOrderById(orderID);
+                    if (order == null)
+                    {
+                        return NotFound($"Order with ID {orderID} not found.");
+                    }
+
+                    _mailManager.SendDenyEmail(order);
+                    return Ok("Order cancelled, email sent.");
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Error sending cancelled notification email.");
+                }
+            }
+            return BadRequest("Order cancellation failed.");
         }
     }
 }
