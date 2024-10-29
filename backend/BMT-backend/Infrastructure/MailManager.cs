@@ -49,7 +49,6 @@ namespace BMT_backend.Infrastructure
 
             try
             {
-                // Enviar correo de confirmación al usuario
                 using (var mailMessage = new MailMessage())
                 using (var smtpClient = new SmtpClient(host, port))
                 {
@@ -101,10 +100,40 @@ namespace BMT_backend.Infrastructure
             }
             catch (Exception ex)
             {
-                // Aquí podrías registrar el error o lanzar una excepción controlada
                 Console.WriteLine($"Error al enviar correos: {ex.Message}");
             }
         }
 
+        public void SendDenyEmail(OrderModel order)
+        {
+            string title = "Orden cancelada";
+            string body = "<h1>Orden cancelada</h1>" +
+                          $"Hola!<br><br>Te informamos que tu orden con la id {order.OrderId} ha sido cancelada.<br>" +
+                          "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>" +
+                          "¡Gracias por confiar en nosotros!<br><br>" +
+                          "Saludos,<br>" +
+                          "El equipo de Business Tracker";
+            try
+            {
+                using (var mailMessage = new MailMessage())
+                using (var smtpClient = new SmtpClient(host, port))
+                {
+                    mailMessage.From = new MailAddress(email);
+                    mailMessage.Subject = title;
+                    mailMessage.Body = body;
+                    mailMessage.IsBodyHtml = true;
+                    mailMessage.To.Add(order.UserEmail);
+
+                    smtpClient.Credentials = new NetworkCredential(email, password);
+                    smtpClient.EnableSsl = true;
+
+                    smtpClient.Send(mailMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al enviar correo de cancelación: {ex.Message}");
+            }
+        }
     }
 }

@@ -67,11 +67,33 @@ namespace BMT_backend.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Log exception (ex) as needed
                     return StatusCode(500, "Error sending confirmation emails.");
                 }
             }
             return BadRequest("Order confirmation failed.");
+        }
+        [HttpPut("DenyOrder")]
+        public IActionResult DenyOrder(String orderID)
+        {
+            if (_orderHandler.DenyOrder(orderID))
+            {
+                try
+                {
+                    var order = _orderHandler.GetOrderById(orderID);
+                    if (order == null)
+                    {
+                        return NotFound($"Order with ID {orderID} not found.");
+                    }
+
+                    _mailManager.SendDenyEmail(order);
+                    return Ok("Order cancelled, email sent.");
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Error sending cancelled notification email.");
+                }
+            }
+            return BadRequest("Order cancellation failed.");
         }
     }
 }

@@ -21,21 +21,21 @@
                 </li>
               </ul>
               <p>Peso: {{ item.Weight }} kg</p>
-              <p>{{getTotalProductQuantity(item.Products)}} artículos • Costo: ₡{{ item.OrderCost.toFixed(2) }} + ₡{{ item.DeliveryFee.toFixed(2) }} de envío</p>
+              <p>{{ getTotalProductQuantity(item.Products) }} artículos • Costo: ₡{{ item.OrderCost.toFixed(2) }} + ₡{{ item.DeliveryFee.toFixed(2) }} de envío</p>
               <p>{{ item.OrderDate.toLocaleDateString() }}</p>
             </v-col>
             <v-col class="d-flex flex-column align-center justify-center" cols="auto">
               <v-btn size="x-large" class="mb-3 custom-btn" :style="{ backgroundColor: '#d0eda0', color: 'black' }" @click="confirmOrder(item.OrderId)">
                 Aceptar pedido
               </v-btn>
-              <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }">
+              <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }" @click="denyOrder(item.OrderId)">
                 Rechazar pedido
               </v-btn>
             </v-col>
           </v-row>
         </template>
       </v-virtual-scroll>
-    </template>
+      </template>
     </v-main>
     <AppFooter />
     <AppSidebar />
@@ -67,30 +67,50 @@ export default {
       }
     },
     async confirmOrder(orderId) {
-      try {
-        const response = await axios.post(API_URL + '/Developer/ConfirmOrder', null, {
-          params: { orderID: orderId }
-        });
-        
-        if (response.status === 200) {
-          console.log('Order ${orderId} confirmed successfully');
-          this.orders = this.orders.filter(order => order.OrderId !== orderId);
-        } else {
-          console.error('Failed to confirm order ${orderId}');
+      if (confirm("¿Estás seguro de que quieres aceptar este pedido?")) {
+        try {
+          const response = await axios.post(API_URL + '/Developer/ConfirmOrder', null, {
+            params: { orderID: orderId }
+          });
+          
+          if (response.status === 200) {
+            console.log(`Order ${orderId} confirmed successfully`);
+            this.orders = this.orders.filter(order => order.OrderId !== orderId);
+          } else {
+            console.error(`Failed to confirm order ${orderId}`);
+          }
+        } catch (error) {
+          console.error("Error confirming order:", error);
         }
-      } catch (error) {
-        console.error("Error confirming order:", error);
+      }
+    },
+    async denyOrder(orderId) {
+      if (confirm("¿Estás seguro de que quieres rechazar este pedido?")) {
+        try {
+          const response = await axios.post(API_URL + '/Developer/DenyOrder', null, {
+            params: { orderID: orderId }
+          });
+          
+          if (response.status === 200) {
+            console.log(`Order ${orderId} denied successfully`);
+            this.orders = this.orders.filter(order => order.OrderId !== orderId);
+          } else {
+            console.error(`Failed to deny order ${orderId}`);
+          }
+        } catch (error) {
+          console.error("Error denying order:", error);
+        }
       }
     },
     getTotalProductQuantity(products) {
       return products.reduce((total, product) => total + product.Quantity, 0);
+    },
+    groupProductsByEnterprise(products) {
+      return products.reduce((grouped, product) => {
+        (grouped[product.EnterpriseName] = grouped[product.EnterpriseName] || []).push(product);
+        return grouped;
+      }, {});
     }
-  },
-  groupProductsByEnterprise(products) {
-    return products.reduce((grouped, product) => {
-      (grouped[product.EnterpriseName] = grouped[product.EnterpriseName] || []).push(product);
-      return grouped;
-    }, {});
   },
   async mounted() {
     await this.fetchOrders();
@@ -137,8 +157,8 @@ export default {
 
 .order-card p,
 .order-card h4 {
-  margin: 0; /* Elimina el margen por defecto */
-  padding: 0.1rem 0; /* Ajusta el padding para un espaciado más pequeño */
+  margin: 0;
+  padding: 0.1rem 0;
 }
 
 .order-card h4 {
