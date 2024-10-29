@@ -9,21 +9,21 @@
             <v-row class="order-card mb-4 p-1 bg-light-grey rounded" justify="space-between">
               <v-col style="padding-left: 5rem;">
                 <ul class="order-list">
-                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.Products)" :key="enterpriseName">
+                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products || [])" :key="enterpriseName">
                     <h4 class="enterprise-name" style="padding-bottom: 0.5rem;">{{ enterpriseName }}</h4>
                     <ul class="product-list">
-                      <li v-for="product in products" :key="product.ProductId" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
-                        <span class="quantity-box">{{ product.Quantity }}</span> {{ product.ProductName }}
+                      <li v-for="product in products" :key="product.productId" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
+                        <span class="quantity-box">{{ product.quantity }}</span> {{ product.productName }}
                       </li>
                     </ul>
                   </li>
                 </ul>
-                <p>Peso: {{ item.Weight }} kg</p>
-                <p>{{ getTotalProductQuantity(item.Products) }} artículos • Costo: ₡{{ item.OrderCost.toFixed(2) }} + ₡{{ item.DeliveryFee.toFixed(2) }} de envío</p>
-                <p>{{ item.OrderDate.toLocaleDateString() }}</p>
+                <p>Peso: {{ item.weight }} kg</p>
+                <p>{{ getTotalProductQuantity(item.products || []) }} artículos • Costo: ₡{{ (item.orderCost ?? 0).toFixed(2) }} + ₡{{ (item.deliveryFee ?? 0).toFixed(2) }} de envío</p>
+                <p v-if="item.orderDate">{{ new Date(item.orderDate).toLocaleDateString() }}</p>
               </v-col>
               <v-col class="d-flex flex-column align-center justify-center" cols="auto">
-                <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }" @click="denyOrder(item.OrderId)">
+                <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }" @click="denyOrder(item.orderId)">
                   Cancelar pedido
                 </v-btn>
               </v-col>
@@ -73,7 +73,7 @@ export default {
 
           if (response.status === 200) {
             console.log(`Order ${orderId} denied successfully`);
-            this.orders = this.orders.filter((order) => order.OrderId !== orderId);
+            this.orders = this.orders.filter((order) => order.orderId !== orderId);
           } else {
             console.error(`Failed to deny order ${orderId}`);
           }
@@ -83,11 +83,13 @@ export default {
       }
     },
     getTotalProductQuantity(products) {
-      return products.reduce((total, product) => total + product.Quantity, 0);
+      if (!Array.isArray(products)) return 0; // Verificar si `products` es un arreglo válido
+      return products.reduce((total, product) => total + product.quantity, 0);
     },
     groupProductsByEnterprise(products) {
+      if (!products || !Array.isArray(products)) return {}; // Verifica si `products` es un arreglo válido
       return products.reduce((grouped, product) => {
-        (grouped[product.EnterpriseName] = grouped[product.EnterpriseName] || []).push(product);
+        (grouped[product.enterpriseName] = grouped[product.enterpriseName] || []).push(product);
         return grouped;
       }, {});
     },

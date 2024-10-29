@@ -15,7 +15,7 @@ namespace BMT_backend.Handlers
         public OrderHandler()
         {
             var builder = WebApplication.CreateBuilder();
-            _connectionString = builder.Configuration.GetConnectionString("BMTContext");
+            _connectionString = builder.Configuration.GetConnectionString("BMTContext") + ";MultipleActiveResultSets=True";
             Connection = new SqlConnection(_connectionString);
         }
         public SqlConnection Connection { get => _connection; set => _connection = value; }
@@ -84,7 +84,7 @@ namespace BMT_backend.Handlers
                             UserEmail = reader["UserEmail"].ToString(),
                             Coordinates = reader["Coordinates"].ToString(),
                             Status = (int)reader["Status"],
-                            Products = GetProductsByOrderId(reader["OrderId"].ToString())
+                            Products = GetProductsByOrderId(reader["OrderId"].ToString(), Connection)
                         };
                         orders.Add(order);
                     }
@@ -104,7 +104,7 @@ namespace BMT_backend.Handlers
 
                 connection.Open();
                 int rowsAffected = command.ExecuteNonQuery();
-
+                Connection.Close();
                 return rowsAffected > 0;
             }
         }
@@ -144,31 +144,29 @@ namespace BMT_backend.Handlers
                             UserEmail = reader["Email"]?.ToString(),
                             Coordinates = reader["Coordinates"]?.ToString(),
                             Status = reader["Status"] as int? ?? 0,
-                            Products = GetProductsByOrderId(orderId)
+                            Products = GetProductsByOrderId(reader["OrderId"].ToString(), Connection)
                         };
                     }
                 }
+                Connection.Close();
             }
             return order;
         }
 
-        private List<ProductDetails> GetProductsByOrderId(String orderId)
+        private List<ProductDetails> GetProductsByOrderId(String orderId, SqlConnection connection)
         {
             var products = new List<ProductDetails>();
             string query = @"
             SELECT op.ProductId, p.Name AS ProductName, op.Amount, op.ProductsCost, 
-               e.Name AS EnterpriseName, e.Email, op.DeliveryDate
+                   e.Name AS EnterpriseName, e.Email, op.DeliveryDate
             FROM Order_Product op
             JOIN Products p ON op.ProductId = p.Id
             JOIN Enterprises e ON p.EnterpriseId = e.Id
             WHERE op.OrderId = @OrderId;";
 
-            using var command = new SqlCommand(query, Connection);
+            using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@OrderId", orderId);
-
-            Connection.Open();
             using var reader = command.ExecuteReader();
-
             while (reader.Read())
             {
                 var product = new ProductDetails
@@ -183,8 +181,6 @@ namespace BMT_backend.Handlers
                 };
                 products.Add(product);
             }
-
-            Connection.Close();
             return products;
         }
 
@@ -199,7 +195,7 @@ namespace BMT_backend.Handlers
 
                 connection.Open();
                 int rowsAffected = command.ExecuteNonQuery();
-
+                Connection.Close();
                 return rowsAffected > 0;
             }
         }
@@ -238,7 +234,7 @@ namespace BMT_backend.Handlers
                             UserEmail = reader["UserEmail"].ToString(),
                             Coordinates = reader["Coordinates"].ToString(),
                             Status = (int)reader["Status"],
-                            Products = GetProductsByOrderId(reader["OrderId"].ToString())
+                            Products = GetProductsByOrderId(reader["OrderId"].ToString(), Connection)
                         };
                         orders.Add(order);
                     }
