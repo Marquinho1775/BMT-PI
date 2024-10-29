@@ -94,7 +94,7 @@ export default {
           this.cartProducts = shoppingCart.cartProducts.map((item) => ({
             ...item,
             subtotal: item.subtotal.toFixed(2),
-            newQuantity: item.quantity, // Initialize newQuantity
+            newQuantity: item.quantity,
           }));
         })
         .catch((error) => {
