@@ -203,5 +203,49 @@ namespace BMT_backend.Handlers
                 return rowsAffected > 0;
             }
         }
+        public List<OrderModel> GetToConfirmUserOrders(String userId)
+        {
+            var orders = new List<OrderModel>();
+            string query = @"
+            SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+           u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
+           d.Coordinates, o.Status
+            FROM Orders o
+            JOIN Users u ON o.UserId = u.Id
+            JOIN Directions d ON o.DirectionId = d.Id
+            WHERE o.Status = 0 AND o.UserId = @UserId;";
+
+            using (var command = new SqlCommand(query, Connection))
+            {
+                command.Parameters.AddWithValue("@UserId", userId);
+
+                Connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var order = new OrderModel
+                        {
+                            OrderId = reader["OrderId"].ToString(),
+                            OrderDate = (DateTime)reader["OrderDate"],
+                            OrderCost = (decimal)reader["OrderCost"],
+                            DeliveryFee = (decimal)reader["DeliveryFee"],
+                            Weight = (decimal)reader["Weight"],
+                            UserId = reader["UserId"].ToString(),
+                            UserName = reader["UserName"].ToString(),
+                            Direction = reader["NumDirection"].ToString(),
+                            OtherSigns = reader["OtherSigns"].ToString(),
+                            UserEmail = reader["UserEmail"].ToString(),
+                            Coordinates = reader["Coordinates"].ToString(),
+                            Status = (int)reader["Status"],
+                            Products = GetProductsByOrderId(reader["OrderId"].ToString())
+                        };
+                        orders.Add(order);
+                    }
+                }
+                Connection.Close();
+            }
+            return orders;
+        }
     }
 }

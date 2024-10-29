@@ -1,0 +1,157 @@
+<template>
+  <v-app class="d-flex flex-column">
+    <AppHeader />
+    <v-main class="flex-grow-1" style="overflow-x: hidden;">
+      <h1 class="title1">Pedidos pendientes</h1>
+      <template v-if="items && items.length > 0">
+        <v-virtual-scroll :items="items" height="100%" style="overflow-x: hidden">
+          <template v-slot:default="{ item }">
+            <v-row class="order-card mb-4 p-1 bg-light-grey rounded" justify="space-between">
+              <v-col style="padding-left: 5rem;">
+                <ul class="order-list">
+                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.Products)" :key="enterpriseName">
+                    <h4 class="enterprise-name" style="padding-bottom: 0.5rem;">{{ enterpriseName }}</h4>
+                    <ul class="product-list">
+                      <li v-for="product in products" :key="product.ProductId" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
+                        <span class="quantity-box">{{ product.Quantity }}</span> {{ product.ProductName }}
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+                <p>Peso: {{ item.Weight }} kg</p>
+                <p>{{ getTotalProductQuantity(item.Products) }} artículos • Costo: ₡{{ item.OrderCost.toFixed(2) }} + ₡{{ item.DeliveryFee.toFixed(2) }} de envío</p>
+                <p>{{ item.OrderDate.toLocaleDateString() }}</p>
+              </v-col>
+              <v-col class="d-flex flex-column align-center justify-center" cols="auto">
+                <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }" @click="denyOrder(item.OrderId)">
+                  Cancelar pedido
+                </v-btn>
+              </v-col>
+            </v-row>
+          </template>
+        </v-virtual-scroll>
+      </template>
+    </v-main>
+    <AppFooter />
+    <AppSidebar />
+  </v-app>
+</template>
+
+<script>
+import axios from 'axios';
+import { getUser } from '@/helpers/auth';
+import { API_URL } from '@/main.js';
+
+export default {
+  data() {
+    return {
+      orders: [],
+    };
+  },
+  computed: {
+    items() {
+      return this.orders;
+    }
+  },
+  methods: {
+    async fetchOrders() {
+      try {
+        const response = await axios.post(API_URL + "/User/GetToConfirmOrders", null, {
+          params: { userId: getUser().id },
+        });
+        this.orders = response.data;
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    },
+    async denyOrder(orderId) {
+      if (confirm("¿Estás seguro de que quieres rechazar este pedido?")) {
+        try {
+          const response = await axios.post(API_URL + "/User/DenyOrder", null, {
+            params: { orderID: orderId },
+          });
+
+          if (response.status === 200) {
+            console.log(`Order ${orderId} denied successfully`);
+            this.orders = this.orders.filter((order) => order.OrderId !== orderId);
+          } else {
+            console.error(`Failed to deny order ${orderId}`);
+          }
+        } catch (error) {
+          console.error("Error denying order:", error);
+        }
+      }
+    },
+    getTotalProductQuantity(products) {
+      return products.reduce((total, product) => total + product.Quantity, 0);
+    },
+    groupProductsByEnterprise(products) {
+      return products.reduce((grouped, product) => {
+        (grouped[product.EnterpriseName] = grouped[product.EnterpriseName] || []).push(product);
+        return grouped;
+      }, {});
+    },
+  },
+  async mounted() {
+    await this.fetchOrders();
+  },
+};
+</script>
+
+<style scoped>
+.order-card {
+  border-bottom: 2px solid #ebebeb;
+}
+
+.custom-btn {
+  min-width: 100%;
+  margin-right: 80%;
+  font-weight: 700;
+}
+
+.product-list {
+  padding-left: 1rem;
+  list-style-type: none;
+  padding-bottom: 0.7rem;
+}
+
+.order-list {
+  padding-left: 0;
+  list-style-type: none;
+}
+
+.enterprise-name {
+  font-weight: bold;
+  margin: 0;
+}
+
+.quantity-box {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 8px;
+  font-weight: bold;
+  background-color: #f9f9f9;
+}
+
+.title1 {
+  text-align: left;
+  padding: 1rem;
+  padding-left: 2rem;
+  font-weight: 700;
+}
+
+.order-card p,
+.order-card h4 {
+  margin: 0;
+  padding: 0.1rem 0;
+}
+
+.order-card h4 {
+  font-weight: 700;
+}
+</style>

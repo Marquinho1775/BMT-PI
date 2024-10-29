@@ -11,6 +11,7 @@ import UserEmailVerification from './components/UserEmailVerification.vue';
 import UserProfilePage from './components/UserProfilePage.vue';
 import UserRegisterAddress from './components/UserRegisterAddress.vue';
 import UserShoppingCart from './components/UserShoppingCart.vue';
+import UserOrders from './components/UserOrders.vue';
 
 import EditProfileInfo from './components/EditProfileInfo.vue';
 import EditEnterpriseInfo from './components/EditEnterpriseInfo.vue';
@@ -89,6 +90,7 @@ const router = createRouter({
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
     { path: '/products-confirmation', name: "ProductsConfirmation", component: ProductsConfirmationPage },
     { path: '/profile/edit', name: "EditProfile", component: EditProfileInfo },
+    { path: '/orders', name: "Orders", component: UserOrders },
   ]
 });
 
