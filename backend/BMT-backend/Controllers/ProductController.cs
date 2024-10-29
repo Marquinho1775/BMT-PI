@@ -93,5 +93,37 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the product");
             }
         }
+
+        [HttpPost("get-stock")]
+        public int GetStock(CheckOutProductModel product)
+        {
+            int cant = 0;
+            if (product.Type == "NonPerishable")
+            {
+                try
+                {
+                    cant = _productHandler.GetStock(product.ProductId);
+                }
+                catch (Exception)
+                {
+                    return cant;
+                }
+                return cant;
+            }
+
+            if (product.Type == "Perishable")
+            {
+                try
+                {
+                    cant = _productHandler.GetStockPerishable(product.ProductId, product.Date);
+                }
+                catch (Exception)
+                {
+                    return cant;
+                }
+                return cant;
+            }
+            return cant;
+        }
     }
 }

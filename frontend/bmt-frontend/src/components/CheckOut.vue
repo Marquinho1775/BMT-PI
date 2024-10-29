@@ -341,34 +341,68 @@ export default {
       this.isAddressOpen = !this.isAddressOpen;
     },
 
-    submitForm() {
+    async submitForm() {
       const step1Valid = this.$refs.step1Form.validate();
       const step3Valid = this.$refs.step3Form.validate();
       if (!step1Valid || !step3Valid || !this.selectedAddress) {
         return;
       }
-      const orderData = {
-        userId: this.userId,
-        shoppingCartId: this.shoppingCartId,
-        products: this.cartProducts.map((item) => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-          deliveryDate: item.deliveryDate,
-        })),
-        deliveryAddressId: this.selectedAddress.id,
-        paymentMethod: this.paymentMethod,
-      };
 
-      axios
-        .post(`${API_URL}/Order/SubmitOrder`, orderData, {
-          headers: { Authorization: `Bearer ${getToken()}` },
-        })
-        .then(() => {
-          this.resetForm();
-        })
-        .catch((error) => {
-          console.error('Error al enviar la orden:', error);
+      // Obtener stock de los productos
+      for (const item of this.cartProducts) {
+        const response = await axios.post(`${API_URL}/Product/get-stock`, {
+          productId: item.product.id,
+          type: item.product.type,
+          date: item.deliveryDate,
         });
+        if (response.data.stock < item.quantity) {
+          this.$swal.fire({
+            title: 'Error',
+            text: `No hay suficiente stock para el producto ${item.product.name}`,
+            icon: 'error',
+            confirmButtonText: 'Ok',
+          });
+          return;
+        } else {
+          if (item.product.type === 'Perishable') {
+            const response = await axios.post(`${API_URL}/Product/updateDateDisponibility`, {
+              PerishableProductId: item.product.id,
+              Date: item.deliveryDate,
+              Quantity: item.quantity,
+            });
+            if (!response.data.success) {
+              this.$swal.fire({
+                title: 'Error',
+                text: `No se pudo reservar el stock para el producto ${item.product.name}`,
+                icon: 'error',
+                confirmButtonText: 'Ok',
+              });
+              return;
+            }
+          }
+          else if (item.product.type === 'NonPerishable') {
+            const response = await axios.post(`${API_URL}/Product/inventory`, {
+              id: item.product.id,
+              newStock: item.quantity,
+            });
+            if (!response.data.success) {
+              this.$swal.fire({
+                title: 'Error',
+                text: `No se pudo actualizar el stock para el producto ${item.product.name}`,
+                icon: 'error',
+                confirmButtonText: 'Ok',
+              });
+              return;
+            }
+          }
+        }
+      }
+
+      //post pedido de barbo
+      //!TODO barbo
+
+      this.resetForm();
+
     },
 
     getToday() {
@@ -388,6 +422,10 @@ export default {
           item.isDialogOpen = false;
         }
       });
+      this.sinpeReceipt = null;
+      this.isAddressOpen = false;
+      this.isCreditCardMenuOpen = false;
+      this.selectedCreditCard = null;
       this.selectedAddress = null;
       this.paymentMethod = '';
     },

@@ -31,7 +31,7 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
-        <v-btn color="primary">Checkout</v-btn>
+        <v-btn color="primary" @click="checkOut">Checkout</v-btn>
       </v-card-actions>
 
       <!-- Confirmation dialog for deletion -->
@@ -85,6 +85,9 @@ export default {
     this.fetchShoppingCart();
   },
   methods: {
+    checkOut() {
+      this.$router.push('/checkout');
+    },
     fetchShoppingCart() {
       axios
         .get(`${API_URL}/ShoppingCart`, { params: { userId: this.userId } })
