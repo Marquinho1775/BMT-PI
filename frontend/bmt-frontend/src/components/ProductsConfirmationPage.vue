@@ -120,7 +120,7 @@ export default {
 
 <style scoped>
 .order-card {
-  border-bottom: 2px solid #ffffff;
+  border-bottom: 2px solid #ebebeb;
 }
 
 .custom-btn {

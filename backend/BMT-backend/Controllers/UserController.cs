@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using BMT_backend.Handlers;
 using BMT_backend.Models;
+using BMT_backend.Infrastructure;
 
 namespace BMT_backend.Controllers
 {
@@ -10,11 +11,15 @@ namespace BMT_backend.Controllers
     public class UserController : Controller
     {
         private UserHandler _userHandler;
+        private OrderHandler _orderHandler;
+        private MailManager _mailManager;
         private readonly TokenService _tokenService;
 
-        public UserController(TokenService tokenService)
+        public UserController(TokenService tokenService, IConfiguration configuration)
         {
             _userHandler = new UserHandler();
+            _orderHandler = new OrderHandler();
+            _mailManager = new MailManager(configuration);
             _tokenService = tokenService;
         }
 
@@ -130,6 +135,34 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error al actualizar el perfil");
             }
         }
+        [HttpGet("GetToConfirmOrders")]
+        public List<OrderModel> GetToConfirmOrders(String userId)
+        {
+            List<OrderModel> toConfirmOrders = _orderHandler.GetToConfirmUserOrders(userId);
+            return toConfirmOrders;
+        }
+        [HttpPut("DenyOrder")]
+        public IActionResult DenyOrder(String orderID)
+        {
+            if (_orderHandler.DenyOrder(orderID))
+            {
+                try
+                {
+                    var order = _orderHandler.GetOrderById(orderID);
+                    if (order == null)
+                    {
+                        return NotFound($"Order with ID {orderID} not found.");
+                    }
 
+                    _mailManager.SendDenyEmail(order);
+                    return Ok("Order cancelled, email sent.");
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Error sending cancelled notification email.");
+                }
+            }
+            return BadRequest("Order cancellation failed.");
+        }
     }
 }
