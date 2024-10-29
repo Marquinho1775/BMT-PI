@@ -66,7 +66,7 @@ namespace BMT_backend.Controllers
             }
         }
 
-        [HttpPost("Unity")]
+        [HttpGet("Unity")]
         public async Task<IActionResult> UserInfo(string id)
         {
             try

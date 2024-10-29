@@ -22,15 +22,15 @@
     <v-container v-if="enterpriseExist" class="d-flex justify-center align-center" style="min-height: 100vh;">
       <v-card class="pa-5">
         <v-card-title>
-          <h2 class="text-center">{{ enterprise.enterpriseName }}</h2>
+          <h2 class="text-center">{{ enterprise.name }}</h2>
         </v-card-title>
         <v-card-text>
-          <p><strong>Nombre de la Empresa:</strong> {{ enterprise.enterpriseName || 'No disponible' }}</p>
-          <p><strong>Descripción:</strong> {{ enterprise.enterpriseDescription || 'No disponible' }}</p>
+          <p><strong>Nombre de la Empresa:</strong> {{ enterprise.name || 'No disponible' }}</p>
+          <p><strong>Descripción:</strong> {{ enterprise.description || 'No disponible' }}</p>
           <v-container>
-          <v-form v-if = 'isEntrepeneur' ref="form" v-model="valid" lazy-validation>
+          <v-form v-if = '!isEntrepeneur' ref="form" v-model="valid" lazy-validation>
             <v-text-field
-              v-model="this.Identification"
+              v-model="identification"
               label="Cédula"
               maxlength="9"
               pattern="\d{9}"
@@ -75,13 +75,11 @@
       }
       if (this.user.role === 'emp') {
         this.isEntrepeneur = true;
-        const obtainEntrepreneurResponse = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + this.user.id,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
+        const obtainEntrepreneurResponse = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + this.user.id, {
+          headers: {
+            Authorization: `Bearer ${token}`
           }
-        );
+        });
         this.entrepreneur = obtainEntrepreneurResponse.data;
       }
     },
@@ -101,11 +99,7 @@
           email: '',
           role: '',
         },
-        enterprise: {
-          enterpriseId: '',
-          enterpriseName: '',
-          enterpriseDescription: '',
-        },
+        enterprise: {},
         entrepreneur: {
           Id: '',
           Username: '',
@@ -117,32 +111,72 @@
       goBack() {
         window.location.href = "/";
       },
+      async registerEntrepreneur() {
+        try {
+          const response = await axios.post(`${API_URL}/Entrepreneur`, {
+            id: '',
+            username: JSON.parse(localStorage.getItem('user')).username,
+            identification: this.user.identification,
+          });
+          return response.data;
+        } catch (error) {
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al anexarte a la empresa. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+        }
+      },
+      async addEntrepreneurToEnterprise(entrepreneurId, enterpriseId) {
+        try {
+          await axios.post(`${API_URL}/Entrepreneur/add-to-enterprise`, {
+            entrepreneurIdentification: entrepreneurId,
+            enterpriseIdentification: enterpriseId,
+            isAdmin: false,
+          });
+          this.$swal.fire({
+            title: 'Ahora formas parte de una empresa!',
+            text: '¡Bienvenido!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
+        } catch (error) {
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al anexarte a la empresa. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+        }
+      },
       async declineInvitation(){
         this.goBack();
       },
       async acceptInvitation() {
-        const token = getToken();
         try {
-          const requestPayload = {
-            EntrepreneurIdentification: this.Identification,
-            EnterpriseIdentification: this.verificationCode,
-            IsAdmin: false
-          };
-
-          const response = await axios.post(`${API_URL}/Entrepreneur/add-to-enterprise`, requestPayload, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-
-          if (response.status === 200) {
-            this.successMessage = 'Invitación aceptada exitosamente';
-            this.errorMessage = '';
-            this.goBack();
+          if (this.isEntrepeneur === false) {
+            this.registerEntrepreneur();
           }
+          
+          this.addEntrepreneurToEnterprise(this.user.identification, this.enterprise.id);
+
+          this.$swal.fire({
+            title: 'Ahora formas parte de una empresa!',
+            text: '¡Bienvenido!',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          });
         } catch (error) {
-          console.error('Error al aceptar la invitación:', error);
-          this.errorMessage = 'No se pudo aceptar la invitación';
-          this.successMessage = '';
+          console.error('Error al anexarte a la empresa:', error);
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al anexarte a la empresa. Inténtalo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
         }
+        this.goBack();
       },
       async handleSubmit() {
         try {
@@ -150,13 +184,26 @@
           const enterpriseResponse = await axios.get(API_URL + `/Enterprise/${this.verificationCode}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
+
           this.enterprise = enterpriseResponse.data;
-          this.enterpriseExist = true;
-        } catch (error) {
-          console.error('Error al cargar la empresa:', error);
-          if (error.response) {
-            console.error('Detalles del error:', error.response.data);
+          if (this.enterprise) {
+              this.enterpriseExist = true;
+              this.$swal.fire({
+                  title: 'Código Verificado correctamente!',
+                  text: '¡Verificación exitosa!',
+                  icon: 'success',
+                  confirmButtonText: 'Ok'
+              });
           }
+          this.enterpriseExist = true;
+          this.loggedIn = false;
+        } catch (error) {
+          this.$swal.fire({
+						title: 'Error',
+						text: 'Hubo un error al verificar el código. Inténtalo de nuevo.',
+						icon: 'error',
+						confirmButtonText: 'Ok'
+					});
         }
       }
     }

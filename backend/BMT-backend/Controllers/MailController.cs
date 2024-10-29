@@ -110,12 +110,12 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("sendcollabmail")]
-        public IActionResult SendCollabMail(MailModel userData)
+        public IActionResult SendCollabMail([FromBody]MailModel userData)
         {
             try
             {
                 string code = userData.Id;
-                string link = "http://localhost:8080/accept-invitation/";
+                string link = "http://localhost:8080/acceptInvite/";
 
                 string title = "Invitación a colaborar en Business Tracker";
                 string body = "<h1>Acepta tu invitación</h1>";
@@ -158,7 +158,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("sendconfirmedcollabmail")]
-        public IActionResult ConfirmedCollabMail(MailModel userData)
+        public IActionResult ConfirmedCollabMail([FromBody]MailModel userData)
         {
             try
             {

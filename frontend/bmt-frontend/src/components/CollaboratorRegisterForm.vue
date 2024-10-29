@@ -45,15 +45,14 @@
 				collaboratorId: '',
 				successMessage: '',
 				errorMessage: '',
-				enterprise: {}
+				enterpriseId: this.$route.params.id,
 			};
 		},
 		async created() {
-			const enterpriseId = this.$route.params.id;
 			const token = getToken();
 			
 			try {
-				const response = await axios.get(`${API_URL}/Enterprise/${enterpriseId}`, {
+				const response = await axios.get(`${API_URL}/Enterprise/${this.enterpriseId}`, {
 					headers: { Authorization: `Bearer ${token}` }
 				});
 				this.enterprise = response.data;
@@ -65,21 +64,44 @@
 		methods: {
 			async handleSubmit() {
 				try {
-					const userDetailsResponse = await axios.get(`${API_URL}/User/Unity/${this.collaboratorId}`);
-					const collabUser = userDetailsResponse.data;
-					await axios.post(`${API_URL}/email/sendcollabmail`, {
-						Email: collabUser.Email,
-						Id: this.enterprise.id
+					const userDetailsResponse = await axios.get(`${API_URL}/User/Unity/`, {
+						params: { id: this.collaboratorId }
 					});
-
-					this.successMessage = 'Correo de invitación enviado exitosamente';
-					this.errorMessage = '';
+					const collabUser = userDetailsResponse.data;
+					const collabMail = {
+						Email: collabUser.email,
+						Id: this.enterpriseId
+					};
+					axios.post(API_URL + '/Email/sendcollabmail', collabMail)
+					.then(() => {
+						this.$swal.fire({
+						title: 'Envío exitoso',
+						text: '¡Haz invitado al colaborador correctamente!',
+						icon: 'success',
+						confirmButtonText: 'Ok'
+						}).then(() => {
+							this.goBack();
+						});
+					})
+					.catch(error => {
+						console.error(error);
+						this.$swal.fire({
+							title: 'Error',
+							text: 'Hubo un error al invitar al colaborador. Inténtalo de nuevo.',
+							icon: 'error',
+							confirmButtonText: 'Ok'
+						});
+					});
+				
 				} catch (error) {
-					console.error('Error al enviar la invitación:', error);
-					this.errorMessage = 'No se pudo enviar la invitación';
-					this.successMessage = '';
+					console.error(error);
+					this.$swal.fire({
+						title: 'Error',
+						text: 'Hubo un error al invitar al colaborador. Inténtalo de nuevo.',
+						icon: 'error',
+						confirmButtonText: 'Ok'
+					});
 				}
-				this.goBack();
 			},
 			goBack() {
 				this.$router.push("/enterprise/" + this.enterprise.id);
