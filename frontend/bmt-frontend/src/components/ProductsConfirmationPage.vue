@@ -4,38 +4,43 @@
     <v-main class="flex-grow-1" style="overflow-x: hidden;">
       <h1 class="title1">Pedidos por revisar</h1>
       <template v-if="items && items.length > 0">
-      <v-virtual-scroll :items="items" height="100%" style="overflow-x: hidden;">
-        <template v-slot:default="{ item }">
-          <v-row class="order-card mb-4 p-1 bg-light-grey rounded" justify="space-between">
-            <v-col style="padding-left: 5rem">
-              <h4>{{ item.userName }}</h4>
-              <p>{{ item.direction }} - {{ item.otherSigns }}</p>
-              <ul>
-                <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products || [])" :key="enterpriseName">
-                  <strong>{{ enterpriseName }}</strong>
-                  <ul class="product-list">
-                    <li v-for="product in products" :key="product.productId" style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
-                      <span class="quantity-box">{{ product.quantity }}</span> {{ product.productName }}
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-              <p>Peso: {{ item.weight }} kg</p>
-              <p>{{ getTotalProductQuantity(item.products || []) }} artículos • Costo: ₡{{ (item.orderCost ?? 0).toFixed(2) }} + ₡{{ (item.deliveryFee ?? 0).toFixed(2) }} de envío</p>
-              <p v-if="item.orderDate">{{ new Date(item.orderDate).toLocaleDateString() }}</p>
-              <p v-else>Fecha no disponible</p>
-            </v-col>
-            <v-col class="d-flex flex-column align-center justify-center" cols="auto">
-              <v-btn size="x-large" class="mb-3 custom-btn" :style="{ backgroundColor: '#d0eda0', color: 'black' }" @click="confirmOrder(item.orderId)">
-                Aceptar pedido
-              </v-btn>
-              <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }" @click="denyOrder(item.orderId)">
-                Rechazar pedido
-              </v-btn>
-            </v-col>
-          </v-row>
-        </template>
-      </v-virtual-scroll>
+        <v-virtual-scroll :items="items" height="100%" style="overflow-x: hidden;">
+          <template v-slot:default="{ item }">
+            <v-row class="order-card mb-4 p-1 bg-light-grey rounded" justify="space-between">
+              <v-col style="padding-left: 5rem">
+                <h4>{{ item.userName }}</h4>
+                <p>{{ item.direction }} - {{ item.otherSigns }}</p>
+                <ul>
+                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products || [])"
+                    :key="enterpriseName">
+                    <strong>{{ enterpriseName }}</strong>
+                    <ul class="product-list">
+                      <li v-for="product in products" :key="product.productId"
+                        style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
+                        <span class="quantity-box">{{ product.quantity }}</span> {{ product.productName }}
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
+                <p>Peso: {{ item.weight }} kg</p>
+                <p>{{ getTotalProductQuantity(item.products || []) }} artículos • Costo: ₡{{ (item.orderCost ??
+                  0).toFixed(2) }} + ₡{{ (item.deliveryFee ?? 0).toFixed(2) }} de envío</p>
+                <p v-if="item.orderDate">{{ new Date(item.orderDate).toLocaleDateString() }}</p>
+                <p v-else>Fecha no disponible</p>
+              </v-col>
+              <v-col class="d-flex flex-column align-center justify-center" cols="auto">
+                <v-btn size="x-large" class="mb-3 custom-btn" :style="{ backgroundColor: '#d0eda0', color: 'black' }"
+                  @click="confirmOrder(item.orderId)">
+                  Aceptar pedido
+                </v-btn>
+                <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }"
+                  @click="denyOrder(item.orderId)">
+                  Rechazar pedido
+                </v-btn>
+              </v-col>
+            </v-row>
+          </template>
+        </v-virtual-scroll>
       </template>
     </v-main>
     <AppFooter />
@@ -74,7 +79,7 @@ export default {
           const response = await axios.put(API_URL + '/Developer/ConfirmOrder', null, {
             params: { orderID: orderId }
           });
-          
+
           if (response.status === 200) {
             console.log(`Order ${orderId} confirmed successfully`);
             this.orders = this.orders.filter(order => order.orderId !== orderId);
@@ -89,10 +94,10 @@ export default {
     async denyOrder(orderId) {
       if (confirm("¿Estás seguro de que quieres rechazar este pedido?")) {
         try {
-          const response = await axios.post(API_URL + '/Developer/DenyOrder', null, {
+          const response = await axios.put(API_URL + '/Developer/DenyOrder', null, {
             params: { orderID: orderId }
           });
-          
+
           if (response.status === 200) {
             console.log(`Order ${orderId} denied successfully`);
             this.orders = this.orders.filter(order => order.orderId !== orderId);
