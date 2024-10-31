@@ -8,8 +8,8 @@
           <template v-slot:default="{ item }">
             <v-row class="order-card mb-4 p-1 bg-light-grey rounded" justify="space-between">
               <v-col style="padding-left: 5rem;">
-                <ul class="order-list">
-                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products || [])"
+                <ul class="order-list" v-if="item.products && item.products.length > 0">
+                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products)"
                     :key="enterpriseName">
                     <h4 class="enterprise-name" style="padding-bottom: 0.5rem;">{{ enterpriseName }}</h4>
                     <ul class="product-list">
@@ -60,7 +60,7 @@ export default {
   methods: {
     async fetchOrders() {
       try {
-        const response = await axios.get(API_URL + "/User/GetToConfirmOrders", null, {
+        const response = await axios.get(API_URL + "/User/GetToConfirmOrders", {
           params: { userId: getUser().id },
         });
         this.orders = response.data;
