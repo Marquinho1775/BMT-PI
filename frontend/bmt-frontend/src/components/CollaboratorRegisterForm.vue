@@ -7,8 +7,8 @@
 					<h1 v-if="title" class="text-center mb-5">{{ title }}</h1>
 					
 					<v-text-field
-						v-model="collaboratorId"
-						label="ID del usuario a invitar"
+						v-model="collaboratorUsername"
+						label="Username del usuario a invitar"
 						required
 					></v-text-field>
 					<v-row class="mt-4">
@@ -42,7 +42,7 @@
 		data() {
 			return {
 				title: 'Invitar colaborador',
-				collaboratorId: '',
+				collaboratorUsername: '',
 				successMessage: '',
 				errorMessage: '',
 				enterpriseId: this.$route.params.id,
@@ -64,13 +64,14 @@
 		methods: {
 			async handleSubmit() {
 				try {
-					const userDetailsResponse = await axios.get(`${API_URL}/User/Unity/`, {
-						params: { id: this.collaboratorId }
+					const userDetailsResponse = await axios.get(`${API_URL}/User/GetUserByUserName/`, {
+						params: { username: this.collaboratorUsername }
 					});
 					const collabUser = userDetailsResponse.data;
 					const collabMail = {
 						Email: collabUser.email,
-						Id: this.enterpriseId
+						Id: collabUser.id,
+						EntCode: this.enterpriseId,
 					};
 					axios.post(API_URL + '/Email/sendcollabmail', collabMail)
 					.then(() => {

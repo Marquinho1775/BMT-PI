@@ -5,12 +5,17 @@
       <v-form @submit.prevent="handleSubmit" style="width: 100%; max-width: 500px;">
         <h1 v-if="title" class="text-center mb-5">{{ title }}</h1>
         <v-text-field
+          v-model="enterpriseCode"
+          label="Ingresa el código de la empresa"
+          required
+        ></v-text-field>
+        <v-text-field
           v-model="verificationCode"
-          label="Ingresa tu código"
+          label="Ingresa tu código de seguridad"
           required
         ></v-text-field>
         <v-btn @click="goBack" color="secondary" class="mr-2">Volver</v-btn>
-        <v-btn @click="handleSubmit" type="submit" color="primary">Verificar Código</v-btn>
+        <v-btn @click="handleSubmit" type="submit" color="primary">Verificar Códigos</v-btn>
         <v-alert v-if="successMessage" type="success" class="mt-4">
           {{ successMessage }}
         </v-alert>
@@ -28,7 +33,7 @@
           <p><strong>Nombre de la Empresa:</strong> {{ enterprise.name || 'No disponible' }}</p>
           <p><strong>Descripción:</strong> {{ enterprise.description || 'No disponible' }}</p>
           <v-container>
-          <v-form v-if = "!this.isEntrepeneur" ref="form" v-model="valid" lazy-validation>
+          <v-form v-if = "!isEntrepeneur" ref="form" v-model="valid" lazy-validation>
             <v-text-field
               v-model="user.Identification"
               label="Cédula"
@@ -46,9 +51,6 @@
   </v-container>
         </v-card-text>
         <v-row class="mt-4" justify="space-between">
-          <v-col cols="auto">
-            <v-btn color="red" @click="declineInvitation">Declinar Invitación</v-btn>
-          </v-col>
           <v-col cols="auto">
             <v-btn color="green" @click="acceptInvitation">Aceptar Invitación</v-btn>
           </v-col>
@@ -72,6 +74,7 @@
       } else {
         this.loggedIn = true;
         this.user = JSON.parse(localStorage.getItem('user')) || this.user;
+        this.user.userId = this.user.id;
       }
       if (this.user.role === 'emp') {
         this.isEntrepeneur = true;
@@ -88,10 +91,11 @@
         isEntrepeneur: false,
         loggedIn: false,
         title: 'Verificación de Código',
-        verificationCode: '',
+        enterpriseCode: '',
         successMessage: '',
         errorMessage: '',
         enterpriseExist: false,
+        verificationCode: '',
         user: {
           userId: '',
           Identification: '',
@@ -154,9 +158,6 @@
           throw error;
         }
       },
-      async declineInvitation(){
-        this.goBack();
-      },
       async acceptInvitation() {
         try {
           if (this.isEntrepeneur === false) {
@@ -181,26 +182,32 @@
       async handleSubmit() {
         try {
           const token = getToken();
-          const enterpriseResponse = await axios.get(API_URL + `/Enterprise/${this.verificationCode}`, {
+          const enterpriseResponse = await axios.get(API_URL + `/Enterprise/${this.enterpriseCode}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
 
+          const codeTaken = {
+            Code: this.verificationCode,
+            Id: this.user.userId
+          };
+          await axios.post(API_URL + '/Email/verifycode', codeTaken);
+
           this.enterprise = enterpriseResponse.data;
           if (this.enterprise) {
-              this.enterpriseExist = true;
-              this.$swal.fire({
-                  title: 'Código Verificado correctamente!',
-                  text: '¡Verificación exitosa!',
-                  icon: 'success',
-                  confirmButtonText: 'Ok'
-              });
+            this.enterpriseExist = true;
+            this.$swal.fire({
+                title: 'Código Verificado correctamente!',
+                text: '¡Verificación exitosa!',
+                icon: 'success',
+                confirmButtonText: 'Ok'
+            });
           }
           this.enterpriseExist = true;
           this.loggedIn = false;
         } catch (error) {
           this.$swal.fire({
 						title: 'Error',
-						text: 'Hubo un error al verificar el código. Inténtalo de nuevo.',
+						text: 'Hubo un error al verificar los códigos. Inténtalo de nuevo.',
 						icon: 'error',
 						confirmButtonText: 'Ok'
 					});
