@@ -186,11 +186,13 @@ export default {
 
     async changeRole() {
       try {
-        const userId = JSON.parse(localStorage.getItem('user')).id;
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user.id;
         const role = 'emp';
         const url = `${API_URL}/User/Role?id=${encodeURIComponent(userId)}&role=${encodeURIComponent(role)}`;
         await axios.post(url);
-        JSON.parse(localStorage.getItem('user')).role = role;
+        user.role = role;
+        localStorage.setItem('user', JSON.stringify(user));
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al cambiar el rol del usuario.');
         console.error(error);
