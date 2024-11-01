@@ -32,7 +32,7 @@ namespace BMT_backend.Handlers
 
         public List<DirectionModel> GetDirectionsFromUser(UserModel user)
         {
-            string query = "SELECT Username, NumDirection, OtherSigns, Coordinates FROM Directions WHERE Username = @Username";
+            string query = "SELECT Id, Username, NumDirection, OtherSigns, Coordinates FROM Directions WHERE Username = @Username";
             List<DirectionModel> directions = new List<DirectionModel>();
 
             using (var queryCommand = new SqlCommand(query, _conection))
@@ -48,6 +48,7 @@ namespace BMT_backend.Handlers
                 {
                     directions.Add(new DirectionModel
                     {
+                        Id = Convert.ToString(row["Id"]),
                         Username = Convert.ToString(row["Username"]),
                         NumDirection = Convert.ToString(row["NumDirection"]),
                         OtherSigns = row["OtherSigns"] == DBNull.Value ? null : Convert.ToString(row["OtherSigns"]),
@@ -65,6 +66,24 @@ namespace BMT_backend.Handlers
             using (var queryCommand = new SqlCommand(query, Connection))
             {
                 queryCommand.Parameters.AddWithValue("@Username", direction.Username);
+                queryCommand.Parameters.AddWithValue("@NumDirection", direction.NumDirection);
+                queryCommand.Parameters.AddWithValue("@OtherSigns", (object)direction.OtherSigns ?? DBNull.Value);
+                queryCommand.Parameters.AddWithValue("@Coordinates", direction.Coordinates);
+
+                Connection.Open();
+                var result = queryCommand.ExecuteNonQuery();
+                Connection.Close();
+                return result > 0;
+            }
+        }
+
+        public bool UpdateDirection(DirectionModel direction)
+        {
+            var query = "UPDATE Directions SET NumDirection = @NumDirection, OtherSigns = @OtherSigns, Coordinates = @Coordinates WHERE Id = @Id";
+
+            using (var queryCommand = new SqlCommand(query, Connection))
+            {
+                queryCommand.Parameters.AddWithValue("@Id", direction.Id);  // Uso de Id como string
                 queryCommand.Parameters.AddWithValue("@NumDirection", direction.NumDirection);
                 queryCommand.Parameters.AddWithValue("@OtherSigns", (object)direction.OtherSigns ?? DBNull.Value);
                 queryCommand.Parameters.AddWithValue("@Coordinates", direction.Coordinates);

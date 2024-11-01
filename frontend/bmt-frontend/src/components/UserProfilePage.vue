@@ -76,13 +76,57 @@
                   <v-divider></v-divider>
                   <v-card-text>{{ direction.otherSigns }}</v-card-text>
                   <v-card-actions>
-                    <v-btn prepend-icon="mdi-pencil" size="x-small" color="primary">Editar</v-btn>
+                    <v-btn prepend-icon="mdi-pencil" size="x-small" color="primary" @click="openEditDialog(direction)">Editar</v-btn>
                     <v-btn prepend-icon="mdi-delete" size="x-small" color="error">Borrar</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-col>
             </div>
           </v-expand-transition>
+
+          <!-- Edit Address Dialog -->
+          <v-dialog v-model="isEditDialogOpen" max-width="600">
+            <v-card>
+              <v-card-title>Editar Dirección</v-card-title>
+              <v-card-text>
+                <v-form @submit.prevent="saveEditedDirection">
+                  <v-text-field
+                    label="Nombre de la dirección"
+                    v-model="currentDirection.numDirection"
+                    required
+                  ></v-text-field>
+
+                  <v-row class="my-4">
+                    <v-col>
+                      <GMapMap
+                        :center="editMapCenter"
+                        :zoom="12"
+                        style="width: 100%; height: 400px"
+                        @click="updateMarker"
+                      >
+                        <Marker v-if="editMarker" :position="editMarker.position" />
+                      </GMapMap>
+                    </v-col>
+                  </v-row>
+                  
+                  <v-text-field
+                    label="Coordenadas"
+                    v-model="currentDirection.coordinates"
+                    readonly
+                  ></v-text-field>
+                  
+                  <v-text-field
+                    label="Otras señas"
+                    v-model="currentDirection.otherSigns"
+                  ></v-text-field>
+                </v-form>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="secondary" @click="closeEditDialog">Cancelar</v-btn>
+                <v-btn color="primary" @click="saveEditedDirection">Guardar</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
 
           <!-- Action Buttons -->
           <v-row class="d-flex justify-space-between mt-4">
@@ -101,6 +145,7 @@
 import axios from 'axios';
 import { API_URL, URL } from '@/main.js';
 import { getToken } from '@/helpers/auth';
+import { GMapMap, Marker } from '@fawmi/vue-google-maps'; // eslint-disable-line no-unused-vars
 
 export default {
   data() {
@@ -119,7 +164,14 @@ export default {
       },
       directions: [],
       showPassword: false,
-      isAddressOpen: false, // Controla si se muestra la sección de direcciones
+      isAddressOpen: false,
+      isEditDialogOpen: false,
+      editAddressData: { numDirection: '', coordinates: '', otherSigns: '' },
+      currentDirection: { numDirection: '', coordinates: '', otherSigns: '' },
+      editMapCenter: { lat: 9.9359015, lng: -84.0506458 },
+      editMarker: null,
+    
+
     };
   },
   created() {
@@ -128,7 +180,7 @@ export default {
     } else {
       this.user = JSON.parse(localStorage.getItem('user')) || this.user;
       this.GetDirectionsOfUser();
-      this.imageURL = this.user.profilePictureURL ? URL + this.user.profilePictureURL : ''; // Asegura la sincronización
+      this.imageURL = this.user.profilePictureURL ? URL + this.user.profilePictureURL : '';
     }
   },
   methods: {
@@ -155,13 +207,9 @@ export default {
           throw new Error('El usuario no tiene todos los campos requeridos');
         }
         const response = await axios.post(
-          API_URL + '/Direction/ObtainDirectionsFromUser',
+          `${API_URL}/Direction/ObtainDirectionsFromUser`,
           user,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         this.directions = response.data;
       } catch (error) {
@@ -200,6 +248,56 @@ export default {
         };
         reader.readAsDataURL(file);
       }
+    },
+    openEditDialog(direction) {
+      this.isEditDialogOpen = true;
+      this.currentDirection = { ...direction };
+      
+      // Parse coordinates for map center
+      const [lat, lng] = direction.coordinates.split(', ');
+      this.editMapCenter = { lat: parseFloat(lat), lng: parseFloat(lng) };
+      this.editMarker = { position: this.editMapCenter };
+    },
+    updateMarker(event) {
+      const position = { lat: event.latLng.lat(), lng: event.latLng.lng() };
+      this.editMarker = { position };
+      this.currentDirection.coordinates = `${position.lat}, ${position.lng}`;
+    },
+    async saveEditedDirection() {
+      const token = getToken();
+      try {
+        const response = await axios.put(
+          `${API_URL}/Direction/UpdateDirection/${this.currentDirection.id}`,  // Cambiar numDirection por Id
+          this.currentDirection,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (response.data) {
+          this.GetDirectionsOfUser();
+          this.isEditDialogOpen = false;
+
+          await this.$swal.fire({
+            title: 'Dirección actualizada',
+            text: '¡Su dirección ha sido actualizada correctamente!',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          });
+        } else {
+          console.error('Error: No se pudo actualizar la dirección.');
+        }
+      } catch (error) {
+        console.error('Error al guardar la dirección:', error);
+
+        this.$swal.fire({
+          title: 'Error',
+          text: 'Hubo un error al actualizar su dirección. Inténtelo de nuevo.',
+          icon: 'error',
+          confirmButtonText: 'Ok',
+        });
+      }
+    },
+    closeEditDialog() {
+      this.isEditDialogOpen = false;
     },
   }
 };
