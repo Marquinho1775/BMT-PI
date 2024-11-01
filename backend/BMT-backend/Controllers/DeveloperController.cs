@@ -80,6 +80,7 @@ namespace BMT_backend.Controllers
                 try
                 {
                     var order = _orderHandler.GetOrderById(orderID);
+                    Console.WriteLine(order);
                     if (order == null)
                     {
                         return NotFound($"Order with ID {orderID} not found.");

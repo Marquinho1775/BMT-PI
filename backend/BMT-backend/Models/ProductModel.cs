@@ -34,5 +34,12 @@
         public int Quantity { get; set; }
         public double Subtotal { get; set; }
     }
+
+    public class CheckOutProductModel 
+    {
+        public string ProductId { get; set; }
+        public string Type { get; set; }
+        public string? Date { get; set; }
+    }
 }
 

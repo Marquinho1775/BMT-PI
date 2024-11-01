@@ -11,6 +11,7 @@ import UserEmailVerification from './components/UserEmailVerification.vue';
 import UserProfilePage from './components/UserProfilePage.vue';
 import UserRegisterAddress from './components/UserRegisterAddress.vue';
 import UserShoppingCart from './components/UserShoppingCart.vue';
+import UserCardForm from './components/UserCardForm.vue';
 import UserOrders from './components/UserOrders.vue';
 
 import EditProfileInfo from './components/EditProfileInfo.vue';
@@ -32,6 +33,7 @@ import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
 import ProductsConfirmationPage from './components/ProductsConfirmationPage.vue';
 
+import CheckOut from './components/CheckOut.vue';
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
 import AppHeader from './components/AppHeader.vue';
@@ -75,7 +77,8 @@ const router = createRouter({
     { path: '/email-verification', name: "VerifyEmail", component: UserEmailVerification },
     { path: '/profile', name: "Profile", component: UserProfilePage },
     { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress },
-    {path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart},
+    { path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart },
+    { path: '/card-form', name: "CardForm", component: UserCardForm },
 
     { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
     { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
@@ -88,6 +91,7 @@ const router = createRouter({
     { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
 
     { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },
+    { path: '/checkout', name: "CheckOut", component: CheckOut },
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },

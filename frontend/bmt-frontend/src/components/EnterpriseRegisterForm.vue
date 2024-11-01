@@ -1,9 +1,9 @@
 <template>
-  <v-app class="d-flex flex-column">
-    <AppHeader/>
+  <v-main>
+
     <div class="d-flex justify-content-center align-items-center vh-100">
       <b-form @submit.prevent="submitForm" @reset="onReset">
-        <div v-if="userRole === 'cli' " class="card custom-card my-4">
+        <div v-if="userRole === 'cli'" class="card custom-card my-4">
           <h3 class="text-center card-header-custom">Datos del emprendedor</h3>
           <div class="card-body">
             <b-form-group label="Número de identificación" label-for="identification-number-e">
@@ -16,41 +16,42 @@
             </b-form-group>
           </div>
         </div>
-  
+
         <div id="form" class="card custom-card my-4">
           <h3 class="text-center card-header-custom">Datos de la empresa</h3>
           <div class="card-body">
-  
+
             <b-form-group id="selection-group-id-type" label="Seleccione el tipo de identificación de su negocio"
               label-for="select-id-type">
               <b-form-select id="select-id-type" class="form-input" v-model="enterpriseData.identificationType" required
                 :options="idTypeOptions" @change="validateIdentification2">
               </b-form-select>
             </b-form-group>
-  
-            <b-form-group id="group-identification-number-en" label="Número de identificación"
-            k  label-for="identification-number-en">
-              <b-form-input id="identification-number-en" class="form-input" v-model="enterpriseData.identificationNumber"
-                placeholder="Ingresar número de identificación" required :state="identificationValid2"
-                @input="validateIdentification2">
+
+            <b-form-group id="group-identification-number-en" label="Número de identificación" k
+              label-for="identification-number-en">
+              <b-form-input id="identification-number-en" class="form-input"
+                v-model="enterpriseData.identificationNumber" placeholder="Ingresar número de identificación" required
+                :state="identificationValid2" @input="validateIdentification2">
               </b-form-input>
               <b-form-invalid-feedback v-if="identificationValid2 === false">
-                El número de identificación debe tener {{ enterpriseData.identificationType === 1 ? '9' : '10' }} dígitos.
+                El número de identificación debe tener {{ enterpriseData.identificationType === 1 ? '9' : '10' }}
+                dígitos.
               </b-form-invalid-feedback>
             </b-form-group>
-  
+
             <b-form-group id="group-name" label="Nombre:" label-for="name">
               <b-form-input id="name" class="form-input" v-model="enterpriseData.name"
                 placeholder="Ingresar el nombre de su emprendimiento" required>
               </b-form-input>
             </b-form-group>
-  
+
             <b-form-group id="group-description" label="Descripción:" label-for="description">
               <b-form-textarea id="description" class="form-input" v-model="enterpriseData.description"
                 placeholder="Ingresar una descripción de su emprendimiento" rows="4" max-rows="6" no-resize>
               </b-form-textarea>
             </b-form-group>
-  
+
             <b-form-group id="group-email" label="Correo electrónico:" label-for="email">
               <b-form-input id="email" class="form-input" v-model="enterpriseData.email"
                 placeholder="Ingresar correo electrónico" type="email" required :state="emailValid"
@@ -59,7 +60,7 @@
               <b-form-invalid-feedback v-if="!emailValid">El correo debe tener el formato
                 xxxx@xxx.xxx</b-form-invalid-feedback>
             </b-form-group>
-  
+
             <b-form-group id="group-phone-number" label="Número de teléfono:" label-for="phone-number">
               <b-form-input id="phone-number" class="form-input" v-model="enterpriseData.phoneNumber"
                 placeholder="Ingresar número de teléfono" required :state="phoneValid" @input="validatePhone">
@@ -75,9 +76,7 @@
         </div>
       </b-form>
     </div>
-    <AppFooter/>
-    <AppSidebar/>
-  </v-app>
+  </v-main>
 </template>
 
 <script>
@@ -137,10 +136,10 @@ export default {
           entrepreneurIdentification = await this.getExistingEntrepreneur();
         }
         const enterpriseChecks = [
-          {value: this.enterpriseData.identificationNumber, message: 'Ya existe una empresa registrada con este número de identificación.',},
-          {value: this.enterpriseData.name,message: 'Ya existe una empresa registrada con este nombre.',},
-          {value: this.enterpriseData.email,message: 'Ya existe una empresa registrada con este correo electrónico.',},
-          {value: this.enterpriseData.phoneNumber,message: 'Ya existe una empresa registrada con este número de teléfono.',},
+          { value: this.enterpriseData.identificationNumber, message: 'Ya existe una empresa registrada con este número de identificación.', },
+          { value: this.enterpriseData.name, message: 'Ya existe una empresa registrada con este nombre.', },
+          { value: this.enterpriseData.email, message: 'Ya existe una empresa registrada con este correo electrónico.', },
+          { value: this.enterpriseData.phoneNumber, message: 'Ya existe una empresa registrada con este número de teléfono.', },
         ];
         for (const check of enterpriseChecks) {
           const enterpriseExists = await this.checkExistingEnterprise(check.value);
@@ -150,11 +149,11 @@ export default {
           }
         }
         await this.registerEnterprise();
-        await this.addEntrepreneurToEnterprise( entrepreneurIdentification, this.enterpriseData.identificationNumber);
+        await this.addEntrepreneurToEnterprise(entrepreneurIdentification, this.enterpriseData.identificationNumber);
         this.generateSweetAlert('Registro exitoso', 'success', 'Se ha registrado exitosamente su empresa.');
         this.$router.push('/');
       } catch (error) {
-        this.generateSweetAlert( 'Error', 'error', 'Ocurrió un error durante el registro. Por favor, inténtalo de nuevo.');
+        this.generateSweetAlert('Error', 'error', 'Ocurrió un error durante el registro. Por favor, inténtalo de nuevo.');
         console.error(error);
       }
     },
@@ -187,11 +186,13 @@ export default {
 
     async changeRole() {
       try {
-        const userId = JSON.parse(localStorage.getItem('user')).id;
+        const user = JSON.parse(localStorage.getItem('user'));
+        const userId = user.id;
         const role = 'emp';
         const url = `${API_URL}/User/Role?id=${encodeURIComponent(userId)}&role=${encodeURIComponent(role)}`;
         await axios.post(url);
-        JSON.parse(localStorage.getItem('user')).role = role;
+        user.role = role;
+        localStorage.setItem('user', JSON.stringify(user));
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al cambiar el rol del usuario.');
         console.error(error);
