@@ -165,7 +165,7 @@ namespace BMT_backend.Controllers
             try
             {
 
-                string title = "Un nuevo integrante a la familia de tu empresa";
+                string title = "Un nuevo integrante a la familia de tu emprendimiento";
                 string body = "<h1>¡El usuario " + userData.Id + " ha aceptado colaborar contigo! </h1>";
                 body += "¡Esperemos que juntos puedan cumplir sus sueños!<br><br>";
                 body += "Saludos,<br>";
