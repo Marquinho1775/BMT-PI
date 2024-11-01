@@ -28,9 +28,9 @@
           <p><strong>Nombre de la Empresa:</strong> {{ enterprise.name || 'No disponible' }}</p>
           <p><strong>Descripción:</strong> {{ enterprise.description || 'No disponible' }}</p>
           <v-container>
-          <v-form v-if = '!isEntrepeneur' ref="form" v-model="valid" lazy-validation>
+          <v-form v-if = "!this.isEntrepeneur" ref="form" v-model="valid" lazy-validation>
             <v-text-field
-              v-model="identification"
+              v-model="user.Identification"
               label="Cédula"
               maxlength="9"
               pattern="\d{9}"
@@ -111,18 +111,31 @@
       goBack() {
         window.location.href = "/";
       },
+      async changeRole() {
+        try {
+          const userId = JSON.parse(localStorage.getItem('user')).id;
+          const role = 'emp';
+          const url = `${API_URL}/User/Role?id=${encodeURIComponent(userId)}&role=${encodeURIComponent(role)}`;
+          await axios.post(url);
+          JSON.parse(localStorage.getItem('user')).role = role;
+        } catch (error) {
+          this.generateSweetAlert('Error', 'error', 'Hubo un error al cambiar el rol del usuario.');
+          console.error(error);
+          throw error;
+        }
+      },
       async registerEntrepreneur() {
         try {
           const response = await axios.post(`${API_URL}/Entrepreneur`, {
-            id: '',
-            username: JSON.parse(localStorage.getItem('user')).username,
-            identification: this.user.identification,
+            id: this.user.userId,
+            username:this.user.username,
+            identification: this.user.Identification,
           });
           return response.data;
         } catch (error) {
           this.$swal.fire({
             title: 'Error',
-            text: 'Hubo un error al anexarte a la empresa. Inténtalo de nuevo.',
+            text: 'Hubo un error al hacerte emprendedor. Inténtalo de nuevo.',
             icon: 'error',
             confirmButtonText: 'Ok'
           });
@@ -131,23 +144,14 @@
       async addEntrepreneurToEnterprise(entrepreneurId, enterpriseId) {
         try {
           await axios.post(`${API_URL}/Entrepreneur/add-to-enterprise`, {
-            entrepreneurIdentification: entrepreneurId,
-            enterpriseIdentification: enterpriseId,
+            entrepreneurIdentification: entrepreneurId.trim(),
+            enterpriseIdentification: enterpriseId.trim(),
             isAdmin: false,
           });
-          this.$swal.fire({
-            title: 'Ahora formas parte de una empresa!',
-            text: '¡Bienvenido!',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
         } catch (error) {
-          this.$swal.fire({
-            title: 'Error',
-            text: 'Hubo un error al anexarte a la empresa. Inténtalo de nuevo.',
-            icon: 'error',
-            confirmButtonText: 'Ok'
-          });
+          this.generateSweetAlert('Error', 'error', 'Hubo un error al agregar el emprendedor a la empresa.');
+          console.error(error);
+          throw error;
         }
       },
       async declineInvitation(){
@@ -156,17 +160,14 @@
       async acceptInvitation() {
         try {
           if (this.isEntrepeneur === false) {
-            this.registerEntrepreneur();
+            await this.registerEntrepreneur();
+            await this.changeRole();
+            
           }
           
-          this.addEntrepreneurToEnterprise(this.user.identification, this.enterprise.id);
+          await this.addEntrepreneurToEnterprise(this.user.Identification, this.enterprise.Id);
 
-          this.$swal.fire({
-            title: 'Ahora formas parte de una empresa!',
-            text: '¡Bienvenido!',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          });
+
         } catch (error) {
           console.error('Error al anexarte a la empresa:', error);
           this.$swal.fire({
@@ -176,7 +177,6 @@
             confirmButtonText: 'Ok'
           });
         }
-        this.goBack();
       },
       async handleSubmit() {
         try {
