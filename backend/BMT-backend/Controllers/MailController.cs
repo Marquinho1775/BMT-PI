@@ -110,12 +110,12 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("sendcollabmail")]
-        public IActionResult SendCollabMail(MailModel userData)
+        public IActionResult SendCollabMail([FromBody]MailModel userData)
         {
             try
             {
-                string code = _codeHandler.CreateCode(userData.Id);
-                string link = "http://localhost:8080/accept-invitation/";
+                string code = userData.Id;
+                string link = "http://localhost:8080/acceptInvite/";
 
                 string title = "Invitación a colaborar en Business Tracker";
                 string body = "<h1>Acepta tu invitación</h1>";
@@ -128,6 +128,45 @@ namespace BMT_backend.Controllers
                 body += "Si no has creado una cuenta en Business Tracker, puedes ignorar este correo.<br><br>";
                 body += "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>";
                 body += "¡Bienvenido a bordo!<br><br>";
+                body += "Saludos,<br>";
+                body += "El equipo de Business Tracker";
+
+                // Creando el correo
+                MailMessage mailMessage = new MailMessage
+                {
+                    From = new MailAddress(emailCollab),
+                    Subject = title,
+                    Body = body,
+                };
+                mailMessage.IsBodyHtml = true;
+
+                // Seleccionando el destinatario
+                mailMessage.To.Add(userData.Email);
+
+                // Setteando la información necesaria para enviar el correo
+                using var smtpClient = new SmtpClient();
+                smtpClient.Host = host;
+                smtpClient.Port = port;
+                smtpClient.Credentials = new NetworkCredential(emailCollab, passwordCollab);
+                smtpClient.EnableSsl = true;
+                smtpClient.Send(mailMessage);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpPost("sendconfirmedcollabmail")]
+        public IActionResult ConfirmedCollabMail([FromBody]MailModel userData)
+        {
+            try
+            {
+                string link = "http://localhost:8080/accept-invitation/";
+
+                string title = "Un nuevo integrante a la familia de tu empresa";
+                string body = "<h1>¡El usuario </h1>" + userData.Id + " ha aceptado colaborar contigo!";
+                body += "¡Esperemos que juntos puedan cumplir sus sueños!<br><br>";
                 body += "Saludos,<br>";
                 body += "El equipo de Business Tracker";
 
