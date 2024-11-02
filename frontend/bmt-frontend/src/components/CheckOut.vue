@@ -350,6 +350,10 @@ export default {
       if (!step1Valid || !step3Valid || !this.selectedAddress) {
         return;
       }
+      if (!this.cartProducts || this.cartProducts.length === 0) {
+        console.error('No hay productos en el carrito.');
+        return;
+      }
       for (const item of this.cartProducts) {
         const response = await axios.post(`${API_URL}/Product/get-stock`, {
           productId: item.product.id,
@@ -366,40 +370,59 @@ export default {
           return;
         }
       }
-      this.createOrder();
+      await this.createOrder(); // Add 'await' here
       this.clearCart();
       this.resetForm();
       this.$router.push('/');
-
     },
-    // Crear una orden en la tabla Orders con OrderId, UserId, DirectionId, PaymentMethod, Status, OrderDate
-    // Por cada product crear una entrada en la tabla OrderPrdoucts con OrderId, ProductId, Ammount (quantity), ProductsCost(subtotal)
-    createOrder() {
+
+    async createOrder() {
       const order = {
         userId: this.userId,
         directionId: this.selectedAddress.id,
         paymentMethod: this.paymentMethod,
         status: 0,
-        orderDate: this.orderDeliveryDate.toISOString().split('T')[0],
+        deliveryDate: this.orderDeliveryDate.toISOString().split('T')[0],
       };
-      axios
-      .post(`${API_URL}/Order`, order)
-        .then((response) => {
-          const orderId = response.data.id;
-          this.cartProducts.forEach((item) => {
-            const orderProduct = {
-              orderId: orderId,
-              productId: item.product.id,
-              amount: item.quantity,
-              productsCost: item.subtotal,
-            };
-            axios.post(`${API_URL}/OrderProduct`, orderProduct);
+      try {
+        const response = await axios.post(`${API_URL}/Order`, order);
+        const orderId = response.data.id;
+        for (const item of this.cartProducts) {
+          console.log('Agregando producto a la orden:');
+          const orderProduct = {
+            orderId: orderId,
+            productId: item.product.id,
+            amount: item.quantity,
+            productsCost: item.subtotal,
+          };
+          try {
+            await axios.post(`${API_URL}/Order/AddProductToOrder`, orderProduct);
+          } catch (error) {
+            console.error('Error al agregar producto a la orden:', error);
+          }
+        }
+        try {
+          await axios.put(`${API_URL}/Order/UpdateDeliverFee`, null, {
+            params: { orderId: orderId },
+            headers: {
+              Accept: 'text/plain',
+            },
           });
-        })
-        .catch((error) => {
-          console.error('Error al crear la orden:', error);
-        });
-      },
+          this.$swal.fire({
+            title: 'Pedido Realizado',
+            text: 'Su pedido ha sido realizado con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+          });
+        } catch (error) {
+          console.error('Error updating delivery fee:', error);
+        }
+      } catch (error) {
+        console.error('Error al crear la orden:', error);
+      }
+    },
+
+
 
     clearCart() {
       axios

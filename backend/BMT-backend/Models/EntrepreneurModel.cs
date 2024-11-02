@@ -5,7 +5,6 @@
         public string Id { get; set; } = null!;
         public string Username { get; set; }
         public string Identification { get; set; }
-        
     }
     public class EntrepreneurViewModel : EntrepreneurModel
     {

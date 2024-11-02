@@ -54,8 +54,6 @@ export default {
 			this.isShow = !this.isShow;
 		},
 		async addToCart() {
-			console.log('Shopping cart ID:', this.shoppingCartId);
-			console.log('Adding product:', this.product.raw.id);
 			this.productId = this.product.raw.id;
 			let response = await axios
         .put(API_URL + '/ShoppingCart/AddProductToCart?shoppingCartId=' + this.shoppingCartId + '&productId=' + this.productId, null)

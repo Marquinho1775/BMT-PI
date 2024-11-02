@@ -25,7 +25,7 @@ namespace BMT_backend.Infrastructure
             passwordCollab = configuration["EmailSettingsCollabRegister:Password"];
         }
 
-        public void SendConfirmationEmails(OrderModel order)
+        public void SendConfirmationEmails(OrderConfirmationModel order)
         {
             string title = "Confirmación de orden";
             string body = "<h1>Confirmación de orden</h1>" +
@@ -104,7 +104,7 @@ namespace BMT_backend.Infrastructure
             }
         }
 
-        public void SendDenyEmail(OrderModel order)
+        public void SendDenyEmail(OrderConfirmationModel order)
         {
             string title = "Orden cancelada";
             string body = "<h1>Orden cancelada</h1>" +
