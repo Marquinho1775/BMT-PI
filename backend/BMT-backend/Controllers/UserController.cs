@@ -92,6 +92,26 @@ namespace BMT_backend.Controllers
             }
         }
 
+        [HttpGet("GetUserByUsername")]
+        public async Task<IActionResult> GetUserByUsername(string username)
+        {
+            try
+            {
+                var user = _userHandler.GetUserByUsername(username);
+
+                if (user == null)
+                {
+                    return NotFound("Usuario no encontrado");
+                }
+
+                return new JsonResult(user);
+
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener el usuario");
+            }
+        }
 
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel loginData)

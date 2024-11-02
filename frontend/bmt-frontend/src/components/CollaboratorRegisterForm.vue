@@ -1,32 +1,36 @@
 <template>
 <v-app class="d-flex flex-column">
   <AppHeader />
-  <v-main class="flex-grow-1">
-    <v-container class="d-flex justify-center align-center" style="min-height: 100vh;">
-      <v-form @submit.prevent="handleSubmit" style="width: 100%; max-width: 500px;">
-        <h1 v-if="title" class="text-center mb-5">{{ title }}</h1>
+	<v-main class="flex-grow-1">
+		<v-container class="d-flex justify-center align-center" style="min-height: 100vh;">
+			<v-form @submit.prevent="handleSubmit" style="width: 100%; max-width: 500px;">
+				<h1 v-if="title" class="text-center mb-5">{{ title }}</h1>
+				
+				<v-text-field
+					v-model="collaboratorUsername"
+					label="Username del usuario a invitar"
+					required
+				></v-text-field>
+				<v-row class="mt-4">
+					<v-col cols="6">
+							<v-btn @click="goBack" color="secondary" class="w-100">Volver</v-btn>
+					</v-col>
+					<v-col cols="6">
+							<v-btn type="submit" color="primary" class="w-100">Enviar Invitación</v-btn>
+					</v-col>
+				</v-row>
+			</v-form>
 
-        <v-text-field v-model="collaboratorId" label="ID del usuario a invitar" required></v-text-field>
-        <v-row class="mt-4">
-          <v-col cols="6">
-            <v-btn @click="goBack" color="secondary" class="w-100">Volver</v-btn>
-          </v-col>
-          <v-col cols="6">
-            <v-btn type="submit" color="primary" class="w-100">Enviar Invitación</v-btn>
-          </v-col>
-        </v-row>
-      </v-form>
-
-      <v-alert v-if="successMessage" type="success" class="mt-4">
-        {{ successMessage }}
-      </v-alert>
-      <v-alert v-if="errorMessage" type="error" class="mt-4">
-        {{ errorMessage }}
-      </v-alert>
-    </v-container>
-  </v-main>
-  <AppFooter />
-</v-app>
+			<v-alert v-if="successMessage" type="success" class="mt-4">
+				{{ successMessage }}
+			</v-alert>
+			<v-alert v-if="errorMessage" type="error" class="mt-4">
+				{{ errorMessage }}
+			</v-alert>
+		</v-container>
+		</v-main>
+	<AppFooter/>
+	</v-app>
 </template>
 
 <script>
@@ -42,7 +46,7 @@ export default {
   data() {
     return {
       title: 'Invitar colaborador',
-      collaboratorId: '',
+      collaboratorUsername: '',
       successMessage: '',
       errorMessage: '',
       enterpriseId: this.$route.params.id,
@@ -66,16 +70,17 @@ export default {
   methods: {
     async handleSubmit() {
       try {
-        const userDetailsResponse = await axios.get(`${API_URL}/User/Unity/`, {
+        const userDetailsResponse = await axios.get(`${API_URL}/User/GetUserByUsername/`, {
           params: {
-            id: this.collaboratorId
+            username: this.collaboratorUsername
           }
         });
         const collabUser = userDetailsResponse.data;
-        const collabMail = {
-          Email: collabUser.email,
-          Id: this.enterpriseId
-        };
+		const collabMail = {
+			Email: collabUser.email,
+			Id: collabUser.id,
+			EntCode: this.enterpriseId,
+		};
         axios.post(API_URL + '/Email/sendcollabmail', collabMail)
           .then(() => {
             this.$swal.fire({
