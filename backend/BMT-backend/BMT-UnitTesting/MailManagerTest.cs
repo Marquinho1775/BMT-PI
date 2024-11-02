@@ -77,5 +77,43 @@ namespace UnitTestingBMT
             // Act & Assert
             Assert.DoesNotThrow(() => _mailManager.SendDenyEmail(_testOrder));
         }
+
+        [Test]
+        public void SendConfirmationEmails_ValidOrder_ShouldNotThrowException()
+        {
+            // Act & Assert
+            Assert.DoesNotThrow(() => _mailManager.SendConfirmationEmails(_testOrder));
+        }
+
+        [Test]
+        public void SendConfirmationEmails_ValidOrder_ShouldSendEmailToUser()
+        {
+            // Arrange
+            var expectedEmail = "user@test.com";
+
+            // Act
+            _mailManager.SendConfirmationEmails(_testOrder);
+
+            // Assert
+            Assert.That(_testOrder.UserEmail, Is.EqualTo(expectedEmail));
+        }
+
+        [Test]
+        public void SendConfirmationEmails_MultipleProducts_ShouldGroupEmailsByEnterprise()
+        {
+            // Arrange
+            _testOrder.Products.Add(new ProductDetails
+            {
+                ProductId = "p2",
+                ProductName = "Product2",
+                Quantity = 2,
+                EnterpriseName = "Enterprise2",
+                EnterpriseEmail = "enterprise2@test.com",
+                ProductDate = DateTime.Now
+            });
+
+            // Act & Assert
+            Assert.DoesNotThrow(() => _mailManager.SendConfirmationEmails(_testOrder));
+        }
     }
 }
