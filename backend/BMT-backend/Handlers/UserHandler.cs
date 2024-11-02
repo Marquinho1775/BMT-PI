@@ -250,6 +250,32 @@ namespace BMT_backend.Handlers
             }
         }
 
+        public UserModel GetUserByUsername(string username)
+        {
+            string query = "SELECT * FROM dbo.Users WHERE UserName = @username";
+            SqlParameter[] parameters = new SqlParameter[] {
+                new SqlParameter("@username", username)
+            };
+
+            DataTable resultTable = CreateQueryTable(query, parameters);
+
+            if (resultTable.Rows.Count > 0)
+            {
+                DataRow row = resultTable.Rows[0];
+                return new UserModel
+                {
+                    Id = Convert.ToString(row["Id"]),
+                    Name = Convert.ToString(row["Name"]),
+                    LastName = Convert.ToString(row["LastName"]),
+                    Username = Convert.ToString(row["Username"]),
+                    Email = Convert.ToString(row["Email"]),
+                    IsVerified = Convert.ToBoolean(row["IsVerified"]),
+                    Password = Convert.ToString(row["Password"]),
+                    Role = Convert.ToString(row["Role"])
+                };
+            }
+            return null;
+        }
 
     }
 }

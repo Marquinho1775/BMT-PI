@@ -110,22 +110,24 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("sendcollabmail")]
-        public IActionResult SendCollabMail([FromBody]MailModel userData)
+        public IActionResult SendCollabMail([FromBody]CollabMailModel userData)
         {
             try
             {
-                string code = userData.Id;
                 string link = "http://localhost:8080/acceptInvite/";
+                string code = _codeHandler.CreateCode(userData.Id);
 
                 string title = "Invitación a colaborar en Business Tracker";
                 string body = "<h1>Acepta tu invitación</h1>";
                 body += "Hola!<br><br>Alguien piensa que puedes ser una parte clave de su emprendimiento.<br>";
-                body += "Para aceptar la invitación accede al siguiente link ingresando este código:.<br><br>";
+                body += "Para aceptar la invitación accede al siguiente link ingresando estos códigos:.<br><br>";
+                body += "";
+                body += "<b>" + userData.EntCode + "</b><br><br>";
                 body += "";
                 body += "<b>" + code + "</b><br><br>";
                 body += "";
                 body += "<b>" + link + "</b><br><br>";
-                body += "Si no has creado una cuenta en Business Tracker, puedes ignorar este correo.<br><br>";
+                body += "Si no has creado una cuenta en Business Tracker, o no est{a en tus planes colaborar con alguien, puedes ignorar este correo.<br><br>";
                 body += "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>";
                 body += "¡Bienvenido a bordo!<br><br>";
                 body += "Saludos,<br>";
@@ -162,10 +164,9 @@ namespace BMT_backend.Controllers
         {
             try
             {
-                string link = "http://localhost:8080/accept-invitation/";
 
-                string title = "Un nuevo integrante a la familia de tu empresa";
-                string body = "<h1>¡El usuario </h1>" + userData.Id + " ha aceptado colaborar contigo!";
+                string title = "Un nuevo integrante a la familia de tu emprendimiento";
+                string body = "<h1>¡El usuario " + userData.Id + " ha aceptado colaborar contigo! </h1>";
                 body += "¡Esperemos que juntos puedan cumplir sus sueños!<br><br>";
                 body += "Saludos,<br>";
                 body += "El equipo de Business Tracker";
