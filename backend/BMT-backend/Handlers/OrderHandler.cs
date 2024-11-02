@@ -45,11 +45,12 @@ namespace BMT_backend.Handlers
             {
                 orders.Add(new OrderModel
                 {
+                    OrderId = row["OrderId"].ToString(),
                     UserId = row["UserId"].ToString(),
                     DirectionId = row["DirectionId"].ToString(),
-                    PaymentMethod = row["PaymentMethod"].ToString(),
+                    PaymentMethod = row["OrderPaymentMethod"].ToString(),
                     Status = (int)row["Status"],
-                    DeliveryDate = row["DeliveryDate"].ToString(),
+                    DeliveryDate = row["OrderDeliveryDate"].ToString(),
                     OrderCost = Convert.ToDouble(row["OrderCost"]),
                     Weight = Convert.ToDouble(row["Weight"]),
                     DeliveryFee = Convert.ToDouble(row["DeliveryFee"])
