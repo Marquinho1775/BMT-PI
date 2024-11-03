@@ -1,101 +1,101 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using BMT_backend.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Moq;
 using NUnit.Framework;
+using Microsoft.Extensions.Configuration;
+using BMT_backend.Models;
+using BMT_backend.Services;
+using System;
 
 namespace UnitTestingBMT
 {
     [TestFixture]
     public class TokenServiceTests
     {
-        private IConfiguration _configuration;
+        private Mock<IConfiguration> _mockConfiguration;
         private TokenService _tokenService;
+        private UserModel _testUser;
 
         [SetUp]
-        public void Setup()
+        public void SetUp()
         {
-            // Crear una implementación simple de IConfiguration
-            var settings = new Dictionary<string, string>
+            _mockConfiguration = new Mock<IConfiguration>();
+            _mockConfiguration.Setup(config => config["Jwt:Key"]).Returns("fK7QW3tM8nXeG9sZ1jKlB2uY4pSdC6rH");
+            _mockConfiguration.Setup(config => config["Jwt:Issuer"]).Returns("testissuer");
+            _mockConfiguration.Setup(config => config["Jwt:Audience"]).Returns("testaudience");
+            _mockConfiguration.Setup(config => config["Jwt:ExpireMinutes"]).Returns("30");
+
+            _tokenService = new TokenService(_mockConfiguration.Object);
+
+            _testUser = new UserModel
             {
-                { "Jwt:Key", "fK7QW3tM8nXeG9sZ1jKlB2uY4pSdC6rH" },
-                { "Jwt:Issuer", "BusinessTracker" },
-                { "Jwt:Audience", "Richi" },
-                { "Jwt:ExpireMinutes", "60" } // Ensure this is a string
+                Id = "1",
+                Name = "John",
+                LastName = "Doe",
+                Username = "johndoe",
+                Email = "johndoe@example.com",
+                IsVerified = true,
+                Password = "password",
+                Role = "User",
+                ProfilePictureURL = "http://example.com/profile.jpg",
             };
-
-            _configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(settings) // Agregar los valores directamente
-                .Build();
-
-            // Crear la instancia de TokenService
-            _tokenService = new TokenService(_configuration);
         }
 
         [Test]
-        public void GenerateToken_ConUsuarioValido_DeberiaRetornarTokenValido()
+        public void GenerateToken_ValidUser_ReturnsToken()
         {
-            // Arrange
-            var user = new UserModel
-            {
-                Id = "26E5D181-41C9-4729-98AD-429094C9D625",
-                Name = "David",
-                LastName = "GV",
-                Username = "dav",
-                Email = "davidgv03@hotmail.com",
-                IsVerified = true,
-                Password = "Aa1.",
-                Role = "cli",
-                ProfilePictureURL = "/uploads/default.png"
-            };
-
             // Act
-            var token = _tokenService.GenerateToken(user);
+            var token = _tokenService.GenerateToken(_testUser);
 
             // Assert
-            Assert.IsNotNull(token);
-            Assert.IsInstanceOf<string>(token);
+            Assert.That(token, Is.Not.Null);
+            Assert.That(token, Is.Not.Empty);
         }
 
         [Test]
-        public void GenerateToken_MissingConfiguration_ThrowsArgumentException()
+        public void GenerateToken_NullUser_ThrowsArgumentNullException()
         {
-            // Arrange
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.Setup(c => c["Jwt:Key"]).Returns((string)null); // Missing "Jwt:Key"
-
-            var user = new UserModel { Email = "john.doe@example.com" }; // Only provide required user properties
-            var tokenService = new TokenService(mockConfiguration.Object);
-
-            // Act & Assert (Expect ArgumentException)
-            Assert.Throws<ArgumentException>(() => tokenService.GenerateToken(user));
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => _tokenService.GenerateToken(null));
         }
 
         [Test]
-        public void GenerateToken_ConUsuarioInvalido_DeberiaRetornarNull()
+        public void GenerateToken_UserWithoutEmail_ThrowsArgumentException()
         {
             // Arrange
-            var user = new UserModel
-            {
-                Id = "",
-                Name = "David",
-                LastName = "GV",
-                Username = "dav",
-                Email = "",
-                IsVerified = true,
-                Password = "Aa1.",
-                Role = "cli",
-                ProfilePictureURL = "/uploads/default.png"
-            };
+            _testUser.Email = null;
 
-            // Act
-            var token = _tokenService.GenerateToken(user);
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => _tokenService.GenerateToken(_testUser));
+        }
 
-            // Assert
-            Assert.IsNull(token);
+        [Test]
+        public void GenerateToken_UserWithoutName_ThrowsArgumentException()
+        {
+            // Arrange
+            _testUser.Name = null;
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => _tokenService.GenerateToken(_testUser));
+        }
+
+
+        [Test]
+        public void GenerateToken_UserWithoutValidName_ThrowsArgumentException()
+        {
+            // Arrange
+            _testUser.Name = "";
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => _tokenService.GenerateToken(_testUser));
+        }
+
+        [Test]
+        public void GenerateToken_UserWithoutValidEmail_ThrowsArgumentException()
+        {
+            // Arrange
+            _testUser.Email = "";
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => _tokenService.GenerateToken(_testUser));
         }
     }
 }
