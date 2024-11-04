@@ -1,4 +1,5 @@
 ﻿using BMT_backend.Models;
+using BMT_backend.Services;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -34,9 +35,139 @@ namespace BMT_backend.Handlers
             return tableFormatQuery;
         }
 
-        public List<OrderModel> GetToConfirmOrders()
+        public List<OrderModel> GetOrders()
         {
             var orders = new List<OrderModel>();
+            string query = "SELECT * FROM Orders";
+            var table = CreateQueryTable(query);
+
+            foreach (DataRow row in table.Rows)
+            {
+                orders.Add(new OrderModel
+                {
+                    OrderId = row["OrderId"].ToString(),
+                    UserId = row["UserId"].ToString(),
+                    DirectionId = row["DirectionId"].ToString(),
+                    PaymentMethod = row["OrderPaymentMethod"].ToString(),
+                    Status = (int)row["Status"],
+                    DeliveryDate = row["OrderDeliveryDate"].ToString(),
+                    OrderCost = Convert.ToDouble(row["OrderCost"]),
+                    Weight = Convert.ToDouble(row["Weight"]),
+                    DeliveryFee = Convert.ToDouble(row["DeliveryFee"])
+                });
+            }
+            return orders;
+        }
+
+        public string CreateOrder(OrderModel order)
+        {
+            string query = @"
+                INSERT INTO Orders (UserId, DirectionId, OrderPaymentMethod, Status, OrderDeliveryDate, OrderCost, Weight, DeliveryFee)
+                OUTPUT INSERTED.OrderId
+                VALUES (@UserId, @DirectionId, @PaymentMethod, @Status, @DeliveryDate, 0, 0, 0);";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@UserId", order.UserId);
+                command.Parameters.AddWithValue("@DirectionId", order.DirectionId);
+                command.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
+                command.Parameters.AddWithValue("@DeliveryDate", order.DeliveryDate);
+                command.Parameters.AddWithValue("@Status", order.Status);
+                connection.Open();
+                return command.ExecuteScalar().ToString();
+            }
+        }
+
+        public bool AddProductToOrder(OrderProductModel orderProduct)
+        {
+            string query = @"
+                INSERT INTO Order_Product (OrderId, ProductId, Amount, ProductsCost)
+                VALUES (@OrderId, @ProductId, @Amount, @ProductsCost);";
+
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query, connection))
+            {
+                command.Parameters.AddWithValue("@OrderId", orderProduct.OrderId);
+                command.Parameters.AddWithValue("@ProductId", orderProduct.ProductId);
+                command.Parameters.AddWithValue("@Amount", orderProduct.Amount);
+                command.Parameters.AddWithValue("@ProductsCost", orderProduct.ProductsCost);
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+
+            double productWeight = 0;
+            string getProductWeightQuery = "SELECT Weight FROM Products WHERE Id = @ProductId";
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(getProductWeightQuery, connection))
+            {
+                command.Parameters.AddWithValue("@ProductId", orderProduct.ProductId);
+                connection.Open();
+                productWeight = Convert.ToDouble(command.ExecuteScalar());
+            }
+            double totalWeight = orderProduct.Amount * productWeight;
+
+            string query2 = @"
+                UPDATE Orders
+                SET OrderCost = OrderCost + @ProductsCost, Weight = Weight + @totalWeight
+                WHERE OrderId = @OrderId;";
+            using (var connection = new SqlConnection(_connectionString))
+            using (var command = new SqlCommand(query2, connection))
+            {
+                command.Parameters.AddWithValue("@ProductsCost", orderProduct.ProductsCost);
+                command.Parameters.AddWithValue("@totalWeight", totalWeight);
+                command.Parameters.AddWithValue("@OrderId", orderProduct.OrderId);
+                connection.Open();
+                return command.ExecuteNonQuery() > 0;
+            }
+        }
+
+        public bool UpdateDeliverFee(string orderId)
+        {
+            string query = "SELECT DirectionId, Weight FROM Orders WHERE OrderId = @OrderId";
+            var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@OrderId", orderId);
+            connection.Open();
+            var reader = command.ExecuteReader();
+            reader.Read();
+            string directionId = reader["DirectionId"].ToString();
+            double weight = Convert.ToDouble(reader["Weight"]);
+            double deliveryFee = CalculateDeliveryFee(directionId, weight);
+            string query2 = "UPDATE Orders SET DeliveryFee = @DeliveryFee WHERE OrderId = @OrderId";
+            var connection2 = new SqlConnection(_connectionString);
+            var command2 = new SqlCommand(query2, connection2);
+            command2.Parameters.AddWithValue("@DeliveryFee", deliveryFee);
+            command2.Parameters.AddWithValue("@OrderId", orderId);
+            connection2.Open();
+            return command2.ExecuteNonQuery() > 0;
+        }
+
+        public double CalculateDeliveryFee(string directionId, double weight)
+        {
+            string query = "select Coordinates from Directions where Id = @directionId";
+            var connection = new SqlConnection(_connectionString);
+            var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@directionId", directionId);
+            connection.Open();
+            var reader = command.ExecuteReader();
+            reader.Read();
+            string coordinates = reader["Coordinates"].ToString();
+            string[] coord = coordinates.Split(',');
+            double x = Convert.ToDouble(coord[0]);
+            double y = Convert.ToDouble(coord[1]);
+            double distance =  DistanceCalculator.CalcularDistancia(x, y);
+            double deliveryFee = distance >= 25? 3000 : 2000;
+            Console.WriteLine("Distancia: " + distance);
+            Console.WriteLine("Delivery Fee: " + deliveryFee);
+            deliveryFee += weight * 200;
+            Console.WriteLine("Delivery Fee: " + deliveryFee);
+            return deliveryFee;
+        }
+
+        public List<OrderConfirmationModel> GetToConfirmOrders()
+        {
+            var orders = new List<OrderConfirmationModel>();
             string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
@@ -54,7 +185,7 @@ namespace BMT_backend.Handlers
                 {
                     while (reader.Read())
                     {
-                        var order = new OrderModel
+                        var order = new OrderConfirmationModel
                         {
                             OrderId = reader["OrderId"].ToString(),
                             OrderDate = (DateTime)reader["OrderDate"],
@@ -89,7 +220,7 @@ namespace BMT_backend.Handlers
             }
         }
 
-        public OrderModel GetOrderById(string orderId)
+        public OrderConfirmationModel GetOrderById(string orderId)
         {
             string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, 
@@ -108,7 +239,7 @@ namespace BMT_backend.Handlers
                 {
                     if (reader.Read())
                     {
-                        return new OrderModel
+                        return new OrderConfirmationModel
                         {
                             OrderId = reader["OrderId"].ToString(),
                             OrderDate = (DateTime)reader["OrderDate"],
@@ -179,9 +310,9 @@ namespace BMT_backend.Handlers
             }
         }
 
-        public List<OrderModel> GetToConfirmUserOrders(string userId)
+        public List<OrderConfirmationModel> GetToConfirmUserOrders(string userId)
         {
-            var orders = new List<OrderModel>();
+            var orders = new List<OrderConfirmationModel>();
             string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
@@ -200,7 +331,7 @@ namespace BMT_backend.Handlers
                 {
                     while (reader.Read())
                     {
-                        var order = new OrderModel
+                        var order = new OrderConfirmationModel
                         {
                             OrderId = reader["OrderId"].ToString(),
                             OrderDate = (DateTime)reader["OrderDate"],

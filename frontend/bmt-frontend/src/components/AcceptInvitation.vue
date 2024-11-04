@@ -24,6 +24,7 @@
         </v-alert>
       </v-form>
     </v-container>
+
     <v-container v-if="enterpriseExist" class="d-flex justify-center align-center" style="min-height: 100vh;">
       <v-card class="pa-5">
         <v-card-title>
@@ -52,6 +53,9 @@
         </v-card-text>
         <v-row class="mt-4" justify="space-between">
           <v-col cols="auto">
+          <v-btn color="red" @click="declineInvitation">Declinar Invitación</v-btn>
+        </v-col>
+        <v-col cols="auto">
             <v-btn color="green" @click="acceptInvitation">Aceptar Invitación</v-btn>
           </v-col>
         </v-row>
@@ -233,6 +237,10 @@ export default {
           confirmButtonText: 'Ok'
         });
       }
+    },
+
+    async declineInvitation() {
+      this.goBack();
     },
 
     goBack() {

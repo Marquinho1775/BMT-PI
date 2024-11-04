@@ -12,7 +12,7 @@ namespace UnitTestingBMT
     {
         private Mock<IConfiguration> _mockConfiguration;
         private MailManager _mailManager;
-        private OrderModel _testOrder;
+        private OrderConfirmationModel _testOrder;
 
         [SetUp]
         public void SetUp()
@@ -28,7 +28,7 @@ namespace UnitTestingBMT
 
             _mailManager = new MailManager(_mockConfiguration.Object);
 
-            _testOrder = new OrderModel
+            _testOrder = new OrderConfirmationModel
             {
                 OrderId = "123",
                 OrderDate = DateTime.Now,

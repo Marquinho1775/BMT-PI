@@ -3,10 +3,12 @@ CREATE TABLE ShoppingCarts (
     UserId UNIQUEIDENTIFIER NOT NULL,
     Total  DECIMAL(18,2)    NOT NULL
 );
+GO
 
 ALTER TABLE ShoppingCarts
 ADD CONSTRAINT FK_ShoppingCarts_UserId
 FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE;
+GO
 
 CREATE TABLE ShoppingCartProducts (
     ShoppingCartId UNIQUEIDENTIFIER NOT NULL,
@@ -15,12 +17,15 @@ CREATE TABLE ShoppingCartProducts (
     Subtotal       DECIMAL(18,2)    NOT NULL
 	CONSTRAINT UQ_ShoppingCartProducts UNIQUE (ShoppingCartId, ProductId)
 );
+GO
 
 ALTER TABLE ShoppingCartProducts
 ADD CONSTRAINT FK_ShoppingCartProducts_ShoppingCartId
 FOREIGN KEY (ShoppingCartId) REFERENCES ShoppingCarts(Id) ON DELETE CASCADE;
+GO
 
 ALTER TABLE ShoppingCartProducts
 ADD CONSTRAINT FK_ShoppingCartProducts_ProductId
 FOREIGN KEY (ProductId) REFERENCES Products(Id) ON DELETE CASCADE;
+GO
 

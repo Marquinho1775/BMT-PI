@@ -157,9 +157,9 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpGet("GetToConfirmOrders")]
-        public List<OrderModel> GetToConfirmOrders(String userId)
+        public List<OrderConfirmationModel> GetToConfirmOrders(String userId)
         {
-            List<OrderModel> toConfirmOrders = _orderHandler.GetToConfirmUserOrders(userId);
+            List<OrderConfirmationModel> toConfirmOrders = _orderHandler.GetToConfirmUserOrders(userId);
             return toConfirmOrders;
         }
         [HttpPut("DenyOrder")]
