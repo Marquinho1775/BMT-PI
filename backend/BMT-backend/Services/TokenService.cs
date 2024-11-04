@@ -4,35 +4,47 @@ using System.Text;
 using BMT_backend.Models;
 using Microsoft.IdentityModel.Tokens;
 
-public class TokenService
+namespace BMT_backend.Services
 {
-    private readonly IConfiguration _configuration;
-
-    public TokenService(IConfiguration configuration)
+    public class TokenService
     {
-        _configuration = configuration;
-    }
+        private readonly IConfiguration _configuration;
 
-    public string GenerateToken(UserModel user)
-    {
-        var claims = new[]
+        public TokenService(IConfiguration configuration)
         {
+            _configuration = configuration;
+        }
+
+        public string GenerateToken(UserModel user)
+        {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            if (user.Name.IsNullOrEmpty() || user.Email.IsNullOrEmpty())
+            {
+                throw new ArgumentException("User must have a name and an email");
+            }
+
+            var claims = new[]
+            {
             new Claim(JwtRegisteredClaimNames.Sub, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.Name, user.Name),
             new Claim(ClaimTypes.Email, user.Email)
-        };
+            };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(int.Parse(_configuration["Jwt:ExpireMinutes"])),
-            signingCredentials: creds);
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(int.Parse(_configuration["Jwt:ExpireMinutes"])),
+                signingCredentials: creds);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }
