@@ -370,36 +370,45 @@ namespace BMT_backend.Handlers
             return devProducts;
         }
 
-        public string UpdateDateDisponibility(string PerishableProductId, string DateString, int Quantity)
+        public string UpdateStock(string ProductId, string DateString, int Quantity)
         {
+            string type = GetProductType(ProductId);
             DateTime Date = DateTime.Parse(DateString);
-            string query = @"
-            IF EXISTS (SELECT 1 FROM DateDisponibility WHERE ProductId = @ProductId AND Date = @Date)
-            BEGIN
-                -- Si existe, actualizar el Stock
-                UPDATE DateDisponibility 
-                SET Stock = Stock - @Quantity
-                WHERE ProductId = @ProductId AND Date = @Date;
-            END
-            ELSE
-            BEGIN
-                -- Si no existe, insertar una nueva entrada con el Stock calculado
-                INSERT INTO DateDisponibility (ProductId, Date, Stock) 
-                VALUES (
-                    @ProductId, 
-                    @Date, 
-                    (SELECT [Limit] FROM PerishableProducts WHERE ProductId = @ProductId) - @Quantity
-                );
-            END
-            ";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@ProductId", PerishableProductId);
-            queryCommand.Parameters.AddWithValue("@Date", Date);
+            string query = string.Empty;
+            var queryCommand = new SqlCommand();
+            if (type == "NonPerishable")
+            {
+                query = "UPDATE NonPerishableProducts SET Stock = Stock - @Quantity WHERE ProductId = @ProductId";
+                queryCommand = new SqlCommand(query, _conection);
+            }
+            else if (type == "Perishable")
+            {
+                query = @"
+                    IF EXISTS (SELECT 1 FROM DateDisponibility WHERE ProductId = @ProductId AND Date = @Date)
+                    BEGIN
+                        UPDATE DateDisponibility 
+                        SET Stock = Stock - @Quantity
+                        WHERE ProductId = @ProductId AND Date = @Date;
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO DateDisponibility (ProductId, Date, Stock) 
+                        VALUES (
+                            @ProductId, 
+                            @Date, 
+                            (SELECT [Limit] FROM PerishableProducts WHERE ProductId = @ProductId) - @Quantity
+                        );
+                    END
+                    ";
+                queryCommand = new SqlCommand(query, _conection);
+                queryCommand.Parameters.AddWithValue("@Date", Date);
+            }
+            queryCommand.Parameters.AddWithValue("@ProductId", ProductId);
             queryCommand.Parameters.AddWithValue("@Quantity", Quantity);
             _conection.Open();
             queryCommand.ExecuteNonQuery();
             _conection.Close();
-            return "Date disponibility updated successfully.";
+            return "Product stock updated successfully.";
         }
 
         public List<ProductModel> GetProductsByEnterprise(string enterpriseName)

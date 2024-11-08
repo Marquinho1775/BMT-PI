@@ -370,13 +370,14 @@ export default {
           return;
         }
       }
-      await this.createOrder(); // Add 'await' here
+      await this.createOrder();
       this.clearCart();
       this.resetForm();
       this.$router.push('/');
     },
 
     async createOrder() {
+      const parsedDate = this.orderDeliveryDate.toISOString().split('T')[0];
       const order = {
         userId: this.userId,
         directionId: this.selectedAddress.id,
@@ -400,6 +401,13 @@ export default {
           } catch (error) {
             console.error('Error al agregar producto a la orden:', error);
           }
+          try {
+            await axios.put(API_URL + "/Product/UpdateStock", null, {
+                params: { productId: item.product.id, date: parsedDate, quantity: item.quantity },
+              });
+          } catch (error) {
+            console.error('Error al restar stock:', error);
+          }
         }
         try {
           await axios.put(`${API_URL}/Order/UpdateDeliverFee`, null, {
@@ -421,8 +429,6 @@ export default {
         console.error('Error al crear la orden:', error);
       }
     },
-
-
 
     clearCart() {
       axios

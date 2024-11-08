@@ -223,7 +223,7 @@ namespace BMT_backend.Handlers
         public OrderConfirmationModel GetOrderById(string orderId)
         {
             string query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, 
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.OrderDeliveryDate, o.Weight, o.UserId, 
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email, d.Coordinates, o.Status
                 FROM Orders o
                 JOIN Users u ON o.UserId = u.Id
@@ -245,6 +245,7 @@ namespace BMT_backend.Handlers
                             OrderDate = (DateTime)reader["OrderDate"],
                             OrderCost = (decimal)reader["OrderCost"],
                             DeliveryFee = (decimal)reader["DeliveryFee"],
+                            OrderDeliveryDate = reader["OrderDeliveryDate"].ToString(),
                             Weight = (decimal)reader["Weight"],
                             UserId = reader["UserId"].ToString(),
                             UserName = reader["UserName"].ToString(),
@@ -266,7 +267,7 @@ namespace BMT_backend.Handlers
             var products = new List<ProductDetails>();
             string query = @"
                 SELECT op.ProductId, p.Name AS ProductName, op.Amount, op.ProductsCost, 
-                       e.Name AS EnterpriseName, e.Email, op.DeliveryDate
+                       e.Name AS EnterpriseName, e.Email
                 FROM Order_Product op
                 JOIN Products p ON op.ProductId = p.Id
                 JOIN Enterprises e ON p.EnterpriseId = e.Id
@@ -289,7 +290,6 @@ namespace BMT_backend.Handlers
                             ProductsCost = Convert.ToInt32(reader["ProductsCost"]),
                             EnterpriseName = reader["EnterpriseName"].ToString(),
                             EnterpriseEmail = reader["Email"].ToString(),
-                            ProductDate = Convert.ToDateTime(reader["DeliveryDate"])
                         };
                         products.Add(product);
                     }
@@ -314,7 +314,7 @@ namespace BMT_backend.Handlers
         {
             var orders = new List<OrderConfirmationModel>();
             string query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.OrderDeliveryDate, o.Weight, o.UserId,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                        d.Coordinates, o.Status
                 FROM Orders o
@@ -337,6 +337,7 @@ namespace BMT_backend.Handlers
                             OrderDate = (DateTime)reader["OrderDate"],
                             OrderCost = (decimal)reader["OrderCost"],
                             DeliveryFee = (decimal)reader["DeliveryFee"],
+                            OrderDeliveryDate = reader["OrderDeliveryDate"].ToString(),
                             Weight = (decimal)reader["Weight"],
                             UserId = reader["UserId"].ToString(),
                             UserName = reader["UserName"].ToString(),

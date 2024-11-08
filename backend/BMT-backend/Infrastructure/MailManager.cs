@@ -37,11 +37,11 @@ namespace BMT_backend.Infrastructure
             {
                 body += $"<b>Empresa:</b> {product.EnterpriseName}<br>" +
                         $"<b>Producto:</b> {product.ProductName}<br>" +
-                        $"<b>Cantidad:</b> {product.Quantity}<br>" +
-                        $"<b>Fecha del producto:</b> {product.ProductDate}<br><br>";
+                        $"<b>Cantidad:</b> {product.Quantity}<br><br>";
             }
 
-            body += $"<b>Fecha de orden:</b> {order.OrderDate}<br>" +
+            body += $"<b>Fecha de creación de orden:</b> {order.OrderDate}<br>" +
+                    $"<b>Fecha de Entrega:</b> {order.OrderDeliveryDate}<br>" +
                     "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>" +
                     "¡Gracias por confiar en nosotros!<br><br>" +
                     "Saludos,<br>" +
@@ -76,8 +76,7 @@ namespace BMT_backend.Infrastructure
                     foreach (var product in group)
                     {
                         enterpriseBody += $"<b>Producto:</b> {product.ProductName}<br>" +
-                                          $"<b>Cantidad:</b> {product.Quantity}<br>" +
-                                          $"<b>Fecha del producto:</b> {product.ProductDate}<br><br>";
+                                          $"<b>Cantidad:</b> {product.Quantity}<br><br>";
                     }
                     enterpriseBody += "Saludos,<br>" +
                                       "El equipo de Business Tracker";

@@ -4,29 +4,42 @@
     <v-main class="flex-grow-1" style="overflow-x: hidden;">
       <h1 class="title1">Pedidos pendientes</h1>
       <template v-if="items && items.length > 0">
-        <v-virtual-scroll :items="items" height="100%" style="overflow-x: hidden">
+        <v-virtual-scroll :items="items" height="100%"
+          style="overflow-x: hidden">
           <template v-slot:default="{ item }">
-            <v-row class="order-card mb-4 p-1 bg-light-grey rounded" justify="space-between">
+            <v-row class="order-card mb-4 p-1 bg-light-grey rounded"
+              justify="space-between">
               <v-col style="padding-left: 5rem;">
-                <ul class="order-list" v-if="item.products && item.products.length > 0">
-                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products)"
+                <ul class="order-list"
+                  v-if="item.products && item.products.length > 0">
+                  <li
+                    v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products)"
                     :key="enterpriseName">
-                    <h4 class="enterprise-name" style="padding-bottom: 0.5rem;">{{ enterpriseName }}</h4>
+                    <h4 class="enterprise-name" style="padding-bottom: 0.5rem;">
+                      {{ enterpriseName }}</h4>
                     <ul class="product-list">
                       <li v-for="product in products" :key="product.productId"
                         style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
-                        <span class="quantity-box">{{ product.quantity }}</span> {{ product.productName }}
+                        <span class="quantity-box">{{ product.quantity }}</span>
+                        {{ product.productName }}
                       </li>
                     </ul>
                   </li>
                 </ul>
                 <p>Peso: {{ item.weight }} kg</p>
-                <p>{{ getTotalProductQuantity(item.products || []) }} artículos • Costo: ₡{{ (item.orderCost ??
-                  0).toFixed(2) }} + ₡{{ (item.deliveryFee ?? 0).toFixed(2) }} de envío</p>
-                <p v-if="item.orderDate">{{ new Date(item.orderDate).toLocaleDateString() }}</p>
+                <p>{{ getTotalProductQuantity(item.products || []) }} artículos
+                  • Costo: ₡{{ (item.orderCost ??
+                    0).toFixed(2) }} + ₡{{ (item.deliveryFee ?? 0).toFixed(2) }}
+                  de envío</p>
+                <p v-if="item.orderDate"> Fecha de creación del pedido: {{ new
+                  Date(item.orderDate).toLocaleDateString() }}</p>
+                <p v-if="item.orderDeliveryDate"> Fecha de entrega: {{ new
+                  Date(item.orderDeliveryDate).toLocaleDateString() }}</p>
               </v-col>
-              <v-col class="d-flex flex-column align-center justify-center" cols="auto">
-                <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }"
+              <v-col class="d-flex flex-column align-center justify-center"
+                cols="auto">
+                <v-btn size="x-large" class="custom-btn"
+                  :style="{ backgroundColor: '#9fc9fc', color: 'black' }"
                   @click="denyOrder(item.orderId)">
                   Cancelar pedido
                 </v-btn>

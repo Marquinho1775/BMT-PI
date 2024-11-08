@@ -30,6 +30,7 @@ namespace BMT_backend.Models
         public DateTime OrderDate { get; set; }
         public decimal OrderCost { get; set; }
         public decimal DeliveryFee { get; set; }
+        public string OrderDeliveryDate { get; set; }
         public decimal Weight { get; set; }
         public string UserId { get; set; }
         public string UserName { get; set; } = null!;
@@ -57,6 +58,5 @@ namespace BMT_backend.Models
         public int ProductsCost { get; set; }
         public string EnterpriseName { get; set; } = null!;
         public string EnterpriseEmail { get; set; } = null!;
-        public DateTime ProductDate { get; set; }
     }
 }

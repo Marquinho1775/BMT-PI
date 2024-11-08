@@ -76,16 +76,16 @@ namespace BMT_backend.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the stock");
             }
         }
-        [HttpPost("updateDateDisponibility")]
-        public ActionResult<string> UpdateDateDisponibility(string PerishableProductId, string Date, int Quantity)
+        [HttpPut("UpdateStock")]
+        public ActionResult<string> UpdateStock(string ProductId, string Date, int Quantity)
         {
             try
             {
-                if (PerishableProductId == null || Date == null || Quantity == 0)
+                if (ProductId == null || Date == null || Quantity == 0)
                 {
                     return BadRequest("Product information is not valid.");
                 }
-                var result = _productHandler.UpdateDateDisponibility(PerishableProductId, Date, Quantity);
+                var result = _productHandler.UpdateStock(ProductId, Date, Quantity);
                 return result;
             }
             catch (Exception)
