@@ -316,7 +316,10 @@ export default {
       this.editMarker = { position: this.editMapCenter };
     },
     updateMarker(event) {
-      const position = { lat: event.lat, lng: event.lng };
+      const position = {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng(),
+      };
       this.editMarker = { position };
       this.currentDirection.coordinates = `${position.lat}, ${position.lng}`;
     },
@@ -324,7 +327,7 @@ export default {
       const token = getToken();
       try {
         const response = await axios.put(
-          `${API_URL}/Direction/UpdateDirection/${this.currentDirection.id}`, // Asegúrate de que 'id' exista
+          `${API_URL}/Direction/UpdateDirection/${this.currentDirection.id}`,
           this.currentDirection,
           { headers: { Authorization: `Bearer ${token}` } }
         );
