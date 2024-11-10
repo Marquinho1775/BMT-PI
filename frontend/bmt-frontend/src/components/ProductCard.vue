@@ -5,8 +5,28 @@
 				<v-img :src="image" height="200px" aspect-ratio="16/9" cover></v-img>
 			</v-carousel-item>
 		</v-carousel>
-		<v-card-title>{{ product.raw.name }}</v-card-title>
-		<v-card-subtitle>₡ {{ product.raw.price }}</v-card-subtitle>
+		<v-row>
+			<v-col>
+				<v-card-title>{{ product.raw.name }}</v-card-title>
+				<v-card-subtitle>₡ {{ product.raw.price }}</v-card-subtitle>
+			</v-col>
+			<v-col class="text-right">
+				<div v-if="product.raw.type === 'Perishable'">
+					<v-chip v-for="(day, index) in formatWeekDays(product.raw.weekDaysAvailable)" :key="index"
+						color="info" size="small" class="white--text">
+						{{ day }}
+					</v-chip>
+				</div>
+				<div v-else>
+					<div v-if="product.raw.stock > 0">
+						<v-chip color="success" class="white--text">Disponible</v-chip>
+					</div>
+					<div v-else>
+						<v-chip color="error" class="white--text">Agotado</v-chip>
+					</div>
+				</div>
+			</v-col>
+		</v-row>
 
 		<v-card-actions>
 			<v-btn prepend-icon="mdi-plus" color="primary" @click="addToCart" text>Añadir al carrito</v-btn>
@@ -21,13 +41,24 @@
 				<v-chip-group>
 					<v-chip v-for="(tag, index) in product.raw.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
 				</v-chip-group>
-				<v-card-text>{{ product.raw.description }}</v-card-text>
+				<v-card-text>
+					Descripción:
+					<br />
+					{{ product.raw.description }}
+					<br /><br />
+					Emprendimiento:
+					<br />
+					{{ product.raw.enterpriseName }}
+				</v-card-text>
 			</div>
 		</v-expand-transition>
 	</v-card>
 </template>
 
+
+
 <script>
+
 import axios from 'axios';
 import { API_URL } from '@/main';
 
@@ -50,31 +81,45 @@ export default {
 		this.shoppingCartId = localStorage.getItem('shoppingCartId');
 	},
 	methods: {
+		formatWeekDays(weekDays) {
+			const daysMapping = {
+				'0': 'Domingo',
+				'1': 'Lunes',
+				'2': 'Martes',
+				'3': 'Miércoles',
+				'4': 'Jueves',
+				'5': 'Viernes',
+				'6': 'Sábado',
+			};
+			const days = weekDays.split('');
+			return days.map((day) => daysMapping[day]).filter(Boolean);
+		},
+
 		toggleShow() {
 			this.isShow = !this.isShow;
 		},
 		async addToCart() {
 			this.productId = this.product.raw.id;
 			let response = await axios
-        .put(API_URL + '/ShoppingCart/AddProductToCart?shoppingCartId=' + this.shoppingCartId + '&productId=' + this.productId, null)
-        .catch((error) => {
-          console.error('Error adding product to cart:', error);
-        });
-				if (response.data === "ProductExists") {
-					this.$swal.fire({
-						title: 'Ya está en el carrito',
-						text: 'Este producto ya está en el carrito',
-						icon: 'error',
-						confirmButtonText: 'Ok',
-					});
-				} else {
-					this.$swal.fire({
-						title: 'Producto añadido',
-						text: 'El producto se ha añadido al carrito',
-						icon: 'success',
-						confirmButtonText: 'Ok',
-					});
-				}
+				.put(API_URL + '/ShoppingCart/AddProductToCart?shoppingCartId=' + this.shoppingCartId + '&productId=' + this.productId, null)
+				.catch((error) => {
+					console.error('Error adding product to cart:', error);
+				});
+			if (response.data === "ProductExists") {
+				this.$swal.fire({
+					title: 'Ya está en el carrito',
+					text: 'Este producto ya está en el carrito',
+					icon: 'error',
+					confirmButtonText: 'Ok',
+				});
+			} else {
+				this.$swal.fire({
+					title: 'Producto añadido',
+					text: 'El producto se ha añadido al carrito',
+					icon: 'success',
+					confirmButtonText: 'Ok',
+				});
+			}
 		},
 	},
 };
@@ -83,5 +128,15 @@ export default {
 <style scoped>
 .v-card {
 	margin-bottom: 16px;
+}
+
+.v-chip {
+	margin-top: 8px;
+	margin-left: 8px;
+	margin-right: 8px;
+}
+
+white--text {
+	margin-top: 8px;
 }
 </style>

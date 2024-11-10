@@ -10,11 +10,57 @@
         <v-divider class="my-4"></v-divider>
         <v-card-text>
           <v-form ref="step1Form">
-            <!-- Contenido del Paso 1 -->
-            <!-- ... (No se realizan cambios aquí) -->
             <v-row>
-              <!-- Aquí va el contenido relacionado con la selección de fecha de entrega -->
-              <!-- ... -->
+              <v-col v-for="item in cartProducts" :key="item.id" cols="12" md="6" lg="4" class="mb-4">
+                <v-card class="pa-3" outlined>
+                  <v-img :src="item.imageURL || 'ruta/a/imagen-placeholder.jpg'" alt="Product Image"
+                    class="product-image" aspect-ratio="1.75" contain></v-img>
+                  <v-card-title class="justify-center mt-2">
+                    <span class="text-h6">{{ item.product.name }}</span>
+                  </v-card-title>
+                  <v-card-subtitle class="text-center">
+                    Subtotal: ${{ item.subtotal }}
+                  </v-card-subtitle>
+                  <v-divider class="my-2"></v-divider>
+                  <v-alert v-if="item.product.type === 'Perishable'" type="info" class="mt-2" elevation="2"
+                    border="left">
+                    <strong>Días Disponibles:</strong> {{ getDayNames(item.weekDaysAvailable) }}
+                  </v-alert>
+                </v-card>
+              </v-col>
+              <v-btn color="secondary" @click="openDateDialog" class="ma-2" block>
+                <v-icon left>mdi-calendar</v-icon>
+                Seleccionar Fecha
+              </v-btn>
+              <v-dialog v-model="isDateDialogOpen" max-width="380" hide-overlay transition="dialog-bottom-transition">
+                <v-card>
+                  <v-card-title>
+                    <span class="text-h6">Selecciona una Fecha</span>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-date-picker v-model="this.orderDeliveryDate" color="secondary" :min="getToday()"
+                      :allowed-dates="(date) => allowedDates(date)" locale="es"></v-date-picker>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn text color="secondary" @click="closeDateDialog">
+                      Cancelar
+                    </v-btn>
+                    <v-btn text color="secondary" @click="closeDateDialog">
+                      OK
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <v-alert v-if="commonDays.length > 0" type="info" class="mt-2" elevation="2" border="left">
+                <v-icon left color="blue">mdi-information</v-icon>
+                <strong>Nota:</strong> Según disponibilidad de los productos el pedido puede ser entregado los días: {{
+                  getDayNames(commonDays) }}
+              </v-alert>
+              <v-alert v-if="orderDeliveryDate" type="success" class="mt-2" elevation="2" border="left">
+                <v-icon left color="green">mdi-check-circle</v-icon>
+                Fecha de Entrega Seleccionada: {{ orderDeliveryDate }}
+              </v-alert>
             </v-row>
           </v-form>
         </v-card-text>
@@ -28,36 +74,25 @@
         </v-card-title>
         <v-divider class="my-4"></v-divider>
         <v-card-text>
-          <!-- Contenido del Paso 2 -->
-          <!-- ... (No se realizan cambios aquí) -->
           <v-btn color="secondary" text @click="toggleAddressMenu" class="mb-4" block>
             <v-icon left>mdi-arrow-down</v-icon>
-            {{
-              isAddressOpen ? 'Ocultar Direcciones' : 'Mostrar Direcciones'
-            }}
+            {{ isAddressOpen ? 'Ocultar Direcciones' : 'Mostrar Direcciones' }}
           </v-btn>
           <v-expand-transition>
             <div v-show="isAddressOpen">
               <v-row>
                 <v-col v-for="(direction, index) in directions" :key="index" cols="12" class="mb-3">
                   <v-card class="mx-auto custom-card" width="100%" max-width="700" elevation="5" hover
-                    @click="selectAddress(direction)" :class="{
-                      'selected-card':
-                        selectedAddress && selectedAddress.id === direction.id,
-                    }">
+                    @click="selectAddress(direction)"
+                    :class="{ 'selected-card': selectedAddress && selectedAddress.id === direction.id }">
                     <v-card-item>
                       <v-icon color="primary" class="mr-2">mdi-map-marker-outline</v-icon>
                       <v-card-title>{{ direction.numDirection }}</v-card-title>
                     </v-card-item>
                     <v-divider></v-divider>
                     <v-card-text>
-                      <p>
-                        <strong>Coordenadas:</strong> {{ direction.coordinates }}
-                      </p>
-                      <p>
-                        <strong>Señales Adicionales:</strong>
-                        {{ direction.otherSigns }}
-                      </p>
+                      <p><strong>Coordenadas:</strong> {{ direction.coordinates }}</p>
+                      <p><strong>Señales Adicionales:</strong> {{ direction.otherSigns }}</p>
                     </v-card-text>
                   </v-card>
                 </v-col>
@@ -68,7 +103,7 @@
             <v-icon left color="green">mdi-check-circle</v-icon>
             <strong>Dirección Seleccionada:</strong> {{ selectedAddress.numDirection }}, {{ selectedAddress.coordinates
             }}
-            <br />
+            <br>
             {{ selectedAddress.otherSigns }}
           </v-alert>
         </v-card-text>
