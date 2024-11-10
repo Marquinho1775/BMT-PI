@@ -83,35 +83,7 @@
                     </v-btn>
                   </v-card-actions>
                 </v-card>
-                <v-card class="credit-card mx-auto" width="100%" max-width="500" elevation="5" hover>
-                  <v-card-text>
-                    <div class="card-chip">
-                      <v-icon large>mdi-chip</v-icon>
-                    </div>
-                    <div class="card-number">
-                      {{ formatCardNumber(card.number) }}
-                    </div>
-                    <div class="card-details">
-                      <div class="card-holder">
-                        <span>Titular</span>
-                        <div>{{ card.name }}</div>
-                      </div>
-                      <div class="card-expiry">
-                        <span>Vence</span>
-                        <div>{{ card.dateVenc }}</div>
-                      </div>
-                    </div>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn icon small color="primary" @click="openEditDialog(direction)">
-                      <v-icon>mdi-pencil</v-icon>
-                    </v-btn>
-                    <v-btn icon small color="error" @click="deleteCreditCard(card.id)">
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
+
               </v-col>
             </v-row>
           </div>
