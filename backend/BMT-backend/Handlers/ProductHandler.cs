@@ -1,190 +1,165 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
 using System.Data;
-using BMT_backend.Models;
-using BMT_backend.Controllers;
 using System.Data.SqlClient;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Data.Common;
 using System.Text;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
+using BMT_backend.Domain.Views;
 
 namespace BMT_backend.Handlers
 {
     public class ProductHandler
     {
-        private SqlConnection _conection;
-        private string _conectionPath;
-        private readonly ImageFileController _imageFileController;
+        private readonly string _connectionString;
 
-        public ProductHandler()
+        public ProductHandler(IConfiguration configuration)
         {
-            var builder = WebApplication.CreateBuilder();
-            _conectionPath = builder.Configuration.GetConnectionString("BMTContext");
-            _conection = new SqlConnection(_conectionPath);
+            _connectionString = configuration.GetConnectionString("BMTContext");
         }
 
-        private DataTable CreateQueryTable(string query)
+        private DataTable ExecuteQuery(string query, List<SqlParameter> parameters = null)
         {
-            SqlCommand queryCommand = new SqlCommand(query, _conection);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
-            DataTable tableFormatQuery = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            _conection.Close();
-            return tableFormatQuery;
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            if (parameters != null)
+                command.Parameters.AddRange(parameters.ToArray());
+            using var adapter = new SqlDataAdapter(command);
+            var resultTable = new DataTable();
+            adapter.Fill(resultTable);
+            return resultTable;
         }
 
-        public string CreateProduct(ProductModel product)
+        private int ExecuteNonQuery(string query, List<SqlParameter> parameters = null)
         {
-            string productId = CreateBaseProduct(product);
-            bool exit = AddTagsToProduct(productId, product.Tags);
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            if (parameters != null)
+                command.Parameters.AddRange(parameters.ToArray());
+            connection.Open();
+            return command.ExecuteNonQuery();
+        }
+
+        private object ExecuteScalar(string query, List<SqlParameter> parameters = null)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            if (parameters != null)
+                command.Parameters.AddRange(parameters.ToArray());
+            connection.Open();
+            return command.ExecuteScalar();
+        }
+
+        public string CreateProduct(Product product)
+        {
+            CreateBaseProduct(product);
             if (product.Type == "NonPerishable")
-            {
-                exit = CreateNonPerishableProduct(productId, product.Stock.Value);
-            }
-            else if(product.Type == "Perishable")
-            {
-                exit = CreatePerishableProduct(productId, product.Limit.Value, product.WeekDaysAvailable);
-            }
-            if (exit)
-            {
-                return productId;
-            }
-            return string.Empty;
+                CreateNonPerishableProduct(product);
+            else if (product.Type == "Perishable")
+                CreatePerishableProduct(product);
+            CreateProductTags(product);
+            return product.Id;
         }
 
-        private string CreateBaseProduct (ProductModel product)
+        private void CreateBaseProduct(Product product)
         {
-            string createProductQuery = "insert into Products (EnterpriseId, Name, Description, Price, Weight) " +
-             "output Inserted.Id " +
-             "values(@EnterpriseId, @Name, @Description, @Price, @Weight);";
-
-            var createProductCommand = new SqlCommand(createProductQuery, _conection);
-            createProductCommand.Parameters.AddWithValue("@EnterpriseId", product.EnterpriseId);
-            createProductCommand.Parameters.AddWithValue("@Name", product.Name);
-            createProductCommand.Parameters.AddWithValue("@Description", product.Description);
-            createProductCommand.Parameters.AddWithValue("@Price", product.Price);
-            createProductCommand.Parameters.AddWithValue("@Weight", product.Weight);
-
-            _conection.Open();
-            var productId = createProductCommand.ExecuteScalar()?.ToString();
-            _conection.Close();
-            return productId;
-        }
-
-        public bool CreateNonPerishableProduct(string ProductId, int Stock)
-        {
-            string createNonPerishableProductQuery = "insert into NonPerishableProducts (ProductId, Stock) " +
-                "values(@ProductId, @Stock);";
-            var createNonPerishableProductCommand = new SqlCommand(createNonPerishableProductQuery, _conection);
-            createNonPerishableProductCommand.Parameters.AddWithValue("@ProductId", ProductId);
-            createNonPerishableProductCommand.Parameters.AddWithValue("@Stock", Stock);
-            _conection.Open();
-            bool exit = createNonPerishableProductCommand.ExecuteNonQuery() >= 1;
-            _conection.Close();
-            return exit; 
-        }
-
-        public bool CreatePerishableProduct(string ProductId, int Limit, string WeekDaysAvailable)
-        {
-            string createPerishableProductQuery = "insert into PerishableProducts (ProductId, Limit, WeekDaysAvailable) " +
-                "values(@ProductId, @Limit, @WeekDaysAvailable);";
-            var createPerishableProductCommand = new SqlCommand(createPerishableProductQuery, _conection);
-            createPerishableProductCommand.Parameters.AddWithValue("@ProductId", ProductId);
-            createPerishableProductCommand.Parameters.AddWithValue("@Limit", Limit);
-            createPerishableProductCommand.Parameters.AddWithValue("@WeekDaysAvailable", WeekDaysAvailable);
-            _conection.Open();
-            bool exit = createPerishableProductCommand.ExecuteNonQuery() >= 1;
-            _conection.Close();
-            return exit;
-        }
-
-        private bool CreateDateDisponibility(string ProductId, string WeekDaysAvailable)
-        {
-            string createDisponibilityQuery = "insert into DateDisponibility (ProductId, Date, Stock) " +
-                "values(@ProductId, @Date, (select Limit from PerishableProducts where ProductId = @ProductId));";
-            var createDisponibilityCommand = new SqlCommand(createDisponibilityQuery, _conection);
-            createDisponibilityCommand.Parameters.AddWithValue("@ProductId", ProductId);
-            createDisponibilityCommand.Parameters.Add("@Date", SqlDbType.Date);
-
-            int[] dispatchDays = WeekDaysAvailable.ToString().ToCharArray().Select(c => int.Parse(c.ToString())).ToArray();
-            List<DateTime> dispatchDates = GetDispatchDates(dispatchDays);
-            foreach (DateTime date in dispatchDates)
+            const string query = @"
+                INSERT INTO Products (EnterpriseId, Name, Description, Price, Weight)
+                OUTPUT Inserted.Id
+                VALUES (@EnterpriseId, @Name, @Description, @Price, @Weight);";
+            var parameters = new List<SqlParameter>
             {
-                Console.WriteLine(date.ToString("dd-MM-yyyy"));
+                new("@EnterpriseId", product.EnterpriseId),
+                new("@Name", product.Name),
+                new("@Description", product.Description),
+                new("@Price", product.Price),
+                new("@Weight", product.Weight)
+            };
+            product.Id = ExecuteScalar(query, parameters)?.ToString();
+        }
+
+        private void CreateNonPerishableProduct(Product product)
+        {
+            const string query = "INSERT INTO NonPerishableProducts (ProductId, Stock) VALUES (@ProductId, @Stock);";
+            var parameters = new List<SqlParameter>
+            {
+                new("@ProductId", product.Id),
+                new("@Stock", product.Stock)
+            };
+            ExecuteNonQuery(query, parameters);
+        }
+
+        private void CreatePerishableProduct(Product product)
+        {
+            const string query = @"
+                INSERT INTO PerishableProducts (ProductId, Limit, WeekDaysAvailable)
+                VALUES (@ProductId, @Limit, @WeekDaysAvailable);";
+
+            var parameters = new List<SqlParameter>
+            {
+                new("@ProductId", product.Id),
+                new("@Limit", product.Limit),
+                new("@WeekDaysAvailable", product.WeekDaysAvailable)
+            };
+
+            ExecuteNonQuery(query, parameters);
+        }
+
+        private void CreateProductTags(Product product)
+        {
+            const string query = @"
+                INSERT INTO ProductTags (ProductId, TagId)
+                VALUES (@ProductId, (SELECT Id FROM Tags WHERE Name = @TagName));";
+            foreach (var tag in product.Tags)
+            {
+                var parameters = new List<SqlParameter>
+                {
+                    new("@ProductId", product.Id),
+                    new("@TagName", tag)
+                };
+                ExecuteNonQuery(query, parameters);
             }
-            _conection.Open();
-            foreach (DateTime date in dispatchDates)
+        }
+        public List<Product> GetProducts()
+        {
+            const string query = "SELECT Id FROM Products;";
+            var resultTable = ExecuteQuery(query);
+            var products = new List<Product>();
+            foreach (DataRow row in resultTable.Rows)
             {
-                createDisponibilityCommand.Parameters["@Date"].Value = date;
-                createDisponibilityCommand.ExecuteNonQuery();
+                var product = GetProductById(row["Id"].ToString());
+                if (product != null)
+                    products.Add(product);
             }
-            _conection.Close();
-            return true;
+            return products;
         }
 
-        private static List<DateTime> GetDispatchDates(int[] dispatchDays)
+        public Product GetProductById(string productId)
         {
-            List<DateTime> dispatchDates = new List<DateTime>();
-            DateTime startDate = DateTime.Now.Date;
-            int currentDayNumber = (int)DateTime.Now.DayOfWeek;
-
-            foreach (int day in dispatchDays.Distinct())
+            const string query = @"
+                SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Id AS EnterpriseId, e.Name AS EnterpriseName
+                FROM Products p
+                JOIN Enterprises e ON p.EnterpriseId = e.Id
+                WHERE p.Id = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var row = resultTable.Rows[0];
+            var product = new Product
             {
-                int daysToAdd = (day >= currentDayNumber) ? day - currentDayNumber : 7 - (currentDayNumber - day);
-                DateTime futureDate = startDate.AddDays(daysToAdd);
-                dispatchDates.Add(futureDate);
-            }
-            return dispatchDates.OrderBy(d => d).ToList();
-        }
-
-        private bool AddTagsToProduct(string ProductId, List<string> Tags)
-        {
-            string addTagsQuery = "insert into ProductTags (ProductId, TagId) " +
-                "values(@ProductId, (select Id from Tags where Name = @TagName));";
-            var addTagsCommand = new SqlCommand(addTagsQuery, _conection);
-            addTagsCommand.Parameters.AddWithValue("@ProductId", ProductId);
-            addTagsCommand.Parameters.Add("@TagName", SqlDbType.VarChar);
-
-            _conection.Open();
-            foreach (string tag in Tags)
-            {
-                addTagsCommand.Parameters["@TagName"].Value = tag;
-                addTagsCommand.ExecuteNonQuery();
-            }
-            _conection.Close();
-            return true;
-        }
-
-        public ProductModel GetProduct(string productId)
-        {
-            string query = "SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Id AS EnterpriseId " +
-                           "FROM Products p " +
-                           "JOIN Enterprises e ON p.EnterpriseId = e.Id " +
-                           "WHERE p.Id = @productId";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@productId", productId);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
-            DataTable resultTable = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(resultTable);
-            _conection.Close();
-            DataRow row = resultTable.Rows[0];
-            ProductModel product = new ProductModel
-            {
-                Id = Convert.ToString(row["Id"]),
-                Name = Convert.ToString(row["Name"]),
-                Description = Convert.ToString(row["Description"]),
+                Id = row["Id"].ToString(),
+                EnterpriseName = row["EnterpriseName"].ToString(),
+                EnterpriseId = row["EnterpriseId"].ToString(),
+                Name = row["Name"].ToString(),
+                Description = row["Description"].ToString(),
                 Weight = Convert.ToDouble(row["Weight"]),
                 Price = Convert.ToDouble(row["Price"]),
-                EnterpriseId = Convert.ToString(row["EnterpriseId"]),
-                Tags = GetProductTags(productId),
-                ImagesURLs = GetProductImages(productId),
                 Type = GetProductType(productId),
+                Tags = GetProductTags(productId),
+                ImagesURLs = GetProductImages(productId)
             };
             if (product.Type == "NonPerishable")
-            {
                 product.Stock = GetNonPerishableStock(productId);
-            }
             else if (product.Type == "Perishable")
             {
                 product.Limit = GetPerishableLimit(productId);
@@ -195,513 +170,267 @@ namespace BMT_backend.Handlers
 
         private string GetProductType(string productId)
         {
-            string query = "SELECT COUNT(*) FROM NonPerishableProducts WHERE ProductId = @productId";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@productId", productId);
-            _conection.Open();
-            int nonPerishableCount = (int)queryCommand.ExecuteScalar();
-            _conection.Close();
-            if (nonPerishableCount > 0)
-            {
-                return "NonPerishable";
-            }
-            query = "SELECT COUNT(*) FROM PerishableProducts WHERE ProductId = @productId";
-            queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@productId", productId);
-            _conection.Open();
-            int perishableCount = (int)queryCommand.ExecuteScalar();
-            _conection.Close();
-            if (perishableCount > 0)
-            {
-                return "Perishable";
-            }
-            return string.Empty;
+            const string query = @"
+                SELECT
+                    CASE
+                        WHEN EXISTS (SELECT 1 FROM NonPerishableProducts WHERE ProductId = @ProductId) THEN 'NonPerishable'
+                        WHEN EXISTS (SELECT 1 FROM PerishableProducts WHERE ProductId = @ProductId) THEN 'Perishable'
+                        ELSE ''
+                    END AS ProductType;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return ExecuteScalar(query, parameters)?.ToString() ?? string.Empty;
         }
 
-        private int GetNonPerishableStock(string productId)
+        private List<string> GetProductTags(string productId)
         {
-            string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @productId";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@productId", productId);
-            _conection.Open();
-            int stock = (int)queryCommand.ExecuteScalar();
-            _conection.Close();
-            return stock;
-        }
-
-        private int GetPerishableLimit(string productId)
-        {
-            string query = "SELECT Limit FROM PerishableProducts WHERE ProductId = @productId";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@productId", productId);
-            _conection.Open();
-            int limit = (int)queryCommand.ExecuteScalar();
-            _conection.Close();
-            return limit;
-        }
-
-        private string GetPerishableWeekDays(string productId)
-        {
-            string query = "SELECT WeekDaysAvailable FROM PerishableProducts WHERE ProductId = @productId";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@productId", productId);
-            _conection.Open();
-            string weekDays = queryCommand.ExecuteScalar().ToString();
-            _conection.Close();
-            return weekDays;
-        }
-
-        public double GetProductPrice(string productId)
-        {
-            string query = "SELECT Price FROM Products WHERE Id = @productId";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@productId", productId);
-            _conection.Open();
-            double price = Convert.ToDouble(queryCommand.ExecuteScalar());
-            _conection.Close();
-            return price;
-        }
-
-        public List<ProductViewModel> GetProducts()
-            {
-            List<ProductViewModel> products = new List<ProductViewModel>();
-            var query = "select p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
-                "from Products p " +
-                "join Enterprises e on p.EnterpriseId = e.Id;";
-            DataTable table = CreateQueryTable(query);
-            foreach (DataRow row in table.Rows)
-            {
-                products.Add(
-                    new ProductViewModel
-                    {
-                        Id = Convert.ToString(row["Id"]),
-                        Name = Convert.ToString(row["Name"]),
-                        Description = Convert.ToString(row["Description"]),
-                        Weight = Convert .ToDouble(row["Weight"]),
-                        Price = Convert.ToDouble(row["Price"]),
-                        EnterpriseName = Convert.ToString(row["EnterpriseName"]),
-                        Tags = GetProductTags(Convert.ToString(row["Id"])),
-                        ImagesURLs = GetProductImages(Convert.ToString(row["Id"]))
-                    }
-                );
-            }
-            return products;
-        }
-
-        private List<string> GetProductTags(string productId) {
-            List<string> tags = new List<string>();
-            string getTagsQuery = "select t.Name " +
-                "from Tags t " +
-                "join ProductTags pt on t.Id = pt.TagId " +
-                "where pt.ProductId = @ProductId;";
-            var getTagsCommand = new SqlCommand(getTagsQuery, _conection);
-            getTagsCommand.Parameters.AddWithValue("@ProductId", productId);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(getTagsCommand);
-            DataTable tableFormatQuery = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            _conection.Close();
-            foreach (DataRow row in tableFormatQuery.Rows)
-            {
+            const string query = @"
+                SELECT t.Name
+                FROM Tags t
+                JOIN ProductTags pt ON t.Id = pt.TagId
+                WHERE pt.ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var tags = new List<string>();
+            foreach (DataRow row in resultTable.Rows)
                 tags.Add(row["Name"].ToString());
-            }
             return tags;
         }
 
         private List<string> GetProductImages(string productId)
         {
-            List<string> images = new List<string>();
-            string getImagesQuery = "select i.URL " +
-                "from ProductImages i " +
-                "join Products p on i.ProductId = p.Id " +
-                "where p.Id = @ProductId;";
-            var getImagesCommand = new SqlCommand(getImagesQuery, _conection);
-            getImagesCommand.Parameters.AddWithValue("@ProductId", productId);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(getImagesCommand);
-            DataTable tableFormatQuery = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            _conection.Close();
-            foreach (DataRow row in tableFormatQuery.Rows)
-            {
+            const string query = @"
+                SELECT i.URL
+                FROM ProductImages i
+                WHERE i.ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var images = new List<string>();
+            foreach (DataRow row in resultTable.Rows)
                 images.Add(row["URL"].ToString());
-            }
             return images;
         }
 
-        public List<string> GetTags()
+        private int GetNonPerishableStock(string productId)
         {
-            List<string> tags = new List<string>();
-            var query = "select Name from Tags;";
-            DataTable table = CreateQueryTable(query);
-            foreach (DataRow row in table.Rows)
-            {
-                tags.Add(
-                    Convert.ToString(row["Name"])
-                );
-            }
-            return tags;
+            const string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return Convert.ToInt32(ExecuteScalar(query, parameters));
         }
 
-        public List<DevProductModel> GetDevProducts()
+        private int GetPerishableLimit(string productId)
         {
-            List<DevProductModel> devProducts = new List<DevProductModel>();
-            string query = "SELECT p.Name, p.Price, p.Description, e.Name AS Enterprise " +
-               "FROM Products p " +
-               "JOIN Enterprises e ON p.EnterpriseId = e.Id";
+            const string query = "SELECT Limit FROM PerishableProducts WHERE ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return Convert.ToInt32(ExecuteScalar(query, parameters));
+        }
 
-            var queryCommand = new SqlCommand(query, _conection);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
-            DataTable resultTable = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(resultTable);
-            _conection.Close();
+        private string GetPerishableWeekDays(string productId)
+        {
+            const string query = "SELECT WeekDaysAvailable FROM PerishableProducts WHERE ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return ExecuteScalar(query, parameters)?.ToString();
+        }
+
+        public List<Product> GetProductsByEnterprise(string enterpriseName)
+        {
+            const string query = @"
+                SELECT p.Id
+                FROM Products p
+                JOIN Enterprises e ON p.EnterpriseId = e.Id
+                WHERE e.Name = @EnterpriseName;";
+            var parameters = new List<SqlParameter> { new("@EnterpriseName", enterpriseName) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var products = new List<Product>();
             foreach (DataRow row in resultTable.Rows)
             {
-                devProducts.Add(
-                    new DevProductModel
-                    {
-                        Name = Convert.ToString(row["Name"]),
-                        Enterprise = Convert.ToString(row["Enterprise"]),
-                        Price = Convert.ToString(row["Price"]),
-                        Description = Convert.ToString(row["Description"]),
-                    });
+                var product = GetProductById(row["Id"].ToString());
+                if (product != null)
+                    products.Add(product);
             }
-            return devProducts;
+            return products;
         }
 
-        public string UpdateStock(string ProductId, string DateString, int Quantity)
-        {
-            string type = GetProductType(ProductId);
-            DateTime Date = DateTime.Parse(DateString);
-            string query = string.Empty;
-            var queryCommand = new SqlCommand();
-            if (type == "NonPerishable")
+        public int GetStock(ProductStockRequest product)
+        { 
+            if (product.Type == "NonPerishable")
             {
-                query = "UPDATE NonPerishableProducts SET Stock = Stock - @Quantity WHERE ProductId = @ProductId";
-                queryCommand = new SqlCommand(query, _conection);
+                const string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @ProductId;";
+                var parameters = new List<SqlParameter> { new("@ProductId", product.ProductId) };
+                return Convert.ToInt32(ExecuteScalar(query, parameters));
             }
-            else if (type == "Perishable")
+            else if (product.Type == "Perishable")
             {
-                query = @"
-                    IF EXISTS (SELECT 1 FROM DateDisponibility WHERE ProductId = @ProductId AND Date = @Date)
-                    BEGIN
-                        UPDATE DateDisponibility 
-                        SET Stock = Stock - @Quantity
-                        WHERE ProductId = @ProductId AND Date = @Date;
-                    END
-                    ELSE
-                    BEGIN
-                        INSERT INTO DateDisponibility (ProductId, Date, Stock) 
-                        VALUES (
-                            @ProductId, 
-                            @Date, 
-                            (SELECT [Limit] FROM PerishableProducts WHERE ProductId = @ProductId) - @Quantity
-                        );
-                    END
-                    ";
-                queryCommand = new SqlCommand(query, _conection);
-                queryCommand.Parameters.AddWithValue("@Date", Date);
-            }
-            queryCommand.Parameters.AddWithValue("@ProductId", ProductId);
-            queryCommand.Parameters.AddWithValue("@Quantity", Quantity);
-            _conection.Open();
-            queryCommand.ExecuteNonQuery();
-            _conection.Close();
-            return "Product stock updated successfully.";
-        }
-
-        public List<ProductModel> GetProductsByEnterprise(string enterpriseName)
-        {
-            List<ProductModel> productsOfEnterprise = new List<ProductModel>();
-
-            var query = "SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Name as EnterpriseName " +
-                        "FROM Products p " +
-                        "JOIN Enterprises e ON p.EnterpriseId = e.Id " +
-                        "WHERE e.Name = @EnterpriseName;";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@enterpriseName", enterpriseName);
-
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
-            DataTable tableFormatQuery = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            _conection.Close();
-
-            foreach (DataRow row in tableFormatQuery.Rows)
-            {
-                var productId = Convert.ToString(row["Id"]);
-                var productType = GetProductType(productId);
-
-                var product = new ProductModel
+                const string query = @"
+                SELECT ISNULL(dd.Stock, pp.Limit) AS Stock
+                FROM PerishableProducts pp
+                LEFT JOIN DateDisponibility dd ON dd.ProductId = pp.ProductId AND dd.Date = @Date
+                WHERE pp.ProductId = @ProductId;";
+                var parameters = new List<SqlParameter>
                 {
-                    Id = productId,
-                    Name = Convert.ToString(row["Name"]),
-                    Description = Convert.ToString(row["Description"]),
-                    Weight = Convert.ToDouble(row["Weight"]),
-                    Price = Convert.ToDouble(row["Price"]),
-                    Tags = GetProductTags(productId),
-                    ImagesURLs = GetProductImages(productId),
-                    Type = productType
+                    new("@Date", product.Date),
+                    new("@ProductId", product.ProductId)
                 };
-                if (productType == "NonPerishable")
-                {
-                    product.Stock = GetNonPerishableStock(productId);
-                }
-                else if (productType == "Perishable")
-                {
-                    product.Limit = GetPerishableLimit(productId);
-                    product.WeekDaysAvailable = GetPerishableWeekDays(productId);
-                }
-
-                productsOfEnterprise.Add(product);
+                return Convert.ToInt32(ExecuteScalar(query, parameters));
             }
-            return productsOfEnterprise;
+            else
+            {
+                throw new ArgumentException("Invalid product type or date.");
+            }
+        }
+
+        public bool UpdateProduct(Product updatedProduct)
+        {
+
+            var updateQuery = "update Products set " +
+                "Name = @Name, Description = @Description, Weight = @Weight, Price = @Price " +
+                "where Id = @Id";
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter("@Id", updatedProduct.Id),
+                new SqlParameter("@Name", updatedProduct.Name),
+                new SqlParameter("@Description", updatedProduct.Description),
+                new SqlParameter("@Weight", updatedProduct.Weight),
+                new SqlParameter("@Price", updatedProduct.Price)
+            };
+            var rowsAffected = ExecuteNonQuery(updateQuery, parameters);
+            if (rowsAffected == 0)
+                return false;
+            if (updatedProduct.Tags != null)
+                UpdateProductTags(updatedProduct.Id, updatedProduct.Tags);
+            if (updatedProduct.ImagesURLs != null && updatedProduct.ImagesURLs.Count > 0)
+                UpdateProductImages(updatedProduct.Id, updatedProduct.ImagesURLs);
+            UpdateProductTypeSpecificDetails(updatedProduct);
+            return true;
         }
 
         private void UpdateProductTags(string productId, List<string> newTags)
         {
-            var deleteQuery = "DELETE FROM ProductTags WHERE ProductId = @ProductId";
-            using (var deleteCommand = new SqlCommand(deleteQuery, _conection))
+            const string deleteQuery = "DELETE FROM ProductTags WHERE ProductId = @ProductId;";
+            var deleteParams = new List<SqlParameter> { new("@ProductId", productId) };
+            ExecuteNonQuery(deleteQuery, deleteParams);
+            const string insertQuery = @"
+                INSERT INTO ProductTags (ProductId, TagId)
+                VALUES (@ProductId, (SELECT Id FROM Tags WHERE Name = @TagName));";
+            foreach (var tag in newTags)
             {
-                deleteCommand.Parameters.AddWithValue("@ProductId", productId);
-                _conection.Open();
-                deleteCommand.ExecuteNonQuery();
-                _conection.Close();
-            }
-
-            var insertQuery = "INSERT INTO ProductTags (ProductId, TagId) VALUES (@ProductId, @TagId)";
-            foreach (var tagId in newTags)
-            {
-                using (var insertCommand = new SqlCommand(insertQuery, _conection))
+                var insertParams = new List<SqlParameter>
                 {
-                    insertCommand.Parameters.AddWithValue("@ProductId", productId);
-                    insertCommand.Parameters.AddWithValue("@TagId", tagId);
-                    _conection.Open();
-                    insertCommand.ExecuteNonQuery();
-                    _conection.Close();
-                }
+                    new("@ProductId", productId),
+                    new("@TagName", tag)
+                };
+                ExecuteNonQuery(insertQuery, insertParams);
             }
         }
 
         private void UpdateProductImages(string productId, List<string> newImageUrls)
         {
-            var deleteQuery = "DELETE FROM ProductImages WHERE ProductId = @ProductId";
-            using (var deleteCommand = new SqlCommand(deleteQuery, _conection))
-            {
-                deleteCommand.Parameters.AddWithValue("@ProductId", productId);
-                _conection.Open();
-                deleteCommand.ExecuteNonQuery();
-                _conection.Close();
-            }
-            var insertQuery = "INSERT INTO ProductImages (Id, ProductId, URL) VALUES (@Id, @ProductId, @URL)";
+            const string deleteQuery = "DELETE FROM ProductImages WHERE ProductId = @ProductId;";
+            var deleteParams = new List<SqlParameter> { new("@ProductId", productId) };
+            ExecuteNonQuery(deleteQuery, deleteParams);
+            const string insertQuery = @"
+                INSERT INTO ProductImages (Id, ProductId, URL)
+                VALUES (@Id, @ProductId, @URL);";
             foreach (var url in newImageUrls)
             {
-                using (var insertCommand = new SqlCommand(insertQuery, _conection))
+                var insertParams = new List<SqlParameter>
                 {
-                    insertCommand.Parameters.AddWithValue("@Id", Guid.NewGuid().ToString());
-                    insertCommand.Parameters.AddWithValue("@ProductId", productId);
-                    insertCommand.Parameters.AddWithValue("@URL", url);
-                    _conection.Open();
-                    insertCommand.ExecuteNonQuery();
-                    _conection.Close();
-                }
+                    new("@Id", Guid.NewGuid().ToString()),
+                    new("@ProductId", productId),
+                    new("@URL", url)
+                };
+                ExecuteNonQuery(insertQuery, insertParams);
             }
         }
 
-        public bool UpdateProduct(ProductModel updatedProduct)
+        private void UpdateProductTypeSpecificDetails(Product updatedProduct)
         {
-            var query = new StringBuilder("UPDATE Products SET ");
-            var parameters = new List<SqlParameter>();
-
-            if (!string.IsNullOrEmpty(updatedProduct.Name))
-            {
-                query.Append("Name = @Name, ");
-                parameters.Add(new SqlParameter("@Name", updatedProduct.Name));
-            }
-            if (!string.IsNullOrEmpty(updatedProduct.Description))
-            {
-                query.Append("Description = @Description, ");
-                parameters.Add(new SqlParameter("@Description", updatedProduct.Description));
-            }
-            if (updatedProduct.Weight != null)
-            {
-                query.Append("Weight = @Weight, ");
-                parameters.Add(new SqlParameter("@Weight", updatedProduct.Weight));
-            }
-            if (updatedProduct.Price != null)
-            {
-                query.Append("Price = @Price, ");
-                parameters.Add(new SqlParameter("@Price", updatedProduct.Price));
-            }
-
-            if (updatedProduct.Tags != null)
-            {
-                UpdateProductTags(updatedProduct.Id, updatedProduct.Tags);
-            }
-
-
-            if (updatedProduct.ImagesURLs != null && updatedProduct.ImagesURLs.Count > 0)
-            {
-                UpdateProductImages(updatedProduct.Id, updatedProduct.ImagesURLs);
-            }
-
-
-            query.Length -= 2;
-            query.Append(" WHERE Id = @Id AND EnterpriseId = @EnterpriseId");
-            parameters.Add(new SqlParameter("@Id", updatedProduct.Id));
-            parameters.Add(new SqlParameter("@EnterpriseId", updatedProduct.EnterpriseId));
-
-            using (var command = new SqlCommand(query.ToString(), _conection))
-            {
-                command.Parameters.AddRange(parameters.ToArray());
-                _conection.Open();
-                var rowsAffected = command.ExecuteNonQuery();
-                _conection.Close();
-
-                if (rowsAffected == 0)
-                {
-                    return false;
-                }
-            }
-
             if (updatedProduct.Type == "NonPerishable" && updatedProduct.Stock.HasValue)
             {
-                var updateNonPerishableQuery = "UPDATE NonPerishableProducts SET Stock = @Stock WHERE ProductId = @ProductId";
-                using (var stockCommand = new SqlCommand(updateNonPerishableQuery, _conection))
+                const string query = @"
+                    UPDATE NonPerishableProducts
+                    SET Stock = @Stock
+                    WHERE ProductId = @ProductId;";
+                var parameters = new List<SqlParameter>
                 {
-                    stockCommand.Parameters.AddWithValue("@Stock", updatedProduct.Stock.Value);
-                    stockCommand.Parameters.AddWithValue("@ProductId", updatedProduct.Id);
-                    _conection.Open();
-                    stockCommand.ExecuteNonQuery();
-                    _conection.Close();
-                }
+                    new("@Stock", updatedProduct.Stock.Value),
+                    new("@ProductId", updatedProduct.Id)
+                };
+                ExecuteNonQuery(query, parameters);
             }
             else if (updatedProduct.Type == "Perishable")
             {
-                var updatePerishableQuery = new StringBuilder("UPDATE PerishableProducts SET ");
-                var perishableParameters = new List<SqlParameter>();
-
+                var queryBuilder = new StringBuilder("UPDATE PerishableProducts SET ");
+                var parameters = new List<SqlParameter>();
                 if (updatedProduct.Limit.HasValue)
                 {
-                    updatePerishableQuery.Append("Limit = @Limit, ");
-                    perishableParameters.Add(new SqlParameter("@Limit", updatedProduct.Limit.Value));
+                    queryBuilder.Append("Limit = @Limit, ");
+                    parameters.Add(new SqlParameter("@Limit", updatedProduct.Limit.Value));
                 }
                 if (!string.IsNullOrEmpty(updatedProduct.WeekDaysAvailable))
                 {
-                    updatePerishableQuery.Append("WeekDaysAvailable = @WeekDaysAvailable, ");
-                    perishableParameters.Add(new SqlParameter("@WeekDaysAvailable", updatedProduct.WeekDaysAvailable));
+                    queryBuilder.Append("WeekDaysAvailable = @WeekDaysAvailable, ");
+                    parameters.Add(new SqlParameter("@WeekDaysAvailable", updatedProduct.WeekDaysAvailable));
                 }
-
-                if (perishableParameters.Count > 0)
+                if (parameters.Count > 0)
                 {
-                    updatePerishableQuery.Length -= 2;
-                    updatePerishableQuery.Append(" WHERE ProductId = @ProductId");
-                    perishableParameters.Add(new SqlParameter("@ProductId", updatedProduct.Id));
-
-                    using (var perishableCommand = new SqlCommand(updatePerishableQuery.ToString(), _conection))
-                    {
-                        perishableCommand.Parameters.AddRange(perishableParameters.ToArray());
-                        _conection.Open();
-                        perishableCommand.ExecuteNonQuery();
-                        _conection.Close();
-                    }
+                    queryBuilder.Length -= 2;
+                    queryBuilder.Append(" WHERE ProductId = @ProductId");
+                    parameters.Add(new SqlParameter("@ProductId", updatedProduct.Id));
+                    ExecuteNonQuery(queryBuilder.ToString(), parameters);
                 }
             }
-
-            return true;
+        }
+        public string UpdateStock(string productId, int quantity, string dateString = "")
+        {
+            var type = GetProductType(productId);
+            if (type == "NonPerishable")
+                UpdateNonPerishableStock(productId, quantity);
+            else if (type == "Perishable" && DateTime.TryParse(dateString, out var date))
+                UpdatePerishableStock(productId, quantity, date);
+            else
+                throw new ArgumentException("Invalid product type or date.");
+            return "Product stock updated successfully.";
         }
 
-        public List<string> GetTagsIDBasedOnProductID(string productId)
+        private void UpdateNonPerishableStock(string productId, int quantity)
         {
-            List<string> tagsId = new List<string>();
-
-            string getTagsQuery = "SELECT pt.TagId " +
-                "FROM ProductTags pt " +
-                "WHERE pt.ProductId = @ProductId;";
-            var getTagsCommand = new SqlCommand(getTagsQuery, _conection);
-            getTagsCommand.Parameters.AddWithValue("@ProductId", productId);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(getTagsCommand);
-            DataTable tableFormatQuery = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            _conection.Close();
-
-            foreach (DataRow row in tableFormatQuery.Rows)
+            const string query = @"
+                UPDATE NonPerishableProducts
+                SET Stock = Stock - @Quantity
+                WHERE ProductId = @ProductId;";
+            var parameters = new List<SqlParameter>
             {
-                tagsId.Add(row["TagId"].ToString());
-            }
-
-            return tagsId;
+                new("@ProductId", productId),
+                new("@Quantity", quantity)
+            };
+            ExecuteNonQuery(query, parameters);
         }
 
-        public List<string> GetTagsIDBasedOnTagName(string tagName)
+        private void UpdatePerishableStock(string productId, int quantity, DateTime date)
         {
-            List<string> tagsId = new List<string>();
-
-            string getTagsQuery = "SELECT Id " +
-                "FROM Tags " +
-                "WHERE Name = @tagName;";
-            var getTagsCommand = new SqlCommand(getTagsQuery, _conection);
-            getTagsCommand.Parameters.AddWithValue("@tagName", tagName);
-            SqlDataAdapter tableAdapter = new SqlDataAdapter(getTagsCommand);
-            DataTable tableFormatQuery = new DataTable();
-            _conection.Open();
-            tableAdapter.Fill(tableFormatQuery);
-            _conection.Close();
-
-            foreach (DataRow row in tableFormatQuery.Rows)
+            const string query = @"
+                IF EXISTS (SELECT 1 FROM DateDisponibility WHERE ProductId = @ProductId AND Date = @Date)
+                BEGIN
+                    UPDATE DateDisponibility
+                    SET Stock = Stock - @Quantity
+                    WHERE ProductId = @ProductId AND Date = @Date;
+                END
+                ELSE
+                BEGIN
+                    INSERT INTO DateDisponibility (ProductId, Date, Stock)
+                    VALUES (
+                        @ProductId,
+                        @Date,
+                        (SELECT [Limit] FROM PerishableProducts WHERE ProductId = @ProductId) - @Quantity
+                    );
+                END;";
+            var parameters = new List<SqlParameter>
             {
-                tagsId.Add(row["Id"].ToString());
-            }
-
-            return tagsId;
-        }
-
-        public string UpdateStock(string id, int newStock)
-        {
-            string updateStockQuery = "update NonPerishableProducts set Stock = @newStock where ProductId = @id";
-            var updateStockCommand = new SqlCommand(updateStockQuery, _conection);
-            updateStockCommand.Parameters.AddWithValue("@newStock", newStock);
-            updateStockCommand.Parameters.AddWithValue("@id", id);
-            _conection.Open();
-            int rowsAffected = updateStockCommand.ExecuteNonQuery();
-            _conection.Close();
-            if (rowsAffected > 0)
-            {
-                return "Stock updated successfully.";
-            }
-            return "Error updating stock.";
-        }
-
-        public int GetStock(string id)
-        {
-            string query = "select Stock from NonPerishableProducts where ProductId = @id";
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@id", id);
-            _conection.Open();
-            int stock = (int)queryCommand.ExecuteScalar();
-            _conection.Close();
-            return stock;
-        }
-
-        public int GetStockPerishable(string Id, string Date)
-        {
-            string query = @"
-        SELECT ISNULL(dd.Stock, pp.Limit) AS Stock
-        FROM PerishableProducts pp
-        LEFT JOIN DateDisponibility dd ON dd.ProductId = pp.ProductId AND dd.Date = @Date
-        WHERE pp.ProductId = @Id";
-
-            var queryCommand = new SqlCommand(query, _conection);
-            queryCommand.Parameters.AddWithValue("@Date", Date);
-            queryCommand.Parameters.AddWithValue("@Id", Id);
-
-            _conection.Open();
-            int stock = (int)queryCommand.ExecuteScalar();
-            _conection.Close();
-
-            return stock;
+                new("@ProductId", productId),
+                new("@Quantity", quantity),
+                new("@Date", date)
+            };
+            ExecuteNonQuery(query, parameters);
         }
     }
 }

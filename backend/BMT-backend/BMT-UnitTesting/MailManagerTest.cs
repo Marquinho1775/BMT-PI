@@ -1,9 +1,9 @@
 ﻿using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.Configuration;
-using BMT_backend.Models;
 using BMT_backend.Infrastructure;
 using System.Collections.Generic;
+using BMT_backend.Domain.Entities;
 
 namespace UnitTestingBMT
 {
@@ -12,7 +12,7 @@ namespace UnitTestingBMT
     {
         private Mock<IConfiguration> _mockConfiguration;
         private MailManager _mailManager;
-        private OrderConfirmationModel _testOrder;
+        private Order _testOrder;
 
         [SetUp]
         public void SetUp()
@@ -28,7 +28,7 @@ namespace UnitTestingBMT
 
             _mailManager = new MailManager(_mockConfiguration.Object);
 
-            _testOrder = new OrderConfirmationModel
+            _testOrder = new Order
             {
                 OrderId = "123",
                 OrderDate = DateTime.Now,

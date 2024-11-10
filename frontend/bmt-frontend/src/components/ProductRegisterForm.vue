@@ -163,6 +163,7 @@ export default {
           description: this.productData.description,
           weight: this.productData.weight,
           price: this.productData.price,
+          
           type: this.productData.type == "Perecedero" ? "Perishable" : "NonPerishable",
           tags: this.value,
           stock: this.productData.stock != null ? this.productData.stock : 0,

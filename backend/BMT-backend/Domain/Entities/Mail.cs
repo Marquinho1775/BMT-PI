@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Entities
 {
-    public class MailModel
+    public class Mail
     {
         public string Email { get; set; }
         public string Id { get; set; }

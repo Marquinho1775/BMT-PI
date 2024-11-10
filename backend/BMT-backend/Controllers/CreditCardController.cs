@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using BMT_backend.Handlers;
-using BMT_backend.Models;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Controllers
 {
@@ -18,7 +18,7 @@ namespace BMT_backend.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateCreditCard(CreditCardModel creditCard)
+        public async Task<ActionResult<bool>> CreateCreditCard(CreditCard creditCard)
         {
             try
             {
@@ -36,14 +36,14 @@ namespace BMT_backend.Controllers
         }
 
         [HttpGet]
-        public List<CreditCardModel> GetCreditCards()
+        public List<CreditCard> GetCreditCards()
         {
             var creditCards = _creditCardHandler.GetCreditCards();
             return creditCards;
         }
 
         [HttpGet("User")]
-        public List<CreditCardModel> GetCreditCardsByUser(string userId)
+        public List<CreditCard> GetCreditCardsByUser(string userId)
         {
             var creditCards = _creditCardHandler.GetCreditCardsByUser(userId);
             return creditCards;

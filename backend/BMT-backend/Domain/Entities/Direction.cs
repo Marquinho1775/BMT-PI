@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Entities
 {
-    public class DirectionModel
+    public class Direction
     {
         public string? Id { get; set; }
         public string Username { get; set; }

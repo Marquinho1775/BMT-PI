@@ -2,8 +2,8 @@
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
-using BMT_backend.Models;
 using BMT_backend.Handlers;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Infrastructure
 {
@@ -25,7 +25,7 @@ namespace BMT_backend.Infrastructure
             passwordCollab = configuration["EmailSettingsCollabRegister:Password"];
         }
 
-        public void SendConfirmationEmails(OrderConfirmationModel order)
+        public void SendConfirmationEmails(Order order)
         {
             string title = "Confirmación de orden";
             string body = "<h1>Confirmación de orden</h1>" +
@@ -41,7 +41,7 @@ namespace BMT_backend.Infrastructure
             }
 
             body += $"<b>Fecha de creación de orden:</b> {order.OrderDate}<br>" +
-                    $"<b>Fecha de Entrega:</b> {order.OrderDeliveryDate}<br>" +
+                    $"<b>Fecha de Entrega:</b> {order.DeliveryDate}<br>" +
                     "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>" +
                     "¡Gracias por confiar en nosotros!<br><br>" +
                     "Saludos,<br>" +
@@ -103,7 +103,7 @@ namespace BMT_backend.Infrastructure
             }
         }
 
-        public void SendDenyEmail(OrderConfirmationModel order)
+        public void SendDenyEmail(Order order)
         {
             string title = "Orden cancelada";
             string body = "<h1>Orden cancelada</h1>" +

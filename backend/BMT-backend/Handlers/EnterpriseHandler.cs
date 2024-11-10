@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
-using BMT_backend.Models;
 using System.Data.SqlClient;
-
-
+using BMT_backend.Domain.Views;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
 
 namespace BMT_backend.Handlers
 {
@@ -60,7 +60,7 @@ namespace BMT_backend.Handlers
             return false;
         }
 
-        public bool CreateEnterprise(EnterpriseModel enterprise)
+        public bool CreateEnterprise(Enterprise enterprise)
         {
             string createEnterpriseQuery = "insert into Enterprises (" +
             "IdentificationType, IdentificationNumber, Name, Description, Email, PhoneNumber) " +
@@ -80,14 +80,14 @@ namespace BMT_backend.Handlers
             return true;
         }
 
-        public List<EnterpriseModel> GetEnterprises()
+        public List<Enterprise> GetEnterprises()
         {
-            List<EnterpriseModel> enterprises = new List<EnterpriseModel>();
+            List<Enterprise> enterprises = new List<Enterprise>();
             DataTable resultTable = CreateQueryTable("select * FROM Enterprises;");
             foreach (DataRow row in resultTable.Rows)
             {
                 enterprises.Add(
-                new EnterpriseModel
+                new Enterprise
                 {
                     IdentificationType = Convert.ToInt32(row["IdentificationType"]),
                     IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
@@ -102,9 +102,9 @@ namespace BMT_backend.Handlers
             return enterprises;
         }
 
-        public List<EntrepreneurViewModel> GetEnterpriseStaff(string enterpriseId)
+        public List<Entrepreneur> GetEnterpriseStaff(string enterpriseId)
         {
-            List<EntrepreneurViewModel> staff = new List<EntrepreneurViewModel>();
+            List<Entrepreneur> staff = new List<Entrepreneur>();
             var queryCommand = new SqlCommand(getEnterpriseStaffQuery, _conection);
             SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
             DataTable tableFormatQuery = new DataTable();
@@ -121,7 +121,7 @@ namespace BMT_backend.Handlers
             foreach (DataRow row in tableFormatQuery.Rows)
             {
                 staff.Add(
-                new EntrepreneurViewModel
+                new Entrepreneur
                 {
                     Identification = Convert.ToString(row["Identification"]),
                     Name = Convert.ToString(row["Name"]),
@@ -134,9 +134,9 @@ namespace BMT_backend.Handlers
             return staff;
         }
 
-        public EntrepreneurViewModel GetEnterpriseAdministrator(string enterpriseId)
+        public Entrepreneur GetEnterpriseAdministrator(string enterpriseId)
         {
-            List<EntrepreneurViewModel> staff = new List<EntrepreneurViewModel>();
+            List<Entrepreneur> staff = new List<Entrepreneur>();
             string getAdminEntrpreneurQuery = getEnterpriseStaffQuery + " and ee.Administrator = 1;";
             var queryCommand = new SqlCommand(getEnterpriseStaffQuery, _conection);
             SqlDataAdapter tableAdapter = new SqlDataAdapter(queryCommand);
@@ -152,7 +152,7 @@ namespace BMT_backend.Handlers
             }
 
             DataRow row = tableFormatQuery.Rows[0];
-            EntrepreneurViewModel administrator = new EntrepreneurViewModel
+            Entrepreneur administrator = new Entrepreneur
             {
                 Identification = Convert.ToString(row["Identification"]),
                 Name = Convert.ToString(row["Name"]),
@@ -164,9 +164,9 @@ namespace BMT_backend.Handlers
             return administrator;
         }
 
-        public List<DevEnterpriseModel> GetDevEnterprises()
+        public List<DeveloperEnterpriseView> GetDevEnterprises()
         {
-            List<DevEnterpriseModel> devEnterprises = new List<DevEnterpriseModel>();
+            List<DeveloperEnterpriseView> devEnterprises = new List<DeveloperEnterpriseView>();
             string query = "SELECT e.Name, " +
                            "(SELECT COUNT(*) FROM Entrepreneurs_Enterprises ee WHERE ee.EnterpriseId = e.Id) AS EmployeeQuantity, " +
                            "(SELECT COUNT(*) FROM Products p WHERE p.EnterpriseId = e.Id) AS ProductQuantity " +
@@ -181,7 +181,7 @@ namespace BMT_backend.Handlers
             foreach (DataRow row in resultTable.Rows)
             {
                 devEnterprises.Add(
-                    new DevEnterpriseModel
+                    new DeveloperEnterpriseView
                     {
                         Name = Convert.ToString(row["Name"]),
                         EmployeeQuantity = Convert.ToString(row["EmployeeQuantity"]),
@@ -191,7 +191,7 @@ namespace BMT_backend.Handlers
             return devEnterprises;
         }
 
-        public EnterpriseModel? GetEnterpriseById(string enterpriseId)
+        public Enterprise? GetEnterpriseById(string enterpriseId)
         {
             var query = "SELECT * FROM Enterprises WHERE Id = @enterpriseId";
             SqlCommand queryCommand = new SqlCommand(query, _conection);
@@ -209,7 +209,7 @@ namespace BMT_backend.Handlers
             }
 
             DataRow row = resultTable.Rows[0];
-            var enterprise = new EnterpriseModel
+            var enterprise = new Enterprise
             {
                 Id = enterpriseId,
                 IdentificationType = Convert.ToInt32(row["IdentificationType"]),
@@ -225,7 +225,7 @@ namespace BMT_backend.Handlers
             return enterprise;
         }
 
-        public bool UpdateEnterpriseProfile(UpdateEnterpriseModel updatedEnterprise)
+        public bool UpdateEnterpriseProfile(UpdateEnterpriseRequest updatedEnterprise)
         {
             var fieldsToUpdate = new List<string>();
             

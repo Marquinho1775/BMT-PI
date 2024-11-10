@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using BMT_backend.Handlers;
-using BMT_backend.Models;
 using BMT_backend.Infrastructure;
-using BMT_backend.Services;
+using BMT_backend.Domain.Requests;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Application.Services;
 
 namespace BMT_backend.Controllers
 {
@@ -25,7 +26,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpGet]
-        public List<UserModel> GetUsers()
+        public List<User> GetUsers()
         {
             try
             {
@@ -35,12 +36,12 @@ namespace BMT_backend.Controllers
             {
                 Console.WriteLine($"Error retrieving users: {ex.Message}");
                 Response.StatusCode = 500;
-                return new List<UserModel>();
+                return new List<User>();
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateUser(UserModel user)
+        public async Task<ActionResult<bool>> CreateUser(User user)
         {
             try
             {
@@ -72,27 +73,6 @@ namespace BMT_backend.Controllers
             }
         }
 
-        [HttpGet("Unity")]
-        public async Task<IActionResult> UserInfo(string id)
-        {
-            try
-            {
-                var user = _userHandler.GetUserById(id);
-
-                if (user == null)
-                {
-                    return NotFound("Usuario no encontrado");
-                }
-
-                return new JsonResult(user);
-
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener el usuario");
-            }
-        }
-
         [HttpGet("GetUserByUsername")]
         public async Task<IActionResult> GetUserByUsername(string username)
         {
@@ -115,7 +95,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel loginData)
+        public IActionResult Login([FromBody] LoginRequest loginData)
         {
             var existingUser = _userHandler.GetUsers()
                 .FirstOrDefault(u => u.Email == loginData.Email && u.Password == loginData.Password);
@@ -130,7 +110,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPut("UpdateProfile")]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileModel updatedUser)
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserProfileRequest updatedUser)
         {
             try
             {
@@ -157,13 +137,13 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpGet("GetToConfirmOrders")]
-        public List<OrderConfirmationModel> GetToConfirmOrders(String userId)
+        public List<Order> GetToConfirmOrders(string userId)
         {
-            List<OrderConfirmationModel> toConfirmOrders = _orderHandler.GetToConfirmUserOrders(userId);
+            List<Order> toConfirmOrders = _orderHandler.GetToConfirmUserOrders(userId);
             return toConfirmOrders;
         }
         [HttpPut("DenyOrder")]
-        public IActionResult DenyOrder(String orderID)
+        public IActionResult DenyOrder(string orderID)
         {
             if (_orderHandler.DenyOrder(orderID))
             {

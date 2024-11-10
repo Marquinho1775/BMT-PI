@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Entities
 {
-    public class CreditCardModel
+    public class CreditCard
     {
         public string Id { get; set; } = null!;
         public string UserID { get; set; }

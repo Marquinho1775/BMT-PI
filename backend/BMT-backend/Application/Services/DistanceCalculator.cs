@@ -1,4 +1,4 @@
-﻿namespace BMT_backend.Services;
+﻿namespace BMT_backend.Application.Services;
 using System;
 public static class DistanceCalculator
 {
@@ -18,7 +18,7 @@ public static class DistanceCalculator
 
         double distancia = RadioTierra * c; // Distancia en metros
 
-        return distancia/1000.0;
+        return distancia / 1000.0;
     }
 
     private static double ConvertirGradosARadianes(double grados)

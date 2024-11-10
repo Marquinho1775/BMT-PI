@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Entities
 {
-    public class ImageFileModel
+    public class ImageFile
     {
         public string OwnerId { get; set; }
         public string OwnerType { get; set; }

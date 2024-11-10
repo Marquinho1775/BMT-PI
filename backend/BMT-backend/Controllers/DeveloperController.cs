@@ -1,10 +1,11 @@
 ﻿using System.Net.Mail;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using BMT_backend.Models;
 using BMT_backend.Handlers;
 using BMT_backend.Infrastructure;
 using System.Reflection.Metadata;
+using BMT_backend.Domain.Views;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Controllers
 {
@@ -21,36 +22,41 @@ namespace BMT_backend.Controllers
         {
             _userHandler = new UserHandler();
             _enterpriseHandler = new EnterpriseHandler();
-            _productHandler = new ProductHandler();
+            _productHandler = new ProductHandler(configuration);
             _orderHandler = new OrderHandler();
             _mailManager = new MailManager(configuration);
         }
+
         [HttpGet("getEnterprises")]
-        public List<DevEnterpriseModel> GetEnterprises()
+        public List<DeveloperEnterpriseView> GetEnterprises()
         {
-            List<DevEnterpriseModel> devEnterprises = _enterpriseHandler.GetDevEnterprises();
+            List<DeveloperEnterpriseView> devEnterprises = _enterpriseHandler.GetDevEnterprises();
             return devEnterprises;
         }
+
         [HttpGet("getProducts")]
-        public List<DevProductModel> GetProducts()
+        public List<Product> GetProducts()
         {
-            List<DevProductModel> devProducts = _productHandler.GetDevProducts();
+            List<Product> devProducts = _productHandler.GetProducts();
             return devProducts;
         }
+
         [HttpGet("getUsers")]
-        public List<DevUserModel> GetUsers()
+        public List<DeveloperUserView> GetUsers()
         {
-            List<DevUserModel> devUsers = _userHandler.GetDevUsers();
+            List<DeveloperUserView> devUsers = _userHandler.GetDevUsers();
             return devUsers;
         }
+
         [HttpGet("getToConfirmOrders")]
-        public List<OrderConfirmationModel> GetToConfirmOrders()
+        public List<Order> GetToConfirmOrders()
         {
-            List<OrderConfirmationModel> toConfirmOrders = _orderHandler.GetToConfirmOrders();
+            List<Order> toConfirmOrders = _orderHandler.GetToConfirmOrders();
             return toConfirmOrders;
         }
+
         [HttpPut("ConfirmOrder")]
-        public IActionResult ConfirmOrder(String orderID)
+        public IActionResult ConfirmOrder(string orderID)
         {
             if (_orderHandler.ConfirmOrder(orderID))
             {
@@ -73,7 +79,7 @@ namespace BMT_backend.Controllers
             return BadRequest("Order confirmation failed.");
         }
         [HttpPut("DenyOrder")]
-        public IActionResult DenyOrder(String orderID)
+        public IActionResult DenyOrder(string orderID)
         {
             if (_orderHandler.DenyOrder(orderID))
             {

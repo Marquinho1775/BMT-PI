@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Views
 {
-    public class DevEnterpriseModel
+    public class DeveloperEnterpriseView
     {
         public string Name { get; set; }
         public string ProductQuantity { get; set; }

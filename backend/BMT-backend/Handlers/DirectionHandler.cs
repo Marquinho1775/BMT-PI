@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
-using BMT_backend.Models;
 using System.Data.SqlClient;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Handlers
 {
@@ -30,10 +30,10 @@ namespace BMT_backend.Handlers
             return tableFormatQuery;
         }
 
-        public List<DirectionModel> GetDirectionsFromUser(UserModel user)
+        public List<Direction> GetDirectionsFromUser(User user)
         {
             string query = "SELECT Id, Username, NumDirection, OtherSigns, Coordinates FROM Directions WHERE Username = @Username";
-            List<DirectionModel> directions = new List<DirectionModel>();
+            List<Direction> directions = new List<Direction>();
 
             using (var queryCommand = new SqlCommand(query, _conection))
             {
@@ -46,7 +46,7 @@ namespace BMT_backend.Handlers
 
                 foreach (DataRow row in tableFormatQuery.Rows)
                 {
-                    directions.Add(new DirectionModel
+                    directions.Add(new Direction
                     {
                         Id = Convert.ToString(row["Id"]),
                         Username = Convert.ToString(row["Username"]),
@@ -60,7 +60,7 @@ namespace BMT_backend.Handlers
             return directions;
         }
 
-        public bool CreateDirection(DirectionModel direction)
+        public bool CreateDirection(Direction direction)
         {
             var query = "INSERT INTO dbo.Directions (Username, NumDirection, OtherSigns, Coordinates) VALUES (@Username, @NumDirection, @OtherSigns, @Coordinates)";
             using (var queryCommand = new SqlCommand(query, Connection))
@@ -77,7 +77,7 @@ namespace BMT_backend.Handlers
             }
         }
 
-        public bool UpdateDirection(DirectionModel direction)
+        public bool UpdateDirection(Direction direction)
         {
             var query = "UPDATE Directions SET NumDirection = @NumDirection, OtherSigns = @OtherSigns, Coordinates = @Coordinates WHERE Id = @Id";
 

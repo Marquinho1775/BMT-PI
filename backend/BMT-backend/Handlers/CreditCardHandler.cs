@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
-using BMT_backend.Models;
-using BMT_backend.Controllers;
 using System.Data.SqlClient;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Data.Common;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Handlers
 {
@@ -55,7 +54,7 @@ namespace BMT_backend.Handlers
         }
 
 
-        public bool CreateCreditCard(CreditCardModel creditCard)
+        public bool CreateCreditCard(CreditCard creditCard)
         {
             try
             {
@@ -88,15 +87,15 @@ namespace BMT_backend.Handlers
         }
 
 
-        public List<CreditCardModel> GetCreditCards()
+        public List<CreditCard> GetCreditCards()
         {
-            List<CreditCardModel> creditCards = new List<CreditCardModel>();
+            List<CreditCard> creditCards = new List<CreditCard>();
             string query = "SELECT * FROM dbo.CreditCard";
             DataTable resultTable = CreateQueryTable(query);
             foreach (DataRow row in resultTable.Rows)
             {
                 creditCards.Add(
-                new CreditCardModel
+                new CreditCard
                 {
                     Id = row["Id"].ToString(),
                     UserID = row["UserID"].ToString(),
@@ -110,9 +109,9 @@ namespace BMT_backend.Handlers
             return creditCards;
         }
 
-        public List<CreditCardModel> GetCreditCardsByUser(string userId)
+        public List<CreditCard> GetCreditCardsByUser(string userId)
         {
-            List<CreditCardModel> creditCards = new List<CreditCardModel>();
+            List<CreditCard> creditCards = new List<CreditCard>();
             string query = "SELECT * FROM dbo.CreditCard WHERE UserID = @UserID";
             SqlParameter[] parameters = new SqlParameter[1];
             parameters[0] = new SqlParameter("@UserID", userId);
@@ -120,7 +119,7 @@ namespace BMT_backend.Handlers
             foreach (DataRow row in resultTable.Rows)
             {
                 creditCards.Add(
-                new CreditCardModel
+                new CreditCard
                 {
                     Id = row["Id"].ToString(),
                     UserID = row["UserID"].ToString(),

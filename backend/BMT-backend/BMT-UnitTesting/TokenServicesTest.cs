@@ -1,9 +1,9 @@
 using Moq;
 using NUnit.Framework;
 using Microsoft.Extensions.Configuration;
-using BMT_backend.Models;
-using BMT_backend.Services;
 using System;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Application.Services;
 
 namespace UnitTestingBMT
 {
@@ -12,7 +12,7 @@ namespace UnitTestingBMT
     {
         private Mock<IConfiguration> _mockConfiguration;
         private TokenService _tokenService;
-        private UserModel _testUser;
+        private User _testUser;
 
         [SetUp]
         public void SetUp()
@@ -25,7 +25,7 @@ namespace UnitTestingBMT
 
             _tokenService = new TokenService(_mockConfiguration.Object);
 
-            _testUser = new UserModel
+            _testUser = new User
             {
                 Id = "1",
                 Name = "John",

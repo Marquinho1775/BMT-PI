@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Views
 {
-    public class DevUserModel
+    public class DeveloperUserView
     {
         public string Name { get; set; }
         public string Email { get; set; }

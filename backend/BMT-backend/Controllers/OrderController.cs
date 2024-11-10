@@ -1,5 +1,6 @@
-﻿using BMT_backend.Handlers;
-using BMT_backend.Models;
+﻿using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
+using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpGet]
-        public List<OrderModel> GetOrders()
+        public List<Order> GetOrders()
         {
             try
             {
@@ -29,7 +30,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost]
-        public async Task<ActionResult<string>> CreateOrder(OrderModel order)
+        public async Task<ActionResult<string>> CreateOrder(Order order)
         {
             try
             {
@@ -46,7 +47,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("AddProductToOrder")]
-        public async Task<ActionResult<string>> AddProductToOrder(OrderProductModel orderProduct)
+        public async Task<ActionResult<string>> AddProductToOrder(AddProductToOrderRequest orderProduct)
         {
             try
             {

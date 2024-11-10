@@ -2,9 +2,9 @@
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc;
-using BMT_backend.Models;
 using System.Data.SqlClient;
 using BMT_backend.Handlers;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Controllers
 {
@@ -33,7 +33,7 @@ namespace BMT_backend.Controllers
             passwordCollab = configuration["EmailSettingsCollabRegister:Password"];
         }
         [HttpPost("sendemail")]
-        public IActionResult SendMail(MailModel userData)
+        public IActionResult SendMail(Mail userData)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("verifycode")]
-        public IActionResult VerifyCode(CodeModel codeModel)
+        public IActionResult VerifyCode(ConfirmationCode codeModel)
         {
             try
             {
@@ -87,7 +87,8 @@ namespace BMT_backend.Controllers
                 {
                     return Ok();
                 }
-                else { 
+                else
+                {
                     return Unauthorized();
                 }
             }
@@ -97,7 +98,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("verifyaccount")]
-        public IActionResult VerifyAccount(CodeModel account)
+        public IActionResult VerifyAccount(ConfirmationCode account)
         {
             try
             {
@@ -110,7 +111,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("sendcollabmail")]
-        public IActionResult SendCollabMail([FromBody]CollabMailModel userData)
+        public IActionResult SendCollabMail([FromBody] CollabMail userData)
         {
             try
             {
@@ -160,7 +161,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpPost("sendconfirmedcollabmail")]
-        public IActionResult ConfirmedCollabMail([FromBody]MailModel userData)
+        public IActionResult ConfirmedCollabMail([FromBody] Mail userData)
         {
             try
             {

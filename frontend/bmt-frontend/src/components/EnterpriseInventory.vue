@@ -299,15 +299,11 @@
       async updateProduct() {
         try {
             console.log(this.editProductData);
-
             if (this.editProductData.newImages && this.editProductData.newImages.length > 0) {
               this.editProductData.imagesURLs = [];
               console.log("Subiendo nuevas imágenes...");
               await this.uploadImages();
             }
-
-            this.editProductData.tags = await this.getTagIdsByNames(this.editProductData.tags);
-
             const updatedProductData = {
                 ...this.editProductData,
                 enterpriseId: this.enterpriseId,
@@ -315,23 +311,17 @@
                 stock: Number(this.editProductData.stock),
                 limit: this.editProductData.limit ? Number(this.editProductData.limit) : null
             };
-
-
             if (!this.editProductData.newImages || this.editProductData.newImages.length === 0) {
                 delete updatedProductData.imagesURLs;
                 delete updatedProductData.newImages;
             }
-
             const token = getToken();
-
             await axios.put(
                 `${API_URL}/Product`,
                 updatedProductData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
             this.isEditDialogOpen = false;
-
             await this.$swal.fire({
                 title: 'Producto actualizado',
                 text: '¡Su producto ha sido actualizado correctamente!',
@@ -342,7 +332,6 @@
                     popup: 'swal-overlay',
                 }
             });
-            
             this.getProducts();
             this.closeEditDialog();
         } catch (error) {

@@ -1,7 +1,9 @@
-﻿using BMT_backend.Models;
+﻿using BMT_backend.Domain.Views;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
 using System.Data.SqlClient;
+using BMT_backend.Domain.Requests;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Handlers
 {
@@ -53,16 +55,16 @@ namespace BMT_backend.Handlers
         }
 
 
-        public List<UserModel> GetUsers()
+        public List<User> GetUsers()
         {
-            List<UserModel> users = new List<UserModel>();
+            List<User> users = new List<User>();
             string query = "SELECT * FROM dbo.Users ";
             DataTable resultTable =
             CreateQueryTable(query);
             foreach (DataRow column in resultTable.Rows)
             {
                 users.Add(
-                new UserModel
+                new User
                 {
                     Id = Convert.ToString(column["Id"]),
                     Name = Convert.ToString(column["Name"]),
@@ -78,34 +80,7 @@ namespace BMT_backend.Handlers
             return users;
         }
 
-        public UserModel GetUserById(string userId)
-        {
-            string query = "SELECT * FROM dbo.Users WHERE Id = @Id";
-            SqlParameter[] parameters = new SqlParameter[] {
-                new SqlParameter("@Id", userId)
-            };
-
-            DataTable resultTable = CreateQueryTable(query, parameters);
-
-            if (resultTable.Rows.Count > 0)
-            {
-                DataRow row = resultTable.Rows[0];
-                return new UserModel
-                {
-                    Id = Convert.ToString(row["Id"]),
-                    Name = Convert.ToString(row["Name"]),
-                    LastName = Convert.ToString(row["LastName"]),
-                    Username = Convert.ToString(row["Username"]),
-                    Email = Convert.ToString(row["Email"]),
-                    IsVerified = Convert.ToBoolean(row["IsVerified"]),
-                    Password = Convert.ToString(row["Password"]),
-                    Role = Convert.ToString(row["Role"])
-                };
-            }
-            return null; 
-        }
-
-        public bool CreateUser(UserModel user)
+        public bool CreateUser(User user)
         {
             var query = "INSERT INTO dbo.Users (Name, LastName, Username, Email, IsVerified, Password) VALUES (@Name, @LastName, @Username, @Email, @IsVerified, @Password)";
             var querryCommand = new SqlCommand(query, Connection);
@@ -152,9 +127,9 @@ namespace BMT_backend.Handlers
             Connection.Close();
         }
 
-        public List<DevUserModel> GetDevUsers()
+        public List<DeveloperUserView> GetDevUsers()
         {
-            List<DevUserModel> devUsers = new List<DevUserModel>();
+            List<DeveloperUserView> devUsers = new List<DeveloperUserView>();
             string query = "SELECT u.Name, u.LastName, u.Email, e.Identification, en.Name AS Enterprise " +
                "FROM Users u " +
                "JOIN Entrepreneurs e ON u.Id = e.UserId " +
@@ -167,7 +142,7 @@ namespace BMT_backend.Handlers
             tableAdapter.Fill(resultTable);
             Connection.Close();
 
-            var usersDictionary = new Dictionary<string, DevUserModel>();
+            var usersDictionary = new Dictionary<string, DeveloperUserView>();
 
             foreach (DataRow row in resultTable.Rows)
             {
@@ -176,7 +151,7 @@ namespace BMT_backend.Handlers
 
                 if (!usersDictionary.ContainsKey(userEmail))
                 {
-                    usersDictionary[userEmail] = new DevUserModel
+                    usersDictionary[userEmail] = new DeveloperUserView
                     {
                         Name = fullName,
                         Email = userEmail,
@@ -198,7 +173,7 @@ namespace BMT_backend.Handlers
             return devUsers;
         }
 
-        public bool UpdateUserProfile(UpdateUserProfileModel updatedUser)
+        public bool UpdateUserProfile(UpdateUserProfileRequest updatedUser)
         {
             var fieldsToUpdate = new List<string>();
 
@@ -250,7 +225,7 @@ namespace BMT_backend.Handlers
             }
         }
 
-        public UserModel GetUserByUsername(string username)
+        public User GetUserByUsername(string username)
         {
             string query = "SELECT * FROM dbo.Users WHERE UserName = @username";
             SqlParameter[] parameters = new SqlParameter[] {
@@ -262,7 +237,7 @@ namespace BMT_backend.Handlers
             if (resultTable.Rows.Count > 0)
             {
                 DataRow row = resultTable.Rows[0];
-                return new UserModel
+                return new User
                 {
                     Id = Convert.ToString(row["Id"]),
                     Name = Convert.ToString(row["Name"]),

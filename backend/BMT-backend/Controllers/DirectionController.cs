@@ -1,5 +1,5 @@
-﻿using BMT_backend.Handlers;
-using BMT_backend.Models;
+﻿using BMT_backend.Domain.Entities;
+using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +16,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost("ObtainDirectionsFromUser")]
-        public async Task<ActionResult<List<DirectionModel>>> getDirectionsFromUser([FromBody] UserModel user)
+        public async Task<ActionResult<List<Direction>>> getDirectionsFromUser([FromBody] User user)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost("CreateDirection")]
-        public async Task<ActionResult<bool>> createDirection(DirectionModel direction)
+        public async Task<ActionResult<bool>> createDirection(Direction direction)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPut("UpdateDirection/{id}")]
-        public async Task<ActionResult<bool>> UpdateDirection(string id, [FromBody] DirectionModel updatedDirection)
+        public async Task<ActionResult<bool>> UpdateDirection(string id, [FromBody] Direction updatedDirection)
         {
             try
             {

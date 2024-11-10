@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Entities
 {
-    public class CodeModel
+    public class ConfirmationCode
     {
         public string Code { get; set; }
         public string Id { get; set; }

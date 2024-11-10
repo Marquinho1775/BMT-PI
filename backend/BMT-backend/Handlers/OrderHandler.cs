@@ -1,5 +1,6 @@
-﻿using BMT_backend.Models;
-using BMT_backend.Services;
+﻿using BMT_backend.Application.Services;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -35,15 +36,15 @@ namespace BMT_backend.Handlers
             return tableFormatQuery;
         }
 
-        public List<OrderModel> GetOrders()
+        public List<Order> GetOrders()
         {
-            var orders = new List<OrderModel>();
+            var orders = new List<Order>();
             string query = "SELECT * FROM Orders";
             var table = CreateQueryTable(query);
 
             foreach (DataRow row in table.Rows)
             {
-                orders.Add(new OrderModel
+                orders.Add(new Order
                 {
                     OrderId = row["OrderId"].ToString(),
                     UserId = row["UserId"].ToString(),
@@ -59,7 +60,7 @@ namespace BMT_backend.Handlers
             return orders;
         }
 
-        public string CreateOrder(OrderModel order)
+        public string CreateOrder(Order order)
         {
             string query = @"
                 INSERT INTO Orders (UserId, DirectionId, OrderPaymentMethod, Status, OrderDeliveryDate, OrderCost, Weight, DeliveryFee)
@@ -79,7 +80,7 @@ namespace BMT_backend.Handlers
             }
         }
 
-        public bool AddProductToOrder(OrderProductModel orderProduct)
+        public bool AddProductToOrder(AddProductToOrderRequest orderProduct)
         {
             string query = @"
                 INSERT INTO Order_Product (OrderId, ProductId, Amount, ProductsCost)
@@ -165,13 +166,13 @@ namespace BMT_backend.Handlers
             return deliveryFee;
         }
 
-        public List<OrderConfirmationModel> GetToConfirmOrders()
+        public List<Order> GetToConfirmOrders()
         {
-            var orders = new List<OrderConfirmationModel>();
+            var orders = new List<Order>();
             string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
-                       u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
-                       d.Coordinates, o.Status
+                u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
+                d.Coordinates, o.Status, d.Id as DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate, o.OrderCost
                 FROM Orders o
                 JOIN Users u ON o.UserId = u.Id
                 JOIN Directions d ON o.DirectionId = d.Id
@@ -185,16 +186,19 @@ namespace BMT_backend.Handlers
                 {
                     while (reader.Read())
                     {
-                        var order = new OrderConfirmationModel
+                        var order = new Order
                         {
                             OrderId = reader["OrderId"].ToString(),
                             OrderDate = (DateTime)reader["OrderDate"],
-                            OrderCost = (decimal)reader["OrderCost"],
-                            DeliveryFee = (decimal)reader["DeliveryFee"],
-                            Weight = (decimal)reader["Weight"],
+                            Weight = Convert.ToDouble(reader["Weight"]),
+                            DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
                             UserId = reader["UserId"].ToString(),
                             UserName = reader["UserName"].ToString(),
                             Direction = reader["NumDirection"].ToString(),
+                            DirectionId = reader["DirectionId"].ToString(),
+                            PaymentMethod = reader["OrderPaymentMethod"].ToString(),
+                            DeliveryDate = reader["OrderDeliveryDate"].ToString(),
+                            OrderCost = Convert.ToDouble(reader["OrderCost"]),
                             OtherSigns = reader["OtherSigns"].ToString(),
                             UserEmail = reader["UserEmail"].ToString(),
                             Coordinates = reader["Coordinates"].ToString(),
@@ -220,7 +224,7 @@ namespace BMT_backend.Handlers
             }
         }
 
-        public OrderConfirmationModel GetOrderById(string orderId)
+        public Order GetOrderById(string orderId)
         {
             string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.OrderDeliveryDate, o.Weight, o.UserId, 
@@ -239,16 +243,16 @@ namespace BMT_backend.Handlers
                 {
                     if (reader.Read())
                     {
-                        return new OrderConfirmationModel
+                        return new Order
                         {
                             OrderId = reader["OrderId"].ToString(),
                             OrderDate = (DateTime)reader["OrderDate"],
-                            OrderCost = (decimal)reader["OrderCost"],
-                            DeliveryFee = (decimal)reader["DeliveryFee"],
-                            OrderDeliveryDate = reader["OrderDeliveryDate"].ToString(),
-                            Weight = (decimal)reader["Weight"],
+                            DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
+                            DeliveryDate = reader["OrderDeliveryDate"].ToString(),
+                            Weight = (double)reader["Weight"],
                             UserId = reader["UserId"].ToString(),
                             UserName = reader["UserName"].ToString(),
+                            OrderCost = Convert.ToDouble(reader["OrderCost"]),
                             Direction = reader["NumDirection"].ToString(),
                             OtherSigns = reader["OtherSigns"].ToString(),
                             UserEmail = reader["Email"].ToString(),
@@ -310,9 +314,9 @@ namespace BMT_backend.Handlers
             }
         }
 
-        public List<OrderConfirmationModel> GetToConfirmUserOrders(string userId)
+        public List<Order> GetToConfirmUserOrders(string userId)
         {
-            var orders = new List<OrderConfirmationModel>();
+            var orders = new List<Order>();
             string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.OrderDeliveryDate, o.Weight, o.UserId,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
@@ -331,14 +335,13 @@ namespace BMT_backend.Handlers
                 {
                     while (reader.Read())
                     {
-                        var order = new OrderConfirmationModel
+                        var order = new Order
                         {
                             OrderId = reader["OrderId"].ToString(),
                             OrderDate = (DateTime)reader["OrderDate"],
-                            OrderCost = (decimal)reader["OrderCost"],
-                            DeliveryFee = (decimal)reader["DeliveryFee"],
-                            OrderDeliveryDate = reader["OrderDeliveryDate"].ToString(),
-                            Weight = (decimal)reader["Weight"],
+                            Weight = Convert.ToDouble(reader["Weight"]),
+                            DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
+                            DeliveryDate = reader["OrderDeliveryDate"].ToString(),
                             UserId = reader["UserId"].ToString(),
                             UserName = reader["UserName"].ToString(),
                             Direction = reader["NumDirection"].ToString(),

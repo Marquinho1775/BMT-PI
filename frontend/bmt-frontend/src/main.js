@@ -18,7 +18,6 @@ import EditProfileInfo from './components/EditProfileInfo.vue';
 import EditEnterpriseInfo from './components/EditEnterpriseInfo.vue';
 
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
-import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
 
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
@@ -88,7 +87,6 @@ const router = createRouter({
     { path: '/acceptInvite', name: "AcceptInvitation", component: AcceptInvitation },
 
     { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
-    { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
 
     { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },
     { path: '/checkout', name: "CheckOut", component: CheckOut },

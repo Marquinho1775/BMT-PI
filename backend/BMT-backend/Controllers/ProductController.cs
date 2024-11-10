@@ -1,24 +1,26 @@
-﻿using BMT_backend.Models;
-using BMT_backend.Handlers;
+﻿using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SqlClient;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
 
 namespace BMT_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductController : ControllerBase {
+    public class ProductController : ControllerBase
+    {
 
         private readonly ProductHandler _productHandler;
 
-        public ProductController()
+        public ProductController(IConfiguration configuration)
         {
-            _productHandler = new ProductHandler();
+            _productHandler = new ProductHandler(configuration);
         }
 
         [HttpPost]
-        public async Task<ActionResult<string>> CreateProduct(ProductModel product)
+        public async Task<ActionResult<string>> CreateProduct(Product product)
         {
             try
             {
@@ -36,21 +38,14 @@ namespace BMT_backend.Controllers
         }
 
         [HttpGet]
-        public List<ProductViewModel> GetProducts()
+        public List<Product> GetProducts()
         {
             var products = _productHandler.GetProducts();
             return products;
         }
 
-        [HttpGet("get-tags")]
-        public List<string> GetTags()
-        {
-            var tags = _productHandler.GetTags();
-            return tags;
-        }
-
         [HttpGet("{enterpriseName}")]
-        public ActionResult<List<ProductViewModel>> GetProductsByEnterprise(string enterpriseName)
+        public ActionResult<List<Product>> GetProductsByEnterprise(string enterpriseName)
         {
             try
             {
@@ -63,71 +58,23 @@ namespace BMT_backend.Controllers
             }
         }
 
-
-        [HttpPut("inventory")]
-        public async Task<ActionResult<string>> UpdateStock(string id, int newStock){
-            try
-            {
-                var result = _productHandler.UpdateStock(id, newStock);
-                return result;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the stock");
-            }
-        }
-        [HttpPut("UpdateStock")]
-        public ActionResult<string> UpdateStock(string ProductId, string Date, int Quantity)
-        {
-            try
-            {
-                if (ProductId == null || Date == null || Quantity == 0)
-                {
-                    return BadRequest("Product information is not valid.");
-                }
-                var result = _productHandler.UpdateStock(ProductId, Date, Quantity);
-                return result;
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the product");
-            }
-        }
-
         [HttpPost("get-stock")]
-        public int GetStock(CheckOutProductModel product)
+        public int GetStock(ProductStockRequest product)
         {
             int cant = 0;
-            if (product.Type == "NonPerishable")
+            try
             {
-                try
-                {
-                    cant = _productHandler.GetStock(product.ProductId);
-                }
-                catch (Exception)
-                {
-                    return cant;
-                }
+                cant = _productHandler.GetStock(product);
                 return cant;
             }
-
-            if (product.Type == "Perishable")
+            catch (Exception)
             {
-                try
-                {
-                    cant = _productHandler.GetStockPerishable(product.ProductId, product.Date);
-                }
-                catch (Exception)
-                {
-                    return cant;
-                }
                 return cant;
             }
-            return cant;
         }
 
         [HttpPut]
-        public ActionResult UpdateProduct([FromBody] ProductModel updatedProduct)
+        public ActionResult UpdateProduct([FromBody] Product updatedProduct)
         {
             try
             {
@@ -144,42 +91,22 @@ namespace BMT_backend.Controllers
             }
         }
 
-        [HttpGet("get-tags-by-product/{productId}")]
-        public ActionResult<List<string>> GetTagsByProductId(string productId)
+        [HttpPut("UpdateStock")]
+        public ActionResult<string> UpdateStock(string ProductId, string Date, int Quantity)
         {
             try
             {
-                var tags = _productHandler.GetTagsIDBasedOnProductID(productId);
-
-                if (tags == null || tags.Count == 0)
-                    return NotFound("No se encontraron tags asociados a este producto.");
-
-                return Ok(tags);
+                if (ProductId == null || Date == null || Quantity == 0)
+                {
+                    return BadRequest("Product information is not valid.");
+                }
+                var result = _productHandler.UpdateStock(ProductId, Quantity, Date);
+                return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los tags: " + ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error updating the product");
             }
         }
-
-        [HttpGet("get-tags-by-name/{tagName}")]
-        public ActionResult<List<string>> GetTagsByName(string tagName)
-        {
-            try
-            {
-                var tags = _productHandler.GetTagsIDBasedOnTagName(tagName);
-
-                if (tags == null || tags.Count == 0)
-                    return NotFound("No se encontraron tags con ese nombre.");
-
-                return Ok(tags);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los IDs de los tags: " + ex.Message);
-            }
-        }
-
-
     }
 }

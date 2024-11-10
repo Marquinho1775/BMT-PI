@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Data;
-using BMT_backend.Models;
 using System.Data.SqlClient;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
 
 namespace BMT_backend.Handlers
 {
@@ -47,7 +48,7 @@ namespace BMT_backend.Handlers
             return false;
         }
 
-        public bool CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        public bool CreateEntrepreneur(Entrepreneur entrepreneur)
         {
             string createEntrepreneurQuery = "insert into Entrepreneurs (UserId, Identification) " +
                 "values ((select Id from Users where UserName = @UserName), " +
@@ -80,15 +81,15 @@ namespace BMT_backend.Handlers
             return exit;
         }
 
-        public List<EntrepreneurViewModel> GetEntrepreneurs() {
-            List<EntrepreneurViewModel> entrepreneurs = new List<EntrepreneurViewModel>();
+        public List<Entrepreneur> GetEntrepreneurs() {
+            List<Entrepreneur> entrepreneurs = new List<Entrepreneur>();
             DataTable table = CreateQueryTable("select e.Id, e.Identification, u.Name, u.LastName, u.UserName, u.Email, u.IsVerified " +
                         "from Entrepreneurs e " +
                         "join Users u on e.UserId = u.Id;");
             foreach (DataRow row in table.Rows)
             {
                 entrepreneurs.Add(
-                    new EntrepreneurViewModel
+                    new Entrepreneur
                     {
                         Id = Convert.ToString(row["Id"]),
                         Name = Convert.ToString(row["Name"]),
@@ -103,39 +104,40 @@ namespace BMT_backend.Handlers
             return entrepreneurs;
         }
 
-        public List<EnterpriseViewModel> GetEnterprisesOfEntrepreneur(string Identification)
+        public List<Enterprise> GetEnterprisesOfEntrepreneur(string Identification)
         {
-            List<EnterpriseViewModel> enterprises = new List<EnterpriseViewModel>();
+            List<Enterprise> enterprises = new List<Enterprise>();
+            EnterpriseHandler enterpriseHandler = new EnterpriseHandler();
 
-            string query = $"select en.Name as EnterpriseName, en.Id, en.IdentificationNumber, u.Name as UserName, u.LastName, en.Description, en.Email, en.PhoneNumber " +
+            string query = $"select en.Id, en.IdentificationNumber, en.Name, en.Description, en.Email, en.PhoneNumber " +
                            $"from Entrepreneurs_Enterprises ee " +
                            $"join Enterprises en on ee.EnterpriseId = en.Id " +
-                           $"join Users u on (select UserId from Entrepreneurs where Identification = '{Identification}') = u.Id " +
                            $"where ee.EntrepreneurId = (select Id from Entrepreneurs where Identification = '{Identification}');";
 
             DataTable tableOfEnterprises = CreateQueryTable(query);
 
             foreach (DataRow row in tableOfEnterprises.Rows)
             {
-                enterprises.Add(new EnterpriseViewModel
+                var enterprise = new Enterprise
                 {
                     Id = Convert.ToString(row["Id"]),
-                    EnterpriseName = Convert.ToString(row["EnterpriseName"]),
                     IdentificationNumber = Convert.ToString(row["IdentificationNumber"]),
+                    Name = Convert.ToString(row["Name"]),
                     Description = Convert.ToString(row["Description"]),
-                    AdminName = Convert.ToString(row["UserName"]),
-                    AdminLastName = Convert.ToString(row["LastName"]),
                     Email = Convert.ToString(row["Email"]),
-                    PhoneNumber = Convert.ToString(row["PhoneNumber"])
-                });
-                Console.WriteLine(enterprises.Last());
+                    PhoneNumber = Convert.ToString(row["PhoneNumber"]),
+                    Administrator = enterpriseHandler.GetEnterpriseAdministrator(Convert.ToString(row["Id"]))
+                };
+                enterprises.Add(enterprise);
+                Console.WriteLine(enterprise);
             }
             return enterprises;
         }
 
-        public EntrepreneurModel GetEntrepreneurByUserId(string id)
+
+        public Entrepreneur GetEntrepreneurByUserId(string id)
         {
-            EntrepreneurModel entrepreneur = new();
+            Entrepreneur entrepreneur = new();
 
             string query = $"SELECT e.Id, e.Identification " +
                             $"FROM Entrepreneurs e " +

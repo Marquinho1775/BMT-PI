@@ -1,7 +1,8 @@
-﻿using BMT_backend.Models;
-using BMT_backend.Handlers;
+﻿using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BMT_backend.Domain.Requests;
+using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Controllers
 {
@@ -16,7 +17,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpGet]
-        public List<EntrepreneurViewModel> Get()
+        public List<Entrepreneur> Get()
         {
             var entrepreneurs = _entrepreneurHandler.GetEntrepreneurs();
             return entrepreneurs;
@@ -40,15 +41,15 @@ namespace BMT_backend.Controllers
             }
         }
 
-        [HttpPost] 
-        public async Task<ActionResult<bool>> CreateEntrepreneur(EntrepreneurModel entrepreneur)
+        [HttpPost]
+        public async Task<ActionResult<bool>> CreateEntrepreneur(Entrepreneur entrepreneur)
         {
             try
             {
                 if (entrepreneur == null
                     || string.IsNullOrEmpty(entrepreneur.Username) || string.IsNullOrEmpty(entrepreneur.Identification))
                 {
-                    return BadRequest ("Username and Identification cannot be null or empty.");
+                    return BadRequest("Username and Identification cannot be null or empty.");
                 }
                 var result = _entrepreneurHandler.CreateEntrepreneur(entrepreneur);
                 return new JsonResult(result);
@@ -59,12 +60,12 @@ namespace BMT_backend.Controllers
             }
         }
 
-        [HttpPost("add-to-enterprise")] 
+        [HttpPost("add-to-enterprise")]
         public async Task<ActionResult<bool>> AddEntrepreneurToEnterprise(AddEntrepreneurToEnterpriseRequest request)
         {
             try
             {
-                if (request == null 
+                if (request == null
                     || string.IsNullOrEmpty(request.EntrepreneurIdentification) || string.IsNullOrEmpty(request.EnterpriseIdentification))
                 {
                     return BadRequest("Identifications cannot be null or empty.");
@@ -91,7 +92,8 @@ namespace BMT_backend.Controllers
                 var result = _entrepreneurHandler.GetEnterprisesOfEntrepreneur(Identification);
                 return new JsonResult(result);
 
-            } catch
+            }
+            catch
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error consultando las empresas registradas");
             }

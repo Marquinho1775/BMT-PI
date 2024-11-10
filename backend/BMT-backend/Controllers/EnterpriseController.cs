@@ -1,7 +1,8 @@
-﻿using BMT_backend.Models;
-using BMT_backend.Handlers;
+﻿using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
 
 namespace BMT_backend.Controllers
 {
@@ -17,7 +18,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpGet]
-        public List<EnterpriseModel> Get()
+        public List<Enterprise> Get()
         {
             return _entrepeneurshipHandler.GetEnterprises();
         }
@@ -41,7 +42,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateEnterprise(EnterpriseModel enterprise)
+        public async Task<ActionResult<bool>> CreateEnterprise(Enterprise enterprise)
         {
             try
             {
@@ -60,7 +61,7 @@ namespace BMT_backend.Controllers
 
 
         [HttpGet("{enterpriseId}")]
-        public ActionResult<EnterpriseModel> GetEnterpriseById(string enterpriseId)
+        public ActionResult<Enterprise> GetEnterpriseById(string enterpriseId)
         {
             try
             {
@@ -80,7 +81,7 @@ namespace BMT_backend.Controllers
         }
 
         [HttpPut("{enterpriseId}")]
-        public async Task<ActionResult<bool>> UpdateEnterprise(string enterpriseId, UpdateEnterpriseModel updatedEnterprise)
+        public async Task<ActionResult<bool>> UpdateEnterprise(string enterpriseId, UpdateEnterpriseRequest updatedEnterprise)
         {
             try
             {

@@ -76,6 +76,7 @@ export default {
         const response = await axios.get(API_URL + "/User/GetToConfirmOrders", {
           params: { userId: getUser().id },
         });
+        console.log(response.data);
         this.orders = response.data;
       } catch (error) {
         console.error("Error fetching orders:", error);

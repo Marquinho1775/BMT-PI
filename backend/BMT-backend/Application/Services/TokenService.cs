@@ -1,10 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using BMT_backend.Models;
+using BMT_backend.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BMT_backend.Services
+namespace BMT_backend.Application.Services
 {
     public class TokenService
     {
@@ -15,7 +15,7 @@ namespace BMT_backend.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(UserModel user)
+        public string GenerateToken(User user)
         {
             if (user == null)
             {

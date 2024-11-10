@@ -1,5 +1,4 @@
-﻿using BMT_backend.Models;
-using BMT_backend.Handlers;
+﻿using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +10,7 @@ namespace BMT_backend.Controllers
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ImageFileHandler _imageFileHandler;
-        
+
         public ImageFileController(IWebHostEnvironment webHostEnvironment)
         {
             _webHostEnvironment = webHostEnvironment;

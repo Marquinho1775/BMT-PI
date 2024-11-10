@@ -1,5 +1,5 @@
-﻿using BMT_backend.Handlers;
-using BMT_backend.Models;
+﻿using BMT_backend.Domain.Entities;
+using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +11,9 @@ namespace BMT_backend.Controllers
     {
         private readonly ShoppingCartHandler _shoppingCartHandler;
 
-        public ShoppingCartController()
+        public ShoppingCartController(IConfiguration configuration)
         {
-            _shoppingCartHandler = new ShoppingCartHandler();
+            _shoppingCartHandler = new ShoppingCartHandler(configuration);
         }
 
         [HttpPost]
@@ -34,7 +34,7 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpGet]
-        public ActionResult<ShoppingCartModel> GetShoppingCart(string userId)
+        public ActionResult<ShoppingCart> GetShoppingCart(string userId)
         {
             try
             {
@@ -45,7 +45,6 @@ namespace BMT_backend.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error getting the shopping cart");
             }
-
         }
         [HttpGet("GetCartId")]
         public ActionResult<string> GetCartId(string userId)

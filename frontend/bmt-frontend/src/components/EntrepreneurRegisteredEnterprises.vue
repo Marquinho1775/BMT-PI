@@ -19,7 +19,7 @@
               @click="goToEnterprise(enterprise.id)">
               <td>{{ enterprise.enterpriseName }}</td>
               <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
-              <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
+              <td>{{ enterprise.administrator.name }} {{ enterprise.administrator.lastname }}</td>
               <td>{{ enterprise.email }}</td>
               <td>{{ enterprise.phoneNumber }}</td>
               <td>{{ enterprise.description }}</td>

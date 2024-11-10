@@ -1,6 +1,6 @@
-﻿namespace BMT_backend.Models
+﻿namespace BMT_backend.Domain.Entities
 {
-    public class CollabMailModel
+    public class CollabMail
     {
         public string Email { get; set; }
         public string Id { get; set; }
