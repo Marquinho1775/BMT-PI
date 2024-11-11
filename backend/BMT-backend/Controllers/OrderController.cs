@@ -11,9 +11,9 @@ namespace BMT_backend.Controllers
     public class OrderController : ControllerBase
     {
         private readonly OrderHandler _orderHandler;
-        public OrderController()
+        public OrderController(IConfiguration configuration)
         {
-            _orderHandler = new OrderHandler();
+            _orderHandler = new OrderHandler(configuration);
         }
 
         [HttpGet]
@@ -29,6 +29,7 @@ namespace BMT_backend.Controllers
                 return null;
             }
         }
+
         [HttpPost]
         public async Task<ActionResult<string>> CreateOrder(Order order)
         {
@@ -72,7 +73,7 @@ namespace BMT_backend.Controllers
                 {
                     return BadRequest();
                 }
-                var result = _orderHandler.UpdateDeliverFee(orderId);
+                var result = _orderHandler.UpdateDeliveryFee(orderId);
                 return new JsonResult(result);
             }
             catch (Exception)

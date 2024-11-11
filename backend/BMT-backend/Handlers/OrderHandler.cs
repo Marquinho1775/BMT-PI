@@ -1,8 +1,9 @@
-﻿using BMT_backend.Application.Services;
-using BMT_backend.Domain.Entities;
-using BMT_backend.Domain.Requests;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using BMT_backend.Application.Services;
+using BMT_backend.Domain.Entities;
+using BMT_backend.Domain.Requests;
 
 namespace BMT_backend.Handlers
 {
@@ -10,352 +11,289 @@ namespace BMT_backend.Handlers
     {
         private readonly string _connectionString;
 
-        public OrderHandler()
+        public OrderHandler(IConfiguration configuration)
         {
-            var builder = WebApplication.CreateBuilder();
-            _connectionString = builder.Configuration.GetConnectionString("BMTContext") + ";MultipleActiveResultSets=True";
+            _connectionString = configuration.GetConnectionString("BMTContext") + ";MultipleActiveResultSets=True";
         }
 
-        private DataTable CreateQueryTable(string query, SqlParameter[] parameters = null)
+        private DataTable ExecuteQuery(string query, List<SqlParameter> parameters = null)
         {
-            var tableFormatQuery = new DataTable();
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
-            {
-                if (parameters != null)
-                {
-                    command.Parameters.AddRange(parameters);
-                }
-
-                using (var adapter = new SqlDataAdapter(command))
-                {
-                    connection.Open();
-                    adapter.Fill(tableFormatQuery);
-                }
-            }
-            return tableFormatQuery;
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            if (parameters != null)
+                command.Parameters.AddRange(parameters.ToArray());
+            using var adapter = new SqlDataAdapter(command);
+            var resultTable = new DataTable();
+            adapter.Fill(resultTable);
+            return resultTable;
         }
 
-        public List<Order> GetOrders()
+        private int ExecuteNonQuery(string query, List<SqlParameter> parameters = null)
         {
-            var orders = new List<Order>();
-            string query = "SELECT * FROM Orders";
-            var table = CreateQueryTable(query);
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            if (parameters != null)
+                command.Parameters.AddRange(parameters.ToArray());
+            connection.Open();
+            return command.ExecuteNonQuery();
+        }
 
-            foreach (DataRow row in table.Rows)
-            {
-                orders.Add(new Order
-                {
-                    OrderId = row["OrderId"].ToString(),
-                    UserId = row["UserId"].ToString(),
-                    DirectionId = row["DirectionId"].ToString(),
-                    PaymentMethod = row["OrderPaymentMethod"].ToString(),
-                    Status = (int)row["Status"],
-                    DeliveryDate = row["OrderDeliveryDate"].ToString(),
-                    OrderCost = Convert.ToDouble(row["OrderCost"]),
-                    Weight = Convert.ToDouble(row["Weight"]),
-                    DeliveryFee = Convert.ToDouble(row["DeliveryFee"])
-                });
-            }
-            return orders;
+        private object ExecuteScalar(string query, List<SqlParameter> parameters = null)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            if (parameters != null)
+                command.Parameters.AddRange(parameters.ToArray());
+            connection.Open();
+            return command.ExecuteScalar();
         }
 
         public string CreateOrder(Order order)
         {
-            string query = @"
+            const string query = @"
                 INSERT INTO Orders (UserId, DirectionId, OrderPaymentMethod, Status, OrderDeliveryDate, OrderCost, Weight, DeliveryFee)
                 OUTPUT INSERTED.OrderId
                 VALUES (@UserId, @DirectionId, @PaymentMethod, @Status, @DeliveryDate, 0, 0, 0);";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
+            var parameters = new List<SqlParameter>
             {
-                command.Parameters.AddWithValue("@UserId", order.UserId);
-                command.Parameters.AddWithValue("@DirectionId", order.DirectionId);
-                command.Parameters.AddWithValue("@PaymentMethod", order.PaymentMethod);
-                command.Parameters.AddWithValue("@DeliveryDate", order.DeliveryDate);
-                command.Parameters.AddWithValue("@Status", order.Status);
-                connection.Open();
-                return command.ExecuteScalar().ToString();
-            }
+                new("@UserId", order.UserId),
+                new("@DirectionId", order.DirectionId),
+                new("@PaymentMethod", order.PaymentMethod),
+                new("@DeliveryDate", order.DeliveryDate),
+                new("@Status", order.Status)
+            };
+            return ExecuteScalar(query, parameters)?.ToString();
         }
 
         public bool AddProductToOrder(AddProductToOrderRequest orderProduct)
         {
-            string query = @"
+            const string insertQuery = @"
                 INSERT INTO Order_Product (OrderId, ProductId, Amount, ProductsCost)
                 VALUES (@OrderId, @ProductId, @Amount, @ProductsCost);";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
+            var insertParams = new List<SqlParameter>
             {
-                command.Parameters.AddWithValue("@OrderId", orderProduct.OrderId);
-                command.Parameters.AddWithValue("@ProductId", orderProduct.ProductId);
-                command.Parameters.AddWithValue("@Amount", orderProduct.Amount);
-                command.Parameters.AddWithValue("@ProductsCost", orderProduct.ProductsCost);
-                connection.Open();
-                command.ExecuteNonQuery();
-            }
-
-            double productWeight = 0;
-            string getProductWeightQuery = "SELECT Weight FROM Products WHERE Id = @ProductId";
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(getProductWeightQuery, connection))
-            {
-                command.Parameters.AddWithValue("@ProductId", orderProduct.ProductId);
-                connection.Open();
-                productWeight = Convert.ToDouble(command.ExecuteScalar());
-            }
+                new("@OrderId", orderProduct.OrderId),
+                new("@ProductId", orderProduct.ProductId),
+                new("@Amount", orderProduct.Amount),
+                new("@ProductsCost", orderProduct.ProductsCost)
+            };
+            ExecuteNonQuery(insertQuery, insertParams);
+            double productWeight = GetProductWeight(orderProduct.ProductId);
             double totalWeight = orderProduct.Amount * productWeight;
-
-            string query2 = @"
+            const string updateQuery = @"
                 UPDATE Orders
-                SET OrderCost = OrderCost + @ProductsCost, Weight = Weight + @totalWeight
+                SET OrderCost = OrderCost + @ProductsCost, Weight = Weight + @TotalWeight
                 WHERE OrderId = @OrderId;";
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query2, connection))
+            var updateParams = new List<SqlParameter>
             {
-                command.Parameters.AddWithValue("@ProductsCost", orderProduct.ProductsCost);
-                command.Parameters.AddWithValue("@totalWeight", totalWeight);
-                command.Parameters.AddWithValue("@OrderId", orderProduct.OrderId);
-                connection.Open();
-                return command.ExecuteNonQuery() > 0;
-            }
+                new("@ProductsCost", orderProduct.ProductsCost),
+                new("@TotalWeight", totalWeight),
+                new("@OrderId", orderProduct.OrderId)
+            };
+            return ExecuteNonQuery(updateQuery, updateParams) > 0;
         }
 
-        public bool UpdateDeliverFee(string orderId)
+        private double GetProductWeight(string productId)
         {
-            string query = "SELECT DirectionId, Weight FROM Orders WHERE OrderId = @OrderId";
-            var connection = new SqlConnection(_connectionString);
-            var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@OrderId", orderId);
-            connection.Open();
-            var reader = command.ExecuteReader();
-            reader.Read();
-            string directionId = reader["DirectionId"].ToString();
-            double weight = Convert.ToDouble(reader["Weight"]);
-            double deliveryFee = CalculateDeliveryFee(directionId, weight);
-            string query2 = "UPDATE Orders SET DeliveryFee = @DeliveryFee WHERE OrderId = @OrderId";
-            var connection2 = new SqlConnection(_connectionString);
-            var command2 = new SqlCommand(query2, connection2);
-            command2.Parameters.AddWithValue("@DeliveryFee", deliveryFee);
-            command2.Parameters.AddWithValue("@OrderId", orderId);
-            connection2.Open();
-            return command2.ExecuteNonQuery() > 0;
+            const string query = "SELECT Weight FROM Products WHERE Id = @ProductId";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return Convert.ToDouble(ExecuteScalar(query, parameters));
         }
 
-        public double CalculateDeliveryFee(string directionId, double weight)
+        public bool UpdateDeliveryFee(string orderId)
         {
-            string query = "select Coordinates from Directions where Id = @directionId";
-            var connection = new SqlConnection(_connectionString);
-            var command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@directionId", directionId);
-            connection.Open();
-            var reader = command.ExecuteReader();
-            reader.Read();
-            string coordinates = reader["Coordinates"].ToString();
-            string[] coord = coordinates.Split(',');
+            var orderDetails = GetOrderDetails(orderId);
+            double deliveryFee = CalculateDeliveryFee(orderDetails.DirectionId, orderDetails.Weight);
+            const string query = "UPDATE Orders SET DeliveryFee = @DeliveryFee WHERE OrderId = @OrderId";
+            var parameters = new List<SqlParameter>
+            {
+                new("@DeliveryFee", deliveryFee),
+                new("@OrderId", orderId)
+            };
+            return ExecuteNonQuery(query, parameters) > 0;
+        }
+
+        private (string DirectionId, double Weight) GetOrderDetails(string orderId)
+        {
+            const string query = "SELECT DirectionId, Weight FROM Orders WHERE OrderId = @OrderId";
+            var parameters = new List<SqlParameter> { new("@OrderId", orderId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var row = resultTable.Rows[0];
+            return (row["DirectionId"].ToString(), Convert.ToDouble(row["Weight"]));
+        }
+
+        private double CalculateDeliveryFee(string directionId, double weight)
+        {
+            var coordinates = GetCoordinates(directionId);
+            var coord = coordinates.Split(',');
             double x = Convert.ToDouble(coord[0]);
             double y = Convert.ToDouble(coord[1]);
-            double distance =  DistanceCalculator.CalcularDistancia(x, y);
-            double deliveryFee = distance >= 25? 3000 : 2000;
-            Console.WriteLine("Distancia: " + distance);
-            Console.WriteLine("Delivery Fee: " + deliveryFee);
+            double distance = DistanceCalculator.CalcularDistancia(x, y);
+            double deliveryFee = distance >= 25 ? 3000 : 2000;
             deliveryFee += weight * 200;
-            Console.WriteLine("Delivery Fee: " + deliveryFee);
             return deliveryFee;
         }
 
-        public List<Order> GetToConfirmOrders()
+        private string GetCoordinates(string directionId)
         {
+            const string query = "SELECT Coordinates FROM Directions WHERE Id = @DirectionId";
+            var parameters = new List<SqlParameter> { new("@DirectionId", directionId) };
+            return ExecuteScalar(query, parameters)?.ToString();
+        }
+
+        public List<Order> GetOrders()
+        {
+            const string query = "SELECT * FROM Orders";
+            var resultTable = ExecuteQuery(query);
             var orders = new List<Order>();
-            string query = @"
+            foreach (DataRow row in resultTable.Rows)
+            {
+                orders.Add(CreateOrderFromRow(row));
+            }
+            return orders;
+        }
+
+        public List<OrderDetails> GetToConfirmOrders()
+        {
+            const string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
-                u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
-                d.Coordinates, o.Status, d.Id as DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate, o.OrderCost
+                       u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
+                       d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
                 JOIN Users u ON o.UserId = u.Id
                 JOIN Directions d ON o.DirectionId = d.Id
                 WHERE o.Status = 0;";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
+            var resultTable = ExecuteQuery(query);
+            var orders = new List<OrderDetails>();
+            foreach (DataRow row in resultTable.Rows)
             {
-                connection.Open();
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var order = new Order
-                        {
-                            OrderId = reader["OrderId"].ToString(),
-                            OrderDate = (DateTime)reader["OrderDate"],
-                            Weight = Convert.ToDouble(reader["Weight"]),
-                            DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                            UserId = reader["UserId"].ToString(),
-                            UserName = reader["UserName"].ToString(),
-                            Direction = reader["NumDirection"].ToString(),
-                            DirectionId = reader["DirectionId"].ToString(),
-                            PaymentMethod = reader["OrderPaymentMethod"].ToString(),
-                            DeliveryDate = reader["OrderDeliveryDate"].ToString(),
-                            OrderCost = Convert.ToDouble(reader["OrderCost"]),
-                            OtherSigns = reader["OtherSigns"].ToString(),
-                            UserEmail = reader["UserEmail"].ToString(),
-                            Coordinates = reader["Coordinates"].ToString(),
-                            Status = (int)reader["Status"],
-                            Products = GetProductsByOrderId(reader["OrderId"].ToString())
-                        };
-                        orders.Add(order);
-                    }
-                }
+                var order = CreateOrderDetailFromRow(row);
+                orders.Add(order);
             }
             return orders;
         }
 
-        public bool ConfirmOrder(string orderId)
+        public List<OrderDetails> GetToConfirmUserOrders(string userId)
         {
-            string query = "UPDATE dbo.Orders SET Status = 1 WHERE OrderId = @OrderId";
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@OrderId", orderId);
-                connection.Open();
-                return command.ExecuteNonQuery() > 0;
-            }
-        }
-
-        public Order GetOrderById(string orderId)
-        {
-            string query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.OrderDeliveryDate, o.Weight, o.UserId, 
-                       u.UserName, d.NumDirection, d.OtherSigns, u.Email, d.Coordinates, o.Status
-                FROM Orders o
-                JOIN Users u ON o.UserId = u.Id
-                JOIN Directions d ON o.DirectionId = d.Id
-                WHERE o.OrderId = @OrderId;";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@OrderId", orderId);
-                connection.Open();
-                using (var reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        return new Order
-                        {
-                            OrderId = reader["OrderId"].ToString(),
-                            OrderDate = (DateTime)reader["OrderDate"],
-                            DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                            DeliveryDate = reader["OrderDeliveryDate"].ToString(),
-                            Weight = (double)reader["Weight"],
-                            UserId = reader["UserId"].ToString(),
-                            UserName = reader["UserName"].ToString(),
-                            OrderCost = Convert.ToDouble(reader["OrderCost"]),
-                            Direction = reader["NumDirection"].ToString(),
-                            OtherSigns = reader["OtherSigns"].ToString(),
-                            UserEmail = reader["Email"].ToString(),
-                            Coordinates = reader["Coordinates"].ToString(),
-                            Status = (int)reader["Status"],
-                            Products = GetProductsByOrderId(orderId)
-                        };
-                    }
-                }
-            }
-            return null;
-        }
-
-        private List<ProductDetails> GetProductsByOrderId(string orderId)
-        {
-            var products = new List<ProductDetails>();
-            string query = @"
-                SELECT op.ProductId, p.Name AS ProductName, op.Amount, op.ProductsCost, 
-                       e.Name AS EnterpriseName, e.Email
-                FROM Order_Product op
-                JOIN Products p ON op.ProductId = p.Id
-                JOIN Enterprises e ON p.EnterpriseId = e.Id
-                WHERE op.OrderId = @OrderId;";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@OrderId", orderId);
-                connection.Open();
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var product = new ProductDetails
-                        {
-                            ProductId = reader["ProductId"].ToString(),
-                            ProductName = reader["ProductName"].ToString(),
-                            Quantity = Convert.ToInt32(reader["Amount"]),
-                            ProductsCost = Convert.ToInt32(reader["ProductsCost"]),
-                            EnterpriseName = reader["EnterpriseName"].ToString(),
-                            EnterpriseEmail = reader["Email"].ToString(),
-                        };
-                        products.Add(product);
-                    }
-                }
-            }
-            return products;
-        }
-
-        public bool DenyOrder(string orderId)
-        {
-            string query = "UPDATE dbo.Orders SET Status = 5 WHERE OrderId = @OrderId";
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
-            {
-                command.Parameters.AddWithValue("@OrderId", orderId);
-                connection.Open();
-                return command.ExecuteNonQuery() > 0;
-            }
-        }
-
-        public List<Order> GetToConfirmUserOrders(string userId)
-        {
-            var orders = new List<Order>();
-            string query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.OrderDeliveryDate, o.Weight, o.UserId,
+            const string query = @"
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
-                       d.Coordinates, o.Status
+                       d.Coordinates, o.Status, o.OrderDeliveryDate
                 FROM Orders o
                 JOIN Users u ON o.UserId = u.Id
                 JOIN Directions d ON o.DirectionId = d.Id
                 WHERE o.Status = 0 AND o.UserId = @UserId;";
-
-            using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(query, connection))
+            var parameters = new List<SqlParameter> { new("@UserId", userId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var orders = new List<OrderDetails>();
+            foreach (DataRow row in resultTable.Rows)
             {
-                command.Parameters.AddWithValue("@UserId", userId);
-                connection.Open();
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        var order = new Order
-                        {
-                            OrderId = reader["OrderId"].ToString(),
-                            OrderDate = (DateTime)reader["OrderDate"],
-                            Weight = Convert.ToDouble(reader["Weight"]),
-                            DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                            DeliveryDate = reader["OrderDeliveryDate"].ToString(),
-                            UserId = reader["UserId"].ToString(),
-                            UserName = reader["UserName"].ToString(),
-                            Direction = reader["NumDirection"].ToString(),
-                            OtherSigns = reader["OtherSigns"].ToString(),
-                            UserEmail = reader["UserEmail"].ToString(),
-                            Coordinates = reader["Coordinates"].ToString(),
-                            Status = (int)reader["Status"],
-                            Products = GetProductsByOrderId(reader["OrderId"].ToString())
-                        };
-                        orders.Add(order);
-                    }
-                }
+                var order = CreateOrderDetailFromRow(row);
+                orders.Add(order);
             }
             return orders;
+        }
+
+        public OrderDetails GetOrderById(string orderId)
+        {
+            const string query = @"
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                       u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
+                       d.Coordinates, o.Status, o.OrderPaymentMethod, o.OrderDeliveryDate
+                FROM Orders o
+                JOIN Users u ON o.UserId = u.Id
+                JOIN Directions d ON o.DirectionId = d.Id
+                WHERE o.OrderId = @OrderId;";
+            var parameters = new List<SqlParameter> { new("@OrderId", orderId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var order = CreateOrderDetailFromRow(resultTable.Rows[0]);
+            return order;
+        }
+
+        private List<ProductDetails> GetProductsByOrderId(string orderId)
+        {
+            const string query = @"
+                SELECT op.ProductId, p.Name AS ProductName, op.Amount, op.ProductsCost, 
+                       e.Name AS EnterpriseName, e.Email AS EnterpriseEmail
+                FROM Order_Product op
+                JOIN Products p ON op.ProductId = p.Id
+                JOIN Enterprises e ON p.EnterpriseId = e.Id
+                WHERE op.OrderId = @OrderId;";
+            var parameters = new List<SqlParameter> { new("@OrderId", orderId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var products = new List<ProductDetails>();
+            foreach (DataRow row in resultTable.Rows)
+            {
+                products.Add(new ProductDetails
+                {
+                    ProductId = row["ProductId"].ToString(),
+                    ProductName = row["ProductName"].ToString(),
+                    Quantity = Convert.ToInt32(row["Amount"]),
+                    ProductsCost = Convert.ToInt32(row["ProductsCost"]),
+                    EnterpriseName = row["EnterpriseName"].ToString(),
+                    EnterpriseEmail = row["EnterpriseEmail"].ToString(),
+                });
+            }
+            return products;
+        }
+
+        public bool ConfirmOrder(string orderId)
+        {
+            const string query = "UPDATE Orders SET Status = 1 WHERE OrderId = @OrderId";
+            var parameters = new List<SqlParameter> { new("@OrderId", orderId) };
+            return ExecuteNonQuery(query, parameters) > 0;
+        }
+
+        public bool DenyOrder(string orderId)
+        {
+            const string query = "UPDATE Orders SET Status = 5 WHERE OrderId = @OrderId";
+            var parameters = new List<SqlParameter> { new("@OrderId", orderId) };
+            return ExecuteNonQuery(query, parameters) > 0;
+        }
+
+        private Order CreateOrderFromRow(DataRow row)
+        {
+            return new Order
+            {
+                OrderId = row["OrderId"].ToString(),
+                UserId = row["UserId"].ToString(),
+                DirectionId = row["DirectionId"].ToString(),
+                PaymentMethod = row["OrderPaymentMethod"].ToString(),
+                OrderDate = Convert.ToDateTime(row["OrderDate"]),
+                DeliveryDate = row["OrderDeliveryDate"].ToString(),
+                OrderCost = Convert.ToDouble(row["OrderCost"]),
+                Weight = Convert.ToDouble(row["Weight"]),
+                DeliveryFee = Convert.ToDouble(row["DeliveryFee"]),
+                Status = Convert.ToInt32(row["Status"])
+            };
+        }
+
+        private OrderDetails CreateOrderDetailFromRow(DataRow row)
+        {
+            var orderId = row["OrderId"].ToString();
+            var order = new OrderDetails
+            {
+                Order = new Order
+                {
+                    OrderId = orderId,
+                    OrderDate = Convert.ToDateTime(row["OrderDate"]),
+                    OrderCost = Convert.ToDouble(row["OrderCost"]),
+                    DeliveryFee = Convert.ToDouble(row["DeliveryFee"]),
+                    Weight = Convert.ToDouble(row["Weight"]),
+                    UserId = row["UserId"].ToString(),
+                    Status = Convert.ToInt32(row["Status"]),
+                    DirectionId = row.Table.Columns.Contains("DirectionId") ? row["DirectionId"].ToString() : null,
+                    PaymentMethod = row.Table.Columns.Contains("OrderPaymentMethod") ? row["OrderPaymentMethod"].ToString() : null,
+                    DeliveryDate = row.Table.Columns.Contains("OrderDeliveryDate") ? row["OrderDeliveryDate"].ToString() : null
+                },
+                UserName = row["UserName"].ToString(),
+                Direction = row["NumDirection"].ToString(),
+                OtherSigns = row["OtherSigns"].ToString(),
+                UserEmail = row["UserEmail"].ToString(),
+                Coordinates = row["Coordinates"].ToString(),
+                Products = GetProductsByOrderId(orderId)
+            };
+            return order;
         }
     }
 }

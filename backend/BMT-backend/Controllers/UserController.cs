@@ -20,7 +20,7 @@ namespace BMT_backend.Controllers
         public UserController(TokenService tokenService, IConfiguration configuration)
         {
             _userHandler = new UserHandler();
-            _orderHandler = new OrderHandler();
+            _orderHandler = new OrderHandler(configuration);
             _mailManager = new MailManager(configuration);
             _tokenService = tokenService;
         }
@@ -137,9 +137,9 @@ namespace BMT_backend.Controllers
             }
         }
         [HttpGet("GetToConfirmOrders")]
-        public List<Order> GetToConfirmOrders(string userId)
+        public List<OrderDetails> GetToConfirmOrders(string userId)
         {
-            List<Order> toConfirmOrders = _orderHandler.GetToConfirmUserOrders(userId);
+            List<OrderDetails> toConfirmOrders = _orderHandler.GetToConfirmUserOrders(userId);
             return toConfirmOrders;
         }
         [HttpPut("DenyOrder")]

@@ -8,6 +8,11 @@ namespace BMT_backend.Domain.Entities
         public string UserId { get; set; }
         public string DirectionId { get; set; }
         public string PaymentMethod { get; set; }
+        public DateTime? OrderDate { get; set; }
+        public string DeliveryDate { get; set; }
+        public double? OrderCost { get; set; }
+        public double? Weight { get; set; }
+        public double? DeliveryFee { get; set; }
         public int Status { get; set; }
         /*
          * 0 No confirmado
@@ -17,13 +22,11 @@ namespace BMT_backend.Domain.Entities
          * 4 Terminado
          * 5 Cancelado
          */
-        public string DeliveryDate { get; set; }
-        public double? OrderCost { get; set; }
-        public double? Weight { get; set; }
-        public double? DeliveryFee { get; set; }
 
-        // Properties from OrderConfirmationModel
-        public DateTime? OrderDate { get; set; }
+    }
+    public class OrderDetails
+    {
+        public Order Order { get; set; }
         public string? UserName { get; set; } = null!;
         public string? Direction { get; set; } = null!;
         public string? UserEmail { get; set; } = null!;

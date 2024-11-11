@@ -23,7 +23,7 @@ namespace BMT_backend.Controllers
             _userHandler = new UserHandler();
             _enterpriseHandler = new EnterpriseHandler();
             _productHandler = new ProductHandler(configuration);
-            _orderHandler = new OrderHandler();
+            _orderHandler = new OrderHandler(configuration);
             _mailManager = new MailManager(configuration);
         }
 
@@ -49,9 +49,9 @@ namespace BMT_backend.Controllers
         }
 
         [HttpGet("getToConfirmOrders")]
-        public List<Order> GetToConfirmOrders()
+        public List<OrderDetails> GetToConfirmOrders()
         {
-            List<Order> toConfirmOrders = _orderHandler.GetToConfirmOrders();
+            List<OrderDetails> toConfirmOrders = _orderHandler.GetToConfirmOrders();
             return toConfirmOrders;
         }
 

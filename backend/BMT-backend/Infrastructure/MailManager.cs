@@ -25,7 +25,7 @@ namespace BMT_backend.Infrastructure
             passwordCollab = configuration["EmailSettingsCollabRegister:Password"];
         }
 
-        public void SendConfirmationEmails(Order order)
+        public void SendConfirmationEmails(OrderDetails order)
         {
             string title = "Confirmación de orden";
             string body = "<h1>Confirmación de orden</h1>" +
@@ -40,8 +40,8 @@ namespace BMT_backend.Infrastructure
                         $"<b>Cantidad:</b> {product.Quantity}<br><br>";
             }
 
-            body += $"<b>Fecha de creación de orden:</b> {order.OrderDate}<br>" +
-                    $"<b>Fecha de Entrega:</b> {order.DeliveryDate}<br>" +
+            body += $"<b>Fecha de creación de orden:</b> {order.Order.OrderDate}<br>" +
+                    $"<b>Fecha de Entrega:</b> {order.Order.DeliveryDate}<br>" +
                     "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>" +
                     "¡Gracias por confiar en nosotros!<br><br>" +
                     "Saludos,<br>" +
@@ -103,11 +103,11 @@ namespace BMT_backend.Infrastructure
             }
         }
 
-        public void SendDenyEmail(Order order)
+        public void SendDenyEmail(OrderDetails order)
         {
             string title = "Orden cancelada";
             string body = "<h1>Orden cancelada</h1>" +
-                          $"Hola!<br><br>Te informamos que tu orden con la id {order.OrderId} ha sido cancelada.<br>" +
+                          $"Hola!<br><br>Te informamos que tu orden con la id {order.Order.OrderId} ha sido cancelada.<br>" +
                           "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>" +
                           "¡Gracias por confiar en nosotros!<br><br>" +
                           "Saludos,<br>" +

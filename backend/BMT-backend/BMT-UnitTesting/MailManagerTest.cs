@@ -12,7 +12,7 @@ namespace UnitTestingBMT
     {
         private Mock<IConfiguration> _mockConfiguration;
         private MailManager _mailManager;
-        private Order _testOrder;
+        private OrderDetails _testOrder;
 
         [SetUp]
         public void SetUp()
@@ -28,10 +28,13 @@ namespace UnitTestingBMT
 
             _mailManager = new MailManager(_mockConfiguration.Object);
 
-            _testOrder = new Order
+            _testOrder = new OrderDetails
             {
-                OrderId = "123",
-                OrderDate = DateTime.Now,
+                Order = new Order
+                {
+                    OrderId = "123",
+                    OrderDate = DateTime.Now,
+                },
                 UserEmail = "user@test.com",
                 Products = new List<ProductDetails>
                 {
