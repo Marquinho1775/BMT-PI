@@ -1,8 +1,8 @@
-﻿using BMT_backend.Handlers;
-using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
+using BMT_backend.Application.Services;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -10,16 +10,16 @@ namespace BMT_backend.Presentation.Controllers
     [ApiController]
     public class EntrepreneurController : ControllerBase
     {
-        private readonly EntrepreneurHandler _entrepreneurHandler;
-        public EntrepreneurController()
+        private readonly EntrepeneurService _entrepeneurService;
+        public EntrepreneurController(EntrepeneurService entrepeneurService)
         {
-            _entrepreneurHandler = new EntrepreneurHandler();
+            _entrepeneurService = entrepeneurService;
         }
 
         [HttpGet]
-        public List<Entrepreneur> Get()
+        public async Task<List<Entrepreneur>> Get()
         {
-            var entrepreneurs = _entrepreneurHandler.GetEntrepreneurs();
+            var entrepreneurs = await _entrepeneurService.GetEntrepreneurs();
             return entrepreneurs;
         }
 
@@ -32,7 +32,7 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest("Identification cannot be null or empty.");
                 }
-                var result = _entrepreneurHandler.CheckIfEntrepreneurExists(identification);
+                var result = _entrepeneurService.CheckIfEntrepreneurExists(identification);
                 return new JsonResult(result);
             }
             catch (Exception)
@@ -51,7 +51,7 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest("Username and Identification cannot be null or empty.");
                 }
-                var result = _entrepreneurHandler.CreateEntrepreneur(entrepreneur);
+                var result = _entrepeneurService.CreateEntrepreneur(entrepreneur);
                 return new JsonResult(result);
             }
             catch (Exception)
@@ -70,7 +70,7 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest("Identifications cannot be null or empty.");
                 }
-                var result = _entrepreneurHandler.AddEntrepreneurToEnterprise(request);
+                var result = _entrepeneurService.AddEntrepreneurToEnterprise(request);
                 return new JsonResult(result);
             }
             catch (Exception)
@@ -89,7 +89,7 @@ namespace BMT_backend.Presentation.Controllers
                     BadRequest();
                 }
 
-                var result = _entrepreneurHandler.GetEnterprisesOfEntrepreneur(Identification);
+                var result = _entrepeneurService.GetEnterprisesOfEntrepreneur(Identification);
                 return new JsonResult(result);
 
             }
@@ -109,7 +109,7 @@ namespace BMT_backend.Presentation.Controllers
                     BadRequest();
                 }
 
-                var result = _entrepreneurHandler.GetEntrepreneurByUserId(id);
+                var result = _entrepeneurService.GetEntrepreneurByUserId(id);
                 return new JsonResult(result);
 
             }

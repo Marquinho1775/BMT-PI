@@ -56,11 +56,20 @@ builder.Services.AddScoped<IImageFileRepository>(provider =>
     new ImageFileRepository(builder.Configuration.GetConnectionString("BMTContext")));
 builder.Services.AddScoped<IDirectionRepository>(provider =>
     new DirectionRepository(builder.Configuration.GetConnectionString("BMTContext")));
+builder.Services.AddScoped<IEntrepeneurRepository>(provider =>
+    new EntrepeneurRepository(builder.Configuration.GetConnectionString("BMTContext")));
+builder.Services.AddScoped<IDirectionRepository>(provider =>
+    new DirectionRepository(builder.Configuration.GetConnectionString("BMTContext")));
+builder.Services.AddScoped<IShoppingCartRepository>(provider =>
+    new ShoppingCartRepository(builder.Configuration.GetConnectionString("BMTContext")));
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<ImageFileService>();
 builder.Services.AddScoped<DirectionService>();
+builder.Services.AddScoped<EntrepeneurService>();
+builder.Services.AddScoped<ShoppingCartService>();
+builder.Services.AddScoped<CreditCardService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

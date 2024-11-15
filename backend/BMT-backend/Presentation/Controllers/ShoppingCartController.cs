@@ -1,7 +1,8 @@
 ﻿using BMT_backend.Domain.Entities;
-using BMT_backend.Handlers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BMT_backend.Application.Services;
+using BMT_backend.Infrastructure;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -9,11 +10,12 @@ namespace BMT_backend.Presentation.Controllers
     [ApiController]
     public class ShoppingCartController : ControllerBase
     {
-        private readonly ShoppingCartHandler _shoppingCartHandler;
+        private readonly ShoppingCartService _shopingCartServices;
 
-        public ShoppingCartController(IConfiguration configuration)
+
+        public ShoppingCartController(IConfiguration configuration, ShoppingCartService shoppingCartService)
         {
-            _shoppingCartHandler = new ShoppingCartHandler(configuration);
+            _shopingCartServices = shoppingCartService;
         }
 
         [HttpPost]
@@ -25,8 +27,8 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest("User Id is not valid.");
                 }
-                var result = _shoppingCartHandler.CreateShoppingCart(userName);
-                return result ? Ok("Shopping cart created successfully.") : StatusCode(StatusCodes.Status500InternalServerError, "Error creating the shopping cart.");
+                var result = _shopingCartServices.CreateShoppingCartAsync(userName);
+                return await result ? Ok("Shopping cart created successfully.") : StatusCode(StatusCodes.Status500InternalServerError, "Error creating the shopping cart.");
             }
             catch (Exception)
             {
@@ -38,7 +40,7 @@ namespace BMT_backend.Presentation.Controllers
         {
             try
             {
-                var shoppingCart = _shoppingCartHandler.GetShoppingCart(userId);
+                var shoppingCart = _shopingCartServices.GetShoppingCartByUserIdAsync(userId);
                 return Ok(shoppingCart);
             }
             catch (Exception)
@@ -51,7 +53,7 @@ namespace BMT_backend.Presentation.Controllers
         {
             try
             {
-                var shoppingCartId = _shoppingCartHandler.GetCartId(userId);
+                var shoppingCartId = _shopingCartServices.GetCartIdAsync(userId);
                 return Ok(shoppingCartId);
             }
             catch (Exception)
@@ -64,7 +66,7 @@ namespace BMT_backend.Presentation.Controllers
         {
             try
             {
-                var result = _shoppingCartHandler.AddProductToCart(shoppingCartId, productId);
+                var result = _shopingCartServices.AddProductToCartAsync(shoppingCartId, productId);
                 return new JsonResult(result);
             }
             catch (Exception ex)
@@ -77,7 +79,7 @@ namespace BMT_backend.Presentation.Controllers
         {
             try
             {
-                var result = _shoppingCartHandler.ChangeProductQuantity(shoppingCartId, productId, quantity);
+                var result = _shopingCartServices.ChangeProductQuantityAsync(shoppingCartId, productId, quantity);
                 return new JsonResult(result);
             }
             catch (Exception ex)
@@ -90,7 +92,7 @@ namespace BMT_backend.Presentation.Controllers
         {
             try
             {
-                var result = _shoppingCartHandler.DeleteProductFromCart(shoppingCartId, productId);
+                var result = _shopingCartServices.RemoveProductFromCartAsync(shoppingCartId, productId);
                 return new JsonResult(result);
             }
             catch (Exception ex)
@@ -103,7 +105,7 @@ namespace BMT_backend.Presentation.Controllers
         {
             try
             {
-                var result = _shoppingCartHandler.ClearShoppingCart(shoppingCartId);
+                var result = _shopingCartServices.ClearShoppingCartAsync(shoppingCartId);
                 return new JsonResult(result);
             }
             catch (Exception ex)
