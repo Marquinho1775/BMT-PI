@@ -51,10 +51,16 @@ builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserRepository>(provider =>
     new UserRepository(builder.Configuration.GetConnectionString("BMTContext")));
 builder.Services.AddScoped<ITagRepository>(provider =>
-    new ProductTagRepository(builder.Configuration.GetConnectionString("BMTContext")));
+    new TagRepository(builder.Configuration.GetConnectionString("BMTContext")));
+builder.Services.AddScoped<IImageFileRepository>(provider =>
+    new ImageFileRepository(builder.Configuration.GetConnectionString("BMTContext")));
+builder.Services.AddScoped<IDirectionRepository>(provider =>
+    new DirectionRepository(builder.Configuration.GetConnectionString("BMTContext")));
 
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<ProductTagService>();
+builder.Services.AddScoped<TagService>();
+builder.Services.AddScoped<ImageFileService>();
+builder.Services.AddScoped<DirectionService>();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

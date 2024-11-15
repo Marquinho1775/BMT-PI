@@ -17,15 +17,14 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpGet("GetDirectionsFromUser")]
-        public async Task<IActionResult> GetDirectionsFromUser([FromQuery] string username)
+        public async Task<IActionResult> GetDirectionsFromUser(string id)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { Success = false, Message = "El nombre de usuario es obligatorio." });
 
             try
             {
-                var user = new User { Username = username };
-                var directions = await _directionService.GetDirectionsFromUserAsync(user);
+                var directions = await _directionService.GetDirectionsFromUserAsync(id);
 
                 if (directions != null && directions.Count > 0)
                     return Ok(new { Success = true, Data = directions });
@@ -39,11 +38,10 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateDirection([FromBody] Direction direction)
+        public async Task<IActionResult> CreateDirection(Direction direction)
         {
             if (direction == null)
                 return BadRequest(new { Success = false, Message = "La información de la dirección no puede ser nula." });
-
             try
             {
                 var result = await _directionService.CreateDirectionAsync(direction);
@@ -59,7 +57,7 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateDirection([FromBody] Direction direction)
+        public async Task<IActionResult> UpdateDirection(Direction direction)
         {
             if (direction == null)
                 return BadRequest(new { Success = false, Message = "La información de la dirección no puede ser nula." });

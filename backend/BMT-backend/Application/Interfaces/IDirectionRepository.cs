@@ -4,8 +4,8 @@ namespace BMT_backend.Application.Interfaces
 {
     public interface IDirectionRepository
     {
-        Task<List<Direction>> GetDirectionsFromUserAsync(User user);
+        Task<List<Direction>> GetDirectionsFromUserAsync(string id);
         Task<bool> CreateDirectionAsync(Direction direction);
-        Task<bool> UpdateDirection(Direction direction);
+        Task<bool> UpdateDirectionAsync(Direction direction);
     }
 }

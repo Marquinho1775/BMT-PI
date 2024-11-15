@@ -138,55 +138,98 @@ namespace BMT_backend.Handlers
 
         public Product GetProductById(string productId)
         {
-            const string storedProcedure = "GetProductDetails";
+            const string query = @"
+                SELECT p.Id, p.Name, p.Description, p.Weight, p.Price, e.Id AS EnterpriseId, e.Name AS EnterpriseName
+                FROM Products p
+                JOIN Enterprises e ON p.EnterpriseId = e.Id
+                WHERE p.Id = @ProductId;";
             var parameters = new List<SqlParameter> { new("@ProductId", productId) };
-            using var connection = new SqlConnection(_connectionString);
-            using var command = new SqlCommand(storedProcedure, connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddRange(parameters.ToArray());
-            connection.Open();
-            using var reader = command.ExecuteReader();
-            Product product = null;
-            if (reader.Read())
+            var resultTable = ExecuteQuery(query, parameters);
+            var row = resultTable.Rows[0];
+            var product = new Product
             {
-                product = new Product
-                {
-                    Id = reader["Id"].ToString(),
-                    Name = reader["Name"].ToString(),
-                    Description = reader["Description"].ToString(),
-                    Weight = Convert.ToDouble(reader["Weight"]),
-                    Price = Convert.ToDouble(reader["Price"]),
-                    EnterpriseId = reader["EnterpriseId"].ToString(),
-                    EnterpriseName = reader["EnterpriseName"].ToString(),
-                    Type = reader["ProductType"].ToString(),
-                    Stock = reader["Stock"] != DBNull.Value ? Convert.ToInt32(reader["Stock"]) : (int?)null,
-                    Limit = reader["Limit"] != DBNull.Value ? Convert.ToInt32(reader["Limit"]) : (int?)null,
-                    WeekDaysAvailable = reader["WeekDaysAvailable"] != DBNull.Value ? reader["WeekDaysAvailable"].ToString() : null
-                };
-            }
-            else
+                Id = row["Id"].ToString(),
+                EnterpriseName = row["EnterpriseName"].ToString(),
+                EnterpriseId = row["EnterpriseId"].ToString(),
+                Name = row["Name"].ToString(),
+                Description = row["Description"].ToString(),
+                Weight = Convert.ToDouble(row["Weight"]),
+                Price = Convert.ToDouble(row["Price"]),
+                Type = GetProductType(productId),
+                Tags = GetProductTags(productId),
+                ImagesURLs = GetProductImages(productId)
+            };
+            if (product.Type == "NonPerishable")
+                product.Stock = GetNonPerishableStock(productId);
+            else if (product.Type == "Perishable")
             {
-                return null;
-            }
-            if (reader.NextResult())
-            {
-                var tags = new List<string>();
-                while (reader.Read())
-                {
-                    tags.Add(reader["TagName"].ToString());
-                }
-                product.Tags = tags;
-            }
-            if (reader.NextResult())
-            {
-                var images = new List<string>();
-                while (reader.Read())
-                {
-                    images.Add(reader["ImageUrl"].ToString());
-                }
-                product.ImagesURLs = images;
+                product.Limit = GetPerishableLimit(productId);
+                product.WeekDaysAvailable = GetPerishableWeekDays(productId);
             }
             return product;
+        }
+
+        private string GetProductType(string productId)
+        {
+            const string query = @"
+                SELECT
+                    CASE
+                        WHEN EXISTS (SELECT 1 FROM NonPerishableProducts WHERE ProductId = @ProductId) THEN 'NonPerishable'
+                        WHEN EXISTS (SELECT 1 FROM PerishableProducts WHERE ProductId = @ProductId) THEN 'Perishable'
+                        ELSE ''
+                    END AS ProductType;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return ExecuteScalar(query, parameters)?.ToString() ?? string.Empty;
+        }
+
+        private List<string> GetProductTags(string productId)
+        {
+            const string query = @"
+                SELECT t.Name
+                FROM Tags t
+                JOIN ProductTags pt ON t.Id = pt.TagId
+                WHERE pt.ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var tags = new List<string>();
+            foreach (DataRow row in resultTable.Rows)
+                tags.Add(row["Name"].ToString());
+            return tags;
+        }
+
+        private List<string> GetProductImages(string productId)
+        {
+            const string query = @"
+                SELECT i.URL
+                FROM ProductImages i
+                WHERE i.ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            var resultTable = ExecuteQuery(query, parameters);
+            var images = new List<string>();
+            foreach (DataRow row in resultTable.Rows)
+                images.Add(row["URL"].ToString());
+            return images;
+        }
+
+        private int GetNonPerishableStock(string productId)
+        {
+            const string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return Convert.ToInt32(ExecuteScalar(query, parameters));
+        }
+
+        private int GetPerishableLimit(string productId)
+        {
+            const string query = "SELECT Limit FROM PerishableProducts WHERE ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return Convert.ToInt32(ExecuteScalar(query, parameters));
+        }
+
+        private string GetPerishableWeekDays(string productId)
+        {
+            const string query = "SELECT WeekDaysAvailable FROM PerishableProducts WHERE ProductId = @ProductId;";
+            var parameters = new List<SqlParameter> { new("@ProductId", productId) };
+            return ExecuteScalar(query, parameters)?.ToString();
         }
 
         //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA

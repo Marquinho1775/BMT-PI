@@ -10,9 +10,11 @@ namespace BMT_backend.Application.Interfaces
         Task<bool> CreatePerishableProductAsync(Product product);
 
         Task<List<Product>> GetProductsAsync();
-        Task<Product> GetProductsDetailsAsync();
         Task<Product> GetProductByIdAsync(string id);
-        Task<Product> GetProductDetailsById(string id);
+        Task<Product> GetProductsDetailsAsync();
+        Task<Product> GetProductDetailsByIdAsyn(string id);
+        Task<string> GetProductTypeAsync(string id);
+
         Task<int> GetProductStock(GetProductStockRequest product);
 
         Task<bool> UpdateProductAsync(Product product);

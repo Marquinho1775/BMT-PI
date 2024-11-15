@@ -14,9 +14,9 @@ namespace BMT_backend.Application.Services
             _directionRepository = directionRepository;
         }
 
-        public async Task<List<Direction>> GetDirectionsFromUserAsync(User user)
+        public async Task<List<Direction>> GetDirectionsFromUserAsync(string id)
         {
-            return await _directionRepository.GetDirectionsFromUserAsync(user);
+            return await _directionRepository.GetDirectionsFromUserAsync(id);
         }
 
         public async Task<bool> CreateDirectionAsync(Direction direction)
@@ -26,7 +26,7 @@ namespace BMT_backend.Application.Services
 
         public async Task<bool> UpdateDirectionAsync(Direction direction)
         {
-            return await _directionRepository.UpdateDirection(direction);
+            return await _directionRepository.UpdateDirectionAsync(direction);
         }
     }
 }

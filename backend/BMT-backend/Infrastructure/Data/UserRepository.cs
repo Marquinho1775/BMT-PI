@@ -40,23 +40,21 @@ namespace BMT_backend.Infrastructure.Data
             using (var command = new SqlCommand(query, connection))
             {
                 await connection.OpenAsync();
-                using (var reader = await command.ExecuteReaderAsync())
+                using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
                 {
-                    while (await reader.ReadAsync())
+                    users.Add(new User
                     {
-                        users.Add(new User
-                        {
-                            Id = reader["Id"].ToString(),
-                            Name = reader["Name"].ToString(),
-                            LastName = reader["LastName"].ToString(),
-                            Username = reader["Username"].ToString(),
-                            Email = reader["Email"].ToString(),
-                            IsVerified = (bool)reader["IsVerified"],
-                            Password = reader["Password"].ToString(),
-                            Role = reader["Role"].ToString(),
-                            ProfilePictureURL = reader["ProfilePictureURL"].ToString()
-                        });
-                    }
+                        Id = reader["Id"].ToString(),
+                        Name = reader["Name"].ToString(),
+                        LastName = reader["LastName"].ToString(),
+                        Username = reader["Username"].ToString(),
+                        Email = reader["Email"].ToString(),
+                        IsVerified = (bool)reader["IsVerified"],
+                        Password = reader["Password"].ToString(),
+                        Role = reader["Role"].ToString(),
+                        ProfilePictureURL = reader["ProfilePictureURL"].ToString()
+                    });
                 }
             }
             return users;
