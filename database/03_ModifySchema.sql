@@ -20,6 +20,11 @@ EXEC UpdateForeignKeyWithCascade
     @ParentTable = 'Products',
     @ConstraintName = 'FK_ProductTags_ProductId';
 
+EXEC UpdateForeignKeyWithCascade
+    @ChildTable = 'ProductTags',
+    @ChildColumn = 'TagId',
+    @ParentTable = 'Tags'
+
 -- Actualizar FK en ProductImages
 EXEC UpdateForeignKeyWithCascade
     @ChildTable = 'ProductImages',

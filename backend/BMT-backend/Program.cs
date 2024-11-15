@@ -1,4 +1,7 @@
-﻿using BMT_backend.Application.Services;
+﻿using BMT_backend.Infrastructure;
+using BMT_backend.Application.Interfaces;
+using BMT_backend.Application.Services;
+using BMT_backend.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -43,16 +46,22 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<TokenService>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
+
+builder.Services.AddScoped<IUserRepository>(provider =>
+    new UserRepository(builder.Configuration.GetConnectionString("BMTContext")));
+builder.Services.AddScoped<ITagRepository>(provider =>
+    new ProductTagRepository(builder.Configuration.GetConnectionString("BMTContext")));
+
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ProductTagService>();
 
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors(MyAllowSpecificOrigins);

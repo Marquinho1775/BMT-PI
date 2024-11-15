@@ -2,46 +2,40 @@
   <v-app class="d-flex flex-column">
     <AppHeader />
     <v-main class="flex-grow-1" style="overflow-x: hidden;">
-      <h1 class="title1">Pedidos pendientes</h1>
+      <h1 class="title1">Pedidos por revisar</h1>
       <template v-if="items && items.length > 0">
-        <v-virtual-scroll :items="items" height="100%"
-          style="overflow-x: hidden">
+        <v-virtual-scroll :items="items" height="100%" style="overflow-x: hidden;">
           <template v-slot:default="{ item }">
-            <v-row class="order-card mb-4 p-1 bg-light-grey rounded"
-              justify="space-between">
-              <v-col style="padding-left: 5rem;">
-                <ul class="order-list"
-                  v-if="item.products && item.products.length > 0">
-                  <li
-                    v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products)"
+            <v-row class="order-card mb-4 p-1 bg-light-grey rounded" justify="space-between">
+              <v-col style="padding-left: 5rem">
+                <h4>{{ item.userName }}</h4>
+                <p>{{ item.direction }} - {{ item.otherSigns }}</p>
+                <ul>
+                  <li v-for="(products, enterpriseName) in groupProductsByEnterprise(item.products || [])"
                     :key="enterpriseName">
-                    <h4 class="enterprise-name" style="padding-bottom: 0.5rem;">
-                      {{ enterpriseName }}</h4>
+                    <strong>{{ enterpriseName }}</strong>
                     <ul class="product-list">
                       <li v-for="product in products" :key="product.productId"
                         style="padding-bottom: 0.3rem; padding-top: 0.3rem;">
-                        <span class="quantity-box">{{ product.quantity }}</span>
-                        {{ product.productName }}
+                        <span class="quantity-box">{{ product.quantity }}</span> {{ product.productName }}
                       </li>
                     </ul>
                   </li>
                 </ul>
                 <p>Peso: {{ item.weight }} kg</p>
-                <p>{{ getTotalProductQuantity(item.products || []) }} artículos
-                  • Costo: ₡{{ (item.order.orderCost ??
-                    0).toFixed(2) }} + ₡{{ (item.order.deliveryFee ?? 0).toFixed(2) }}
-                  de envío</p>
-                <p v-if="item.orderDate"> Fecha de creación del pedido: {{ new
-                  Date(item.orderDate).toLocaleDateString() }}</p>
-                <p v-if="item.orderDeliveryDate"> Fecha de entrega: {{ new
-                  Date(item.orderDeliveryDate).toLocaleDateString() }}</p>
+                <p>{{ getTotalProductQuantity(item.products || []) }} artículos • Costo: ₡{{ (item.order.orderCost ??
+                  0).toFixed(2) }} + ₡{{ (item.order.deliveryFee ?? 0).toFixed(2) }} de envío</p>
+                <p v-if="item.order.orderDate">{{ new Date(item.order.orderDate).toLocaleDateString() }}</p>
+                <p v-else>Fecha no disponible</p>
               </v-col>
-              <v-col class="d-flex flex-column align-center justify-center"
-                cols="auto">
-                <v-btn size="x-large" class="custom-btn"
-                  :style="{ backgroundColor: '#9fc9fc', color: 'black' }"
+              <v-col class="d-flex flex-column align-center justify-center" cols="auto">
+                <v-btn size="x-large" class="mb-3 custom-btn" :style="{ backgroundColor: '#d0eda0', color: 'black' }"
+                  @click="confirmOrder(item.orderId)">
+                  Aceptar pedido
+                </v-btn>
+                <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }"
                   @click="denyOrder(item.orderId)">
-                  Cancelar pedido
+                  Rechazar pedido
                 </v-btn>
               </v-col>
             </v-row>
@@ -56,13 +50,12 @@
 
 <script>
 import axios from 'axios';
-import { getUser } from '@/helpers/auth';
 import { API_URL } from '@/main.js';
 
 export default {
   data() {
     return {
-      orders: [],
+      orders: []
     };
   },
   computed: {
@@ -73,25 +66,41 @@ export default {
   methods: {
     async fetchOrders() {
       try {
-        const response = await axios.get(API_URL + "/User/GetToConfirmOrders", {
-          params: { userId: getUser().id },
-        });
-        console.log(response.data);
+        const response = await axios.get(API_URL + '/Developer/getToConfirmOrders');
         this.orders = response.data;
+        console.log(this.orders);
       } catch (error) {
         console.error("Error fetching orders:", error);
+      }
+    },
+    async confirmOrder(orderId) {
+      if (confirm("¿Estás seguro de que quieres aceptar este pedido?")) {
+        try {
+          const response = await axios.put(API_URL + '/Developer/ConfirmOrder', null, {
+            params: { orderID: orderId }
+          });
+
+          if (response.status === 200) {
+            console.log(`Order ${orderId} confirmed successfully`);
+            this.orders = this.orders.filter(order => order.orderId !== orderId);
+          } else {
+            console.error(`Failed to confirm order ${orderId}`);
+          }
+        } catch (error) {
+          console.error("Error confirming order:", error);
+        }
       }
     },
     async denyOrder(orderId) {
       if (confirm("¿Estás seguro de que quieres rechazar este pedido?")) {
         try {
-          const response = await axios.put(API_URL + "/User/DenyOrder", null, {
-            params: { orderID: orderId },
+          const response = await axios.put(API_URL + '/Developer/DenyOrder', null, {
+            params: { orderID: orderId }
           });
 
           if (response.status === 200) {
             console.log(`Order ${orderId} denied successfully`);
-            this.orders = this.orders.filter((order) => order.orderId !== orderId);
+            this.orders = this.orders.filter(order => order.orderId !== orderId);
           } else {
             console.error(`Failed to deny order ${orderId}`);
           }
@@ -110,11 +119,11 @@ export default {
         (grouped[product.enterpriseName] = grouped[product.enterpriseName] || []).push(product);
         return grouped;
       }, {});
-    },
+    }
   },
   async mounted() {
     await this.fetchOrders();
-  },
+  }
 };
 </script>
 
@@ -133,16 +142,6 @@ export default {
   padding-left: 1rem;
   list-style-type: none;
   padding-bottom: 0.7rem;
-}
-
-.order-list {
-  padding-left: 0;
-  list-style-type: none;
-}
-
-.enterprise-name {
-  font-weight: bold;
-  margin: 0;
 }
 
 .quantity-box {

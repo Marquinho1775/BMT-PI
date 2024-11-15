@@ -4,7 +4,7 @@ public static class DistanceCalculator
 {
     public static double CalcularDistancia(double lat1, double lon1, double lat2 = 9.937722114664625, double lon2 = -84.05251479782451)
     {
-        const double RadioTierra = 6371e3; // Radio de la Tierra en metros
+        const double RadioTierra = 6371e3;
         double φ1 = ConvertirGradosARadianes(lat1);
         double φ2 = ConvertirGradosARadianes(lat2);
         double Δφ = ConvertirGradosARadianes(lat2 - lat1);
@@ -16,7 +16,7 @@ public static class DistanceCalculator
 
         double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-        double distancia = RadioTierra * c; // Distancia en metros
+        double distancia = RadioTierra * c;
 
         return distancia / 1000.0;
     }

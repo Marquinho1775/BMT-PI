@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using BMT_backend.Domain.Entities;
-using BMT_backend.Domain.Requests;
+using BMT_backend.Presentation.Requests;
 
 namespace BMT_backend.Handlers
 {

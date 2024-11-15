@@ -83,7 +83,7 @@ namespace BMT_backend.Handlers
 
             using (var queryCommand = new SqlCommand(query, Connection))
             {
-                queryCommand.Parameters.AddWithValue("@Id", direction.Id);  // Uso de Id como string
+                queryCommand.Parameters.AddWithValue("@Id", direction.Id);
                 queryCommand.Parameters.AddWithValue("@NumDirection", direction.NumDirection);
                 queryCommand.Parameters.AddWithValue("@OtherSigns", (object)direction.OtherSigns ?? DBNull.Value);
                 queryCommand.Parameters.AddWithValue("@Coordinates", direction.Coordinates);

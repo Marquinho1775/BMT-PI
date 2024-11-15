@@ -256,7 +256,6 @@ export default {
         const result = await axios.get(
           `${API_URL}/CreditCard/User?userId=${encodeURIComponent(userId)}`
         );
-        console.log(result.data);
         this.creditCards = result.data;
       } catch (error) {
         console.error('Error al obtener las tarjetas del usuario:', error);

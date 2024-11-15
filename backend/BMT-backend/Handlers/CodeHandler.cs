@@ -34,14 +34,11 @@ namespace BMT_backend.Handlers
                 VALUES (source.Id, source.Code);
             ";
             var sqlCommandForQuery = new SqlCommand(query, Connection);
-
             sqlCommandForQuery.Parameters.AddWithValue("@Id", userId);
             sqlCommandForQuery.Parameters.AddWithValue("@Code", formattedCode);
-
             Connection.Open();
             sqlCommandForQuery.ExecuteNonQuery();
             Connection.Close();
-
             return formattedCode;
         }
 
@@ -49,13 +46,10 @@ namespace BMT_backend.Handlers
         {
             string query = "SELECT Code FROM dbo.Codes WHERE Id = @Id";
             var sqlCommandForQuery = new SqlCommand(query, Connection);
-
             sqlCommandForQuery.Parameters.AddWithValue("@Id", userId);
-
             Connection.Open();
             var code = sqlCommandForQuery.ExecuteScalar();
             Connection.Close();
-
             return code.ToString();
         }
     }

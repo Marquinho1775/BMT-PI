@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace BMT_backend.Domain.Entities
+﻿namespace BMT_backend.Domain.Entities
 {
     public class User
     {
@@ -9,7 +7,7 @@ namespace BMT_backend.Domain.Entities
         public string LastName { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
-        public bool IsVerified { get; set; }
+        public bool? IsVerified { get; set; }
         public string Password { get; set; }
         public string? Role { get; set; }
         public string? ProfilePictureURL { get; set; }

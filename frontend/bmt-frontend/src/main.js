@@ -30,7 +30,7 @@ import ProductRegisterForm from './components/ProductRegisterForm.vue';
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
-import ProductsConfirmationPage from './components/ProductsConfirmationPage.vue';
+import DeveloperOrderConfirmation from './components/DeveloperOrderConfirmation.vue';
 
 import CheckOut from './components/CheckOut.vue';
 import ProductCard from './components/ProductCard.vue';
@@ -94,7 +94,7 @@ const router = createRouter({
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
-    { path: '/products-confirmation', name: "ProductsConfirmation", component: ProductsConfirmationPage },
+    { path: '/products-confirmation', name: "ProductsConfirmation", component: DeveloperOrderConfirmation },
     { path: '/profile/edit', name: "EditProfile", component: EditProfileInfo },
     { path: '/orders', name: "Orders", component: UserOrders },
   ]

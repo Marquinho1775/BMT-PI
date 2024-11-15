@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using BMT_backend.Application.Services;
 using BMT_backend.Domain.Entities;
-using BMT_backend.Domain.Requests;
+using BMT_backend.Presentation.Requests;
 
 namespace BMT_backend.Handlers
 {
@@ -178,7 +178,7 @@ namespace BMT_backend.Handlers
             const string query = @"
                 SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
-                       d.Coordinates, o.Status, o.OrderDeliveryDate
+                       d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
                 JOIN Users u ON o.UserId = u.Id
                 JOIN Directions d ON o.DirectionId = d.Id
