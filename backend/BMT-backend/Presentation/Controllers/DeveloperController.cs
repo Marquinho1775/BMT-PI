@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BMT_backend.Handlers;
 using BMT_backend.Infrastructure;
-using BMT_backend.Domain.Views;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.DTOs;
 using BMT_backend.Application.Services;
@@ -13,26 +12,26 @@ namespace BMT_backend.Presentation.Controllers
     [ApiController]
     public class DeveloperController : Controller
     {
-        private readonly UserService _userService;
-
-        private EnterpriseHandler _enterpriseHandler;
         private ProductService _productService;
+        private readonly UserService _userService;
+        private readonly EnterpriseService _enterpriseService;
+        private readonly CodeRepository _codeRepository;
+        private MailService _mailManager;
+
         private OrderHandler _orderHandler;
-        private MailManager _mailManager;
-        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, CodeRepository codeRepository)
+        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, CodeRepository codeRepository, EnterpriseService enterpriseService)
         {
             _userService = userService;
-
-            _enterpriseHandler = new EnterpriseHandler();
             _productService = productService;
             _orderHandler = new OrderHandler(configuration);
-            _mailManager = new MailManager(configuration, codeRepository);
+            _mailManager = new MailService(configuration, codeRepository);
+            _enterpriseService = enterpriseService;
         }
 
         [HttpGet("getEnterprises")]
-        public List<DeveloperEnterpriseView> GetEnterprises()
+        public async Task<List<EnterpriseDevDto>> GetEnterprises()
         {
-            List<DeveloperEnterpriseView> devEnterprises = _enterpriseHandler.GetDevEnterprises();
+            List<EnterpriseDevDto> devEnterprises = await _enterpriseService.GetAllEnterpriseDevAsnc();
             return devEnterprises;
         }
 

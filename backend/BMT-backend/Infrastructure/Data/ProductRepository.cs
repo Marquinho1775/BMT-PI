@@ -108,6 +108,7 @@ namespace BMT_backend.Infrastructure.Data
             return product;
         }
 
+
         public async Task<List<Product>> GetProductsDetailsAsync()
         {
             var query = "SELECT Id FROM Products;";

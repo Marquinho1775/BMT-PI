@@ -3,8 +3,8 @@ using BMT_backend.Handlers;
 using BMT_backend.Infrastructure;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Application.Services;
+using BMT_backend.Application.Interfaces;
 using BMT_backend.Presentation.Requests;
-using BMT_backend.Infrastructure.Data;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -14,14 +14,14 @@ namespace BMT_backend.Presentation.Controllers
     {
         private readonly UserService _userService;
         private readonly OrderHandler _orderHandler;
-        private readonly MailManager _mailManager;
-        private readonly CodeRepository _codeRepository;
+        private readonly MailService _mailManager;
+        private readonly ICodeRepository _codeRepository;
 
-        public UserController(UserService userService, IConfiguration configuration, CodeRepository codeRepository)
+        public UserController(UserService userService, IConfiguration configuration, ICodeRepository codeRepository)
         {
             _userService = userService;
             _orderHandler = new OrderHandler(configuration);
-            _mailManager = new MailManager(configuration, codeRepository);
+            _mailManager = new MailService(configuration, codeRepository);
             _codeRepository = codeRepository;
         }
  
@@ -181,21 +181,7 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpPost("sendemail")]
-        public IActionResult SendMail(Mail userData)
-        {
-            try
-            {
-                _mailManager.SendVerificationEmail(userData);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al enviar correo: {ex.Message}");
-            }
-        }
-
-        [HttpPost("verifycode")]
+        [HttpPost("VerifyCode")]
         public async Task<IActionResult> VerifyCode(ConfirmationCode codeModel)
         {
             try
@@ -216,7 +202,7 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpPost("verifyaccount")]
+        [HttpPost("VerifyAccount")]
         public async Task<IActionResult> VerifyAccount(ConfirmationCode account)
         {
             try

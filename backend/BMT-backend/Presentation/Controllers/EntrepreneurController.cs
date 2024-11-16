@@ -23,24 +23,6 @@ namespace BMT_backend.Presentation.Controllers
             return entrepreneurs;
         }
 
-        [HttpGet("CheckExistingEntrepreneur")]
-        public async Task<ActionResult<bool>> CheckExistingEntrepreneur(string identification)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(identification))
-                {
-                    return BadRequest("Identification cannot be null or empty.");
-                }
-                var result = _entrepeneurService.CheckIfEntrepreneurExists(identification);
-                return new JsonResult(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si el emprendedor existe");
-            }
-        }
-
         [HttpPost]
         public async Task<ActionResult<bool>> CreateEntrepreneur(Entrepreneur entrepreneur)
         {
@@ -99,7 +81,7 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpPost("GetEntrepreneurByUserId")]
+        [HttpGet("GetEntrepreneurByUserId")]
         public async Task<ActionResult<bool>> GetEntrepreneurByUserId(string id)
         {
             try

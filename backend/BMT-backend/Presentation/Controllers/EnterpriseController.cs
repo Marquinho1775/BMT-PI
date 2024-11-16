@@ -1,8 +1,9 @@
-﻿using BMT_backend.Handlers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using BMT_backend.Application.Services;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
+using System;
+using System.Threading.Tasks;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -10,101 +11,82 @@ namespace BMT_backend.Presentation.Controllers
     [ApiController]
     public class EnterpriseController : ControllerBase
     {
-        private readonly EnterpriseHandler _entrepeneurshipHandler;
+        private readonly EnterpriseService _enterpriseService;
 
-        public EnterpriseController()
+        public EnterpriseController(EnterpriseService enterpriseService)
         {
-            _entrepeneurshipHandler = new EnterpriseHandler();
-        }
-
-        [HttpGet]
-        public List<Enterprise> Get()
-        {
-            return _entrepeneurshipHandler.GetEnterprises();
-        }
-
-        [HttpGet("CheckExistingEnterprise")]
-        public async Task<ActionResult<bool>> CheckExistingEnterprise(string identification)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(identification))
-                {
-                    return BadRequest("Identification cannot be null or empty.");
-                }
-                var result = _entrepeneurshipHandler.CheckIfEnterpriseExists(identification);
-                return new JsonResult(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si la empresa existe");
-            }
+            _enterpriseService = enterpriseService;
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateEnterprise(Enterprise enterprise)
+        public async Task<IActionResult> CreateEnterprise([FromBody] Enterprise enterprise)
         {
+            if (enterprise == null)
+                return BadRequest(new { Message = "La información de la empresa no puede ser nula." });
             try
             {
-                if (enterprise == null)
-                {
-                    return BadRequest();
-                }
-                var result = _entrepeneurshipHandler.CreateEnterprise(enterprise);
-                return new JsonResult(result);
+                var result = await _enterpriseService.CreateEnterpriseAsync(enterprise);
+                if (result)
+                    return Ok(new { Success = true, Message = "Empresa creada exitosamente." });
+                else
+                    return StatusCode(500, new { Success = false, Message = "No se pudo crear la empresa." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error creando la empresa");
+                return StatusCode(500, new { Success = false, Message = ex.Message });
             }
         }
 
-
-        [HttpGet("{enterpriseId}")]
-        public ActionResult<Enterprise> GetEnterpriseById(string enterpriseId)
-        {
+        [HttpGet]
+        public async Task<IActionResult> GetEnterprises()
+        { 
             try
             {
-                var enterprise = _entrepeneurshipHandler.GetEnterpriseById(enterpriseId);
-
-                if (enterprise == null)
-                {
-                    return NotFound("Empresa no encontrada");
-                }
-
-                return Ok(enterprise);
+                var enterprises = await _enterpriseService.GetAllEnterprisesAsync();
+                return Ok(new { Success = true, Data = enterprises });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener la empresa");
+                return StatusCode(500, new { Success = false, Message = "Error interno del servidor." });
             }
         }
 
-        [HttpPut("{enterpriseId}")]
-        public async Task<ActionResult<bool>> UpdateEnterprise(string enterpriseId, UpdateEnterpriseRequest updatedEnterprise)
+        [HttpGet("GetEnterpriseById")]
+        public async Task<IActionResult> GetEnterpriseById([FromQuery] string enterpriseId)
         {
+            if (string.IsNullOrWhiteSpace(enterpriseId))
+                return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
             try
             {
-                if (string.IsNullOrEmpty(enterpriseId) || updatedEnterprise == null)
-                {
-                    return BadRequest("Id de la empresa y datos de actualización son requeridos.");
-                }
-
-                updatedEnterprise.Id = enterpriseId;
-                var result = _entrepeneurshipHandler.UpdateEnterpriseProfile(updatedEnterprise);
-
-                if (!result)
-                {
-                    return NotFound("Empresa no encontrada o no se pudo actualizar.");
-                }
-
-                return Ok(result);
+                var enterprise = await _enterpriseService.GetEnterpriseByIdAsync(enterpriseId);
+                if (enterprise != null)
+                    return Ok(new { Success = true, Data = enterprise });
+                else
+                    return NotFound(new { Success = false, Message = "Empresa no encontrada." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error actualizando la empresa");
+                return StatusCode(500, new { Success = false, Message = "Error al obtener la empresa." });
             }
         }
 
+        [HttpPut("UpdateEnterprise")]
+        public async Task<IActionResult> UpdateEnterprise([FromBody] UpdateEnterpriseRequest updatedEnterprise)
+        {
+            if (updatedEnterprise == null)
+                return BadRequest(new { Message = "Los datos de la empresa actualizados no pueden ser nulos." });
+            try
+            {
+                var result = await _enterpriseService.UpdateEnterpriseAsync(updatedEnterprise);
+                if (result)
+                    return Ok(new { Success = true, Message = "Empresa actualizada exitosamente." });
+                else
+                    return NotFound(new { Success = false, Message = "Empresa no encontrada o no se pudo actualizar." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error actualizando la empresa." });
+            }
+        }
     }
 }

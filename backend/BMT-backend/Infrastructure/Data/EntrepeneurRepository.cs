@@ -3,17 +3,21 @@ using BMT_backend.Presentation.Requests;
 using System.Data.SqlClient;
 using BMT_backend.Application.Interfaces;
 using BMT_backend.Domain.Entities;
+using BMT_backend.Handlers;
 
 namespace BMT_backend.Infrastructure.Data
 {
     public class EntrepeneurRepository : IEntrepeneurRepository
     {
         private readonly string _connectionString;
+        private readonly IEnterpriseRepository _enterpriseRepository;
 
         public EntrepeneurRepository(string connectionString)
         {
             _connectionString = connectionString;
+            _enterpriseRepository = new EnterpriseRepository(connectionString);
         }
+
         public async Task<bool> CheckIfEntryInTable(string tableName, string columnName, string columnValue)
         {
             var query = "select " + columnName + " from " + tableName + " where " + columnName + " = '" + columnValue + "'";
@@ -94,7 +98,7 @@ namespace BMT_backend.Infrastructure.Data
             return entrepreneurs;
         }
 
-        public async Task<List<Enterprise>> GetEnterprisesOfEntrepreneur(string Identification)
+        public async Task<List<Enterprise>> GetEntrepreneurEnterprises(string Identification)
         {
             var enterprises = new List<Enterprise>();
             var query = "select en.Id, en.IdentificationNumber, en.Name, en.Description, en.Email, en.PhoneNumber " +
@@ -119,26 +123,27 @@ namespace BMT_backend.Infrastructure.Data
                             Description = reader["Description"].ToString(),
                             Email = reader["Email"].ToString(),
                             PhoneNumber = reader["PhoneNumber"].ToString(),
-                            Administrator = null
+                            Administrator = _enterpriseRepository.GetEnterpriseAdministratorAsync(reader["Id"].ToString()).Result,
                         });
-                        //YEPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA Aministrator
                     }
                 }
             }
             return enterprises;
         }
-
         public async Task<Entrepreneur> GetEntrepreneurByUserId(string id)
         {
             var entrepreneur = new Entrepreneur();
-            var query = $"SELECT e.Id, e.Identification " +
-                            $"FROM Entrepreneurs e " +
-                            $"JOIN Users u ON e.UserId = u.Id " +
-                            $"WHERE u.Id = '{id}'";
+            var query = "SELECT e.Id, e.Identification " +
+                        "FROM Entrepreneurs e " +
+                        "JOIN Users u ON e.UserId = u.Id " +
+                        "WHERE u.Id = @id";
 
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
             {
+                // Add id parameter
+                command.Parameters.AddWithValue("@id", id);
+
                 await connection.OpenAsync();
                 using (var reader = await command.ExecuteReaderAsync())
                 {

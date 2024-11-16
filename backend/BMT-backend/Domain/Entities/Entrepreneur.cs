@@ -3,7 +3,7 @@
     public class Entrepreneur
     {
         public string Id { get; set; } = null!;
-        public string Username { get; set; }
+        public string? Username { get; set; }
         public string Identification { get; set; }
         public string? Name { get; set; }
         public string? LastName { get; set; }

@@ -8,13 +8,13 @@
 //    {
 //        private SqlConnection _conection;
 //        private string _conectionPath;
-//        private readonly ProductHandler _productHandler;
+//        //private readonly ProductHandler _productHandler;
 
 //        public ShoppingCartHandler(IConfiguration configuration)
 //        {
 //            _conectionPath = configuration.GetConnectionString("BMTContext");
 //            _conection = new SqlConnection(_conectionPath);
-//            _productHandler = new ProductHandler(configuration);
+//            //_productHandler = new ProductHandler(configuration);
 //        }
 
 //        private DataTable CreateQueryTable(string query)
@@ -28,6 +28,7 @@
 //            return tableFormatQuery;
 //        }
 
+//        //repo
 //        public bool CreateShoppingCart(string userName)
 //        {
 //            string cartQuery = "INSERT INTO ShoppingCarts (UserId, Total) " +
@@ -40,6 +41,7 @@
 //            return rowsAffected > 0;
 //        }
 
+//        //repo
 //        public ShoppingCart GetShoppingCart(string userId)
 //        {
 //            string cartQuery = "SELECT Id, UserId, Total " +
@@ -65,6 +67,7 @@
 //            return shoppingCart;
 //        }
 
+//        //repo
 //        private List<CartProduct> GetCartProducts(string shoppingCartId)
 //        {
 //            List<CartProduct> cartProducts = new List<CartProduct>();
@@ -89,6 +92,7 @@
 //            return cartProducts;
 //        }
 
+//        //repo
 //        private CartProduct GetCartProduct(string shoppingCartId, string productId)
 //        {
 //            CartProduct cartProduct = null;
@@ -114,6 +118,7 @@
 //            return cartProduct;
 //        }
 
+//        //repo
 //        public string GetCartId(string userId)
 //        {
 //            string cartQuery = "SELECT Id FROM ShoppingCarts WHERE UserId = @userId";
@@ -125,6 +130,7 @@
 //            return cartId;
 //        }
 
+//        //repo
 //        public string AddProductToCart(string shoppingCartId, string productId)
 //        {
 //            try
@@ -164,7 +170,8 @@
 //                    return result;
 //                }
 //            }
-//            catch (Exception ex) {
+//            catch (Exception ex)
+//            {
 //                return $"Error: {ex.Message}";
 //            }
 //            finally
@@ -176,6 +183,7 @@
 //            }
 //        }
 
+//        //Repo
 //        public bool ChangeProductQuantity(string shoppingCartId, string productId, int quantity)
 //        {
 //            CartProduct cartProduct = GetCartProduct(shoppingCartId, productId);
@@ -202,6 +210,7 @@
 //            return rowsAffected > 0;
 //        }
 
+//        //repo
 //        public bool DeleteProductFromCart(string shoppingCartId, string productId)
 //        {
 //            CartProduct cartProduct = GetCartProduct(shoppingCartId, productId);
@@ -226,6 +235,7 @@
 //            return rowsAffected > 0;
 //        }
 
+//        //repo
 //        public bool ClearShoppingCart(string shoppingCartId)
 //        {
 //            string cartProductQuery = "DELETE FROM ShoppingCartProducts " +

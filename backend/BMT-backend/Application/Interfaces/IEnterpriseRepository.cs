@@ -1,25 +1,18 @@
 ﻿using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
-using BMT_backend.Domain.Views;
+using BMT_backend.Presentation.DTOs;
 
 namespace BMT_backend.Application.Interfaces
 {
     public interface IEnterpriseRepository
     {
-        Task<bool> CheckIfEntryInTable(string tableName, string columnName, string columnValue);
-
-        Task<bool> CreateEnterprise(Enterprise enterprise);
-
-        Task<List<Enterprise>> GetEnterprises();
-
-        Task<List<Enterprise>> GetEnterpriseStaff(string enterpriseId);
-
-        Task<Entrepreneur> GetEnterpriseAdministrator(string enterpriseId);
-
-        Task<List<DeveloperEnterpriseView>> GetDevEnterprises();
-
-        Task<Enterprise>? GetEnterpriseById(string enterpriseId);
-
-        Task<bool> UpdateEnterpriseProfile(UpdateEnterpriseRequest updatedEnterprise);
+        Task<bool> CreateEnterpriseAsync(Enterprise enterprise);
+        Task<List<Enterprise>> GetEnterprisesAsync();
+        Task<Enterprise> GetEnterpriseByIdAsync(string enterpriseId);
+        Task<Entrepreneur> GetEnterpriseAdministratorAsync(string enterpriseId);
+        Task<List<Entrepreneur>> GetEnterpriseStaffAsync(string enterpriseId);
+        Task<int> GetProductsQuantityAsync(string id);
+        Task<string> CheckExistingEnterpriseAsync(Enterprise enterprise);
+        Task<bool> UpdateEnterpriseAsync(UpdateEnterpriseRequest updatedEnterprise, List<string> fieldsToUpdate);
     }
 }

@@ -9,7 +9,7 @@ namespace BMT_backend.Application.Interfaces
         Task<bool> CreateEntrepreneur(Entrepreneur entrepreneur);
         Task<bool> AddEntrepreneurToEnterprise(AddEntrepreneurToEnterpriseRequest request);
         Task<List<Entrepreneur>> GetEntrepreneurs();
-        Task<List<Enterprise>> GetEnterprisesOfEntrepreneur(string Identification);
+        Task<List<Enterprise>> GetEntrepreneurEnterprises(string Identification);
         Task<Entrepreneur> GetEntrepreneurByUserId(string id);
     }
 }

@@ -17,13 +17,12 @@ namespace BMT_backend.Application.Services
             _entrepeneurRepository = entrepeneurRepository;
         }
 
-        public async Task<bool> CheckIfEntrepreneurExists(string identification)
-        {
-            return await _entrepeneurRepository.CheckIfEntryInTable("Entrepreneurs", "Identification", identification);
-        }
-
         public async Task<bool> CreateEntrepreneur(Entrepreneur entrepreneur)
         {
+            if (await _entrepeneurRepository.CheckIfEntryInTable("Entrepreneurs", "Identification", entrepreneur.Identification))
+            {
+                return false;
+            }
             return await _entrepeneurRepository.CreateEntrepreneur(entrepreneur);
         }
 
@@ -39,7 +38,7 @@ namespace BMT_backend.Application.Services
 
         public async Task<List<Enterprise>> GetEnterprisesOfEntrepreneur(string identification)
         {
-            return await _entrepeneurRepository.GetEnterprisesOfEntrepreneur(identification);
+            return await _entrepeneurRepository.GetEntrepreneurEnterprises(identification);
         }
 
         public async Task<Entrepreneur> GetEntrepreneurByUserId(string id)

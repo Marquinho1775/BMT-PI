@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using BMT_backend.Handlers;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Application.Services;
+using BMT_backend.Application.Interfaces;
 using BMT_backend.Infrastructure;
-using BMT_backend.Infrastructure.Data;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -13,22 +11,34 @@ namespace BMT_backend.Presentation.Controllers
     public class EmailController : ControllerBase
     {
         private readonly UserService _userService;
-        private readonly MailManager _mailManager;
+        private readonly MailService _mailService;
 
-        public EmailController(IConfiguration configuration, UserService userService, CodeRepository codeRepository)
+        public EmailController(IConfiguration configuration, UserService userService, MailService mailService)
         {
             _userService = userService;
-            _mailManager = new MailManager(configuration, codeRepository);
+            _mailService = mailService;
         }
 
+        [HttpPost("SendEmail")]
+        public IActionResult SendMail(Mail userData)
+        {
+            try
+            {
+                _mailService.SendVerificationEmail(userData);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al enviar correo: {ex.Message}");
+            }
+        }
 
-
-        [HttpPost("sendcollabmail")]
+        [HttpPost("SendCollabMail")]
         public IActionResult SendCollabMail([FromBody] CollabMail userData)
         {
             try
             {
-                _mailManager.SendCollabInviteEmail(userData);
+                _mailService.SendCollabInviteEmail(userData);
                 return Ok();
             }
             catch (Exception ex)
@@ -37,12 +47,12 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpPost("sendconfirmedcollabmail")]
+        [HttpPost("SendConfirmedCollabMail")]
         public IActionResult ConfirmedCollabMail([FromBody] Mail userData)
         {
             try
             {
-                _mailManager.SendConfirmedCollabEmail(userData);
+                _mailService.SendConfirmedCollabEmail(userData);
                 return Ok();
             }
             catch (Exception ex)

@@ -9,11 +9,11 @@ namespace BMT_backend.Presentation.Controllers
     [ApiController]
     public class CreditCardController : ControllerBase
     {
-        private readonly CreditCardHandler _creditCardHandler;
+        private readonly CreditCardService _creditCardService;
 
-        public CreditCardController(IConfiguration configuration)
+        public CreditCardController(IConfiguration configuration, CreditCardService creditCardService)
         {
-            _creditCardHandler = new CreditCardHandler(configuration);
+            _creditCardService = creditCardService;
         }
 
 
@@ -26,8 +26,8 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest();
                 }
-                var result = _creditCardHandler.CreateCreditCard(creditCard);
-                return result;
+                var result = await _creditCardService.CreateCreditCardAsync(creditCard);
+                return Ok(result);
             }
             catch (Exception)
             {
@@ -38,14 +38,14 @@ namespace BMT_backend.Presentation.Controllers
         [HttpGet]
         public async Task<List<CreditCard>> GetCreditCards()
         {
-            var creditCards = await Task.Run(() => _creditCardHandler.GetCreditCards());
+            var creditCards = await _creditCardService.GetCreditCardsAsync();
             return creditCards;
         }
 
         [HttpGet("User")]
         public async Task<List<CreditCard>> GetCreditCardsByUser(string userId)
         {
-            var creditCards = await Task.Run(() => _creditCardHandler.GetCreditCardsByUser(userId));
+            var creditCards = await _creditCardService.GetCreditCardsByUserIdAsync(userId);
             return creditCards;
         }
     }

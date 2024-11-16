@@ -66,6 +66,7 @@ namespace BMT_backend.Application.Services
         public async Task<bool> UpdateUserAsync(UpdateUserRequest request)
         {
             ValidateUpdateUserRequest(request);
+            // validar que el nuevo nombre de usuario no esté en uso
             UpdateUserRequest trimmedRequest = await TrimUnchangedAttributes(request);
             if (request.Password != null)
             {
@@ -113,7 +114,7 @@ namespace BMT_backend.Application.Services
             return await _userRepository.GetUserEnterpisesAsync(user);
         }
 
-        private bool ValidateUserRole(string role)
+        private static bool ValidateUserRole(string role)
         {
             if (string.IsNullOrEmpty(role))
                 return false;
@@ -142,7 +143,7 @@ namespace BMT_backend.Application.Services
                 throw new ArgumentException("La constraseña debe incluir al menos una mayúscula, una minúscula, un número y un carácter especial.");
         }
 
-        private void ValidateUpdateUserRequest(UpdateUserRequest request)
+        private static void ValidateUpdateUserRequest(UpdateUserRequest request)
         {
             if (string.IsNullOrEmpty(request.Username))
                 throw new ArgumentException("Nombre de usuario no válido para actualizar.");
@@ -152,7 +153,7 @@ namespace BMT_backend.Application.Services
                 throw new ArgumentException("Apellido no válido para actualizar.");
         }
 
-        private bool IsValidEmail(string email)
+        private static bool IsValidEmail(string email)
         {
             try
             {
@@ -165,7 +166,7 @@ namespace BMT_backend.Application.Services
             }
         }
 
-        private bool IsValidPassword(string password)
+        private static bool IsValidPassword(string password)
         {
             try
             {

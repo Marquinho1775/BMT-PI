@@ -5,9 +5,14 @@ using System.Data.SqlClient;
 
 namespace BMT_backend.Infrastructure.Data
 {
-    public class CodeRepository(string connectionString)
+    public class CodeRepository : ICodeRepository
     {
-        private readonly string _connectString = connectionString;
+        private readonly string _connectString;
+
+        public CodeRepository (string connectionString)
+        {
+            _connectString = connectionString;
+        }
 
         public async Task<string> CreateCodeAsync(string userId)
         {
