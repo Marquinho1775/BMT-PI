@@ -37,6 +37,7 @@ namespace BMT_backend.Handlers
             return tableFormatQuery;
         }
 
+        //repo
         private bool CheckIfEntryInTable(string tableName, string columnName, string columnValue)
         {
             string query = "select " + columnName + " from " + tableName + " where " + columnName + " = '" + columnValue + "'";
@@ -48,6 +49,7 @@ namespace BMT_backend.Handlers
             return false;
         }
 
+        //service
         public bool CheckIfEnterpriseExists(string identification)
         {
             if (CheckIfEntryInTable("Enterprises", "IdentificationNumber", identification)
@@ -60,6 +62,7 @@ namespace BMT_backend.Handlers
             return false;
         }
 
+        //repo
         public bool CreateEnterprise(Enterprise enterprise)
         {
             string createEnterpriseQuery = "insert into Enterprises (" +
@@ -80,6 +83,7 @@ namespace BMT_backend.Handlers
             return true;
         }
 
+        //repo
         public List<Enterprise> GetEnterprises()
         {
             List<Enterprise> enterprises = new List<Enterprise>();
@@ -102,6 +106,7 @@ namespace BMT_backend.Handlers
             return enterprises;
         }
 
+        //repo
         public List<Entrepreneur> GetEnterpriseStaff(string enterpriseId)
         {
             List<Entrepreneur> staff = new List<Entrepreneur>();
@@ -134,6 +139,7 @@ namespace BMT_backend.Handlers
             return staff;
         }
 
+        //repo
         public Entrepreneur GetEnterpriseAdministrator(string enterpriseId)
         {
             List<Entrepreneur> staff = new List<Entrepreneur>();
@@ -164,6 +170,7 @@ namespace BMT_backend.Handlers
             return administrator;
         }
 
+        //repo
         public List<DeveloperEnterpriseView> GetDevEnterprises()
         {
             List<DeveloperEnterpriseView> devEnterprises = new List<DeveloperEnterpriseView>();
@@ -191,6 +198,7 @@ namespace BMT_backend.Handlers
             return devEnterprises;
         }
 
+        //repo
         public Enterprise? GetEnterpriseById(string enterpriseId)
         {
             var query = "SELECT * FROM Enterprises WHERE Id = @enterpriseId";
@@ -224,6 +232,8 @@ namespace BMT_backend.Handlers
 
             return enterprise;
         }
+
+
 
         public bool UpdateEnterpriseProfile(UpdateEnterpriseRequest updatedEnterprise)
         {

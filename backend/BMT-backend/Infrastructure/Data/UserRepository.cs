@@ -153,7 +153,7 @@ namespace BMT_backend.Infrastructure.Data
             }
         }
 
-        public async Task<bool> UpdateUserAsync(UpdateUserRequestDto request)
+        public async Task<bool> UpdateUserAsync(UpdateUserRequest request)
         {
             var query = "EXEC UpdateUser @Id, @Username, @Name, @LastName, @Password";
             using (var connection = new SqlConnection(_connectionString))

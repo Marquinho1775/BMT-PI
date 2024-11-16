@@ -1,6 +1,6 @@
 ﻿namespace BMT_backend.Presentation.Requests
 {
-    public class UpdateUserRequestDto
+    public class UpdateUserRequest
     {
         public string Id { get; set; }
         public string? Username { get; set; }

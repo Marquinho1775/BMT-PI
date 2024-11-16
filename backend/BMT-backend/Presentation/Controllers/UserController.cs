@@ -4,6 +4,7 @@ using BMT_backend.Infrastructure;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Application.Services;
 using BMT_backend.Presentation.Requests;
+using BMT_backend.Infrastructure.Data;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -14,12 +15,14 @@ namespace BMT_backend.Presentation.Controllers
         private readonly UserService _userService;
         private readonly OrderHandler _orderHandler;
         private readonly MailManager _mailManager;
+        private readonly CodeRepository _codeRepository;
 
-        public UserController(UserService userService, IConfiguration configuration)
+        public UserController(UserService userService, IConfiguration configuration, CodeRepository codeRepository)
         {
             _userService = userService;
             _orderHandler = new OrderHandler(configuration);
-            _mailManager = new MailManager(configuration);
+            _mailManager = new MailManager(configuration, codeRepository);
+            _codeRepository = codeRepository;
         }
  
         [HttpPost]
@@ -27,7 +30,6 @@ namespace BMT_backend.Presentation.Controllers
         {
             if (user == null)
                 return BadRequest(new { Message = "El usuario no puede ser nulo." });
-
             try
             {
                 var result = await _userService.CreateUserAsync(user);
@@ -76,7 +78,7 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequestDto updatedUser)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest updatedUser)
         {
             if (updatedUser == null)
                 return BadRequest(new { Message = "Los datos del usuario actualizados no pueden ser nulos." });
@@ -176,6 +178,55 @@ namespace BMT_backend.Presentation.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Success = false, Message = "Error al enviar el correo de notificación de cancelación." });
+            }
+        }
+
+        [HttpPost("sendemail")]
+        public IActionResult SendMail(Mail userData)
+        {
+            try
+            {
+                _mailManager.SendVerificationEmail(userData);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al enviar correo: {ex.Message}");
+            }
+        }
+
+        [HttpPost("verifycode")]
+        public async Task<IActionResult> VerifyCode(ConfirmationCode codeModel)
+        {
+            try
+            {
+                string realCode = await _codeRepository.GetCodeAsync(codeModel.Id);
+                if (realCode == codeModel.Code)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return Unauthorized("Código de verificación incorrecto.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar código: {ex.Message}");
+            }
+        }
+
+        [HttpPost("verifyaccount")]
+        public async Task<IActionResult> VerifyAccount(ConfirmationCode account)
+        {
+            try
+            {
+                await _userService.UpdateAccountVerification(account.Id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al verificar cuenta: {ex.Message}");
             }
         }
     }

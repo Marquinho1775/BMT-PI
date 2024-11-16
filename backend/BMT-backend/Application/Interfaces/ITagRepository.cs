@@ -9,6 +9,6 @@ namespace BMT_backend.Application.Interfaces
         Task<List<Tag>> GetProductTagsByIdAsync(string id);
         Task<bool> UpdateTagAsync(Tag productTag);
         Task<bool> DeleteTagAsync(string name);
-        Task<bool> AddProductTagsAsync(string productId, List<Tag> tags);
+        Task<bool> AddProductTagsAsync(string productId, List<string> tags);
     }
 }

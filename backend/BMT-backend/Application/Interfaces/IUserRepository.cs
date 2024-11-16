@@ -12,7 +12,7 @@ namespace BMT_backend.Application.Interfaces
         Task<User> GetUserByEmailAndPasswordAsync(string email, string password);
         Task<List<Enterprise>> GetUserEnterpisesAsync(User user);
         Task<string> CheckExistingUserAsync(string email, string username);
-        Task<bool> UpdateUserAsync(UpdateUserRequestDto request);
+        Task<bool> UpdateUserAsync(UpdateUserRequest request);
         Task<bool> UpdateAccountVerification(string id);
         Task<bool> UpdateRoleAsync(string id, string role);
     }

@@ -36,16 +36,16 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpGet]
-        public async List<CreditCard> GetCreditCards()
+        public async Task<List<CreditCard>> GetCreditCards()
         {
-            var creditCards = _creditCardHandler.GetCreditCards();
+            var creditCards = await Task.Run(() => _creditCardHandler.GetCreditCards());
             return creditCards;
         }
 
         [HttpGet("User")]
-        public async List<CreditCard> GetCreditCardsByUser(string userId)
+        public async Task<List<CreditCard>> GetCreditCardsByUser(string userId)
         {
-            var creditCards = _creditCardHandler.GetCreditCardsByUser(userId);
+            var creditCards = await Task.Run(() => _creditCardHandler.GetCreditCardsByUser(userId));
             return creditCards;
         }
     }

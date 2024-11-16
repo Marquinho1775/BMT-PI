@@ -11,6 +11,7 @@ namespace BMT_backend.Application.Services
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
 
+
         public UserService(IUserRepository userRepository, ITokenService tokenService)
         {
             _userRepository = userRepository;
@@ -62,10 +63,10 @@ namespace BMT_backend.Application.Services
             return userDevDtos;
         }
 
-        public async Task<bool> UpdateUserAsync(UpdateUserRequestDto request)
+        public async Task<bool> UpdateUserAsync(UpdateUserRequest request)
         {
             ValidateUpdateUserRequest(request);
-            UpdateUserRequestDto trimmedRequest = await TrimUnchangedAttributes(request);
+            UpdateUserRequest trimmedRequest = await TrimUnchangedAttributes(request);
             if (request.Password != null)
             {
                 if (IsValidPassword(trimmedRequest.Password))
@@ -141,7 +142,7 @@ namespace BMT_backend.Application.Services
                 throw new ArgumentException("La constraseña debe incluir al menos una mayúscula, una minúscula, un número y un carácter especial.");
         }
 
-        private void ValidateUpdateUserRequest(UpdateUserRequestDto request)
+        private void ValidateUpdateUserRequest(UpdateUserRequest request)
         {
             if (string.IsNullOrEmpty(request.Username))
                 throw new ArgumentException("Nombre de usuario no válido para actualizar.");
@@ -178,9 +179,9 @@ namespace BMT_backend.Application.Services
             }
         }
 
-        private async Task<UpdateUserRequestDto> TrimUnchangedAttributes(UpdateUserRequestDto request)
+        private async Task<UpdateUserRequest> TrimUnchangedAttributes(UpdateUserRequest request)
         {
-            UpdateUserRequestDto trimmedRequest = new UpdateUserRequestDto();
+            UpdateUserRequest trimmedRequest = new UpdateUserRequest();
             User user = await _userRepository.GetUserByIdAsync(request.Id);
             trimmedRequest.Id = request.Id;
             trimmedRequest.Username = request.Username != user.Username ? request.Username : null;

@@ -6,6 +6,6 @@ namespace BMT_backend.Application.Interfaces
     {
         Task<bool> CreateCreditCardAsync(CreditCard creditCard);
         Task<List<CreditCard>> GetCreditCardsAsync();
-        Task<List<CreditCard>> GetCreditCardsByUserAsync(string userId);
+        Task<List<CreditCard>> GetCreditCardsByUserIdAsync(string userId);
     }
 }

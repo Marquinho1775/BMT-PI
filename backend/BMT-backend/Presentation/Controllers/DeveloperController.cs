@@ -5,6 +5,7 @@ using BMT_backend.Domain.Views;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.DTOs;
 using BMT_backend.Application.Services;
+using BMT_backend.Infrastructure.Data;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -15,17 +16,17 @@ namespace BMT_backend.Presentation.Controllers
         private readonly UserService _userService;
 
         private EnterpriseHandler _enterpriseHandler;
-        private ProductHandler _productHandler;
+        private ProductService _productService;
         private OrderHandler _orderHandler;
         private MailManager _mailManager;
-        public DeveloperController(UserService userService, IConfiguration configuration)
+        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, CodeRepository codeRepository)
         {
             _userService = userService;
 
             _enterpriseHandler = new EnterpriseHandler();
-            _productHandler = new ProductHandler(configuration);
+            _productService = productService;
             _orderHandler = new OrderHandler(configuration);
-            _mailManager = new MailManager(configuration);
+            _mailManager = new MailManager(configuration, codeRepository);
         }
 
         [HttpGet("getEnterprises")]
@@ -36,9 +37,9 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpGet("getProducts")]
-        public List<Product> GetProducts()
+        public async Task<List<Product>> GetProducts()
         {
-            List<Product> devProducts = _productHandler.GetProducts();
+            List<Product> devProducts = await _productService.GetProductsAsync();
             return devProducts;
         }
 

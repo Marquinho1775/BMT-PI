@@ -92,7 +92,7 @@ namespace BMT_backend.Infrastructure.Data
             return await command.ExecuteNonQueryAsync() > 0;
         }
 
-        public async Task<bool> AddProductTagsAsync(string productId, List<Tag> tags)
+        public async Task<bool> AddProductTagsAsync(string productId, List<string> tags)
         {
             var query = "INSERT INTO ProductTags (ProductId, TagId) VALUES (@ProductId, (SELECT Id FROM Tags WHERE Name = @TagName))";
             using var connection = new SqlConnection(_connectionString);
@@ -101,7 +101,7 @@ namespace BMT_backend.Infrastructure.Data
             {
                 using var command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@ProductId", productId);
-                command.Parameters.AddWithValue("@TagName", tag.Name);
+                command.Parameters.AddWithValue("@TagName", tag);
                 await command.ExecuteNonQueryAsync();
             }
             return true;

@@ -1,9 +1,8 @@
 ﻿using System.Net.Mail;
 using System.Net;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Mvc;
 using BMT_backend.Handlers;
 using BMT_backend.Domain.Entities;
+using BMT_backend.Infrastructure.Data;
 
 namespace BMT_backend.Infrastructure
 {
@@ -15,9 +14,9 @@ namespace BMT_backend.Infrastructure
         private readonly int port;
         private readonly string password;
         private readonly string passwordCollab;
-        private readonly CodeHandler _codeHandler;
-
-        public MailManager(IConfiguration configuration)
+        private readonly CodeRepository codeRepository;
+            
+        public MailManager(IConfiguration configuration, CodeRepository codeRepository)
         {
             email = configuration["EmailSettings:Email"];
             emailCollab = configuration["EmailSettingsCollabRegister:Email"];
@@ -25,12 +24,12 @@ namespace BMT_backend.Infrastructure
             port = int.Parse(configuration["EmailSettings:Port"]);
             password = configuration["EmailSettings:Password"];
             passwordCollab = configuration["EmailSettingsCollabRegister:Password"];
-            _codeHandler = new CodeHandler();
+            codeRepository = codeRepository;
         }
 
-        public void SendVerificationEmail(Mail userData)
+        public async Task SendVerificationEmail(Mail userData)
         {
-            string code = _codeHandler.CreateCode(userData.Id);
+            string code = await codeRepository.CreateCodeAsync(userData.Id);
             string title = "Verificación de correo Business Tracker";
             string body = "<h1>Verifica tu correo</h1>" +
                           "Hola!<br><br>Gracias por registrarte en Business Tracker.<br>" +
@@ -68,7 +67,7 @@ namespace BMT_backend.Infrastructure
         public void SendCollabInviteEmail(CollabMail userData)
         {
             string link = "http://localhost:8080/acceptInvite/";
-            string code = _codeHandler.CreateCode(userData.Id);
+            string code = codeRepository.CreateCodeAsync(userData.Id).ToString();
             string title = "Invitación a colaborar en Business Tracker";
             string body = "<h1>Acepta tu invitación</h1>" +
                           "Hola!<br><br>Alguien piensa que puedes ser una parte clave de su emprendimiento.<br>" +
