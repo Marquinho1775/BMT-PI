@@ -83,6 +83,7 @@
                     </v-btn>
                   </v-card-actions>
                 </v-card>
+
               </v-col>
             </v-row>
           </div>
@@ -133,12 +134,27 @@
           <div v-if="isCreditCardOpen">
             <v-row>
               <v-col v-for="(card, index) in creditCards" :key="index" cols="12" class="mb-3">
-                <v-card class="mx-auto custom-card" width="100%" max-width="700" elevation="5" hover>
-                  <v-card-title>{{ card.name }}</v-card-title>
-                  <v-card-subtitle>{{ card.number }}</v-card-subtitle>
-                  <v-divider></v-divider>
-                  <v-card-text>Fecha de Vencimiento: {{ card.dateVenc }}</v-card-text>
+                <v-card class="credit-card mx-auto" width="100%" max-width="500" elevation="5" hover>
+                  <v-card-text>
+                    <div class="card-chip">
+                      <v-icon large>mdi-chip</v-icon>
+                    </div>
+                    <div class="card-number">
+                      {{ formatCardNumber(card.number) }}
+                    </div>
+                    <div class="card-details">
+                      <div class="card-holder">
+                        <span>Titular</span>
+                        <div>{{ card.name }}</div>
+                      </div>
+                      <div class="card-expiry">
+                        <span>Vence</span>
+                        <div>{{ card.dateVenc }}</div>
+                      </div>
+                    </div>
+                  </v-card-text>
                   <v-card-actions>
+                    <v-spacer></v-spacer>
                     <v-btn icon small color="error" @click="deleteCreditCard(card.id)">
                       <v-icon>mdi-delete</v-icon>
                     </v-btn>
@@ -208,7 +224,13 @@ export default {
   },
 
   methods: {
-    // Métodos de dirección y edición
+    formatCardNumber(number) {
+      // Enmascarar todos los dígitos excepto los últimos cuatro
+      return number
+        .replace(/\d(?=\d{4})/g, '•')
+        .replace(/(.{4})/g, '$1 ')
+        .trim();
+    },
     goBack() {
       this.$router.push('/');
     },
@@ -485,5 +507,48 @@ export default {
 
 .v-snackbar {
   max-width: 400px;
+}
+
+.credit-card {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  border-radius: 15px;
+  position: relative;
+  padding: 20px;
+}
+
+.card-chip {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+}
+
+.card-number {
+  margin-top: 60px;
+  font-size: 24px;
+  letter-spacing: 3px;
+  text-align: center;
+}
+
+.card-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.card-holder,
+.card-expiry {
+  font-size: 14px;
+}
+
+.card-holder span,
+.card-expiry span {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.card-holder div,
+.card-expiry div {
+  font-size: 16px;
 }
 </style>

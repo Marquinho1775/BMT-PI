@@ -1,6 +1,29 @@
 <template>
     <v-main>
         <v-container>
+            <!-- Tarjeta de crédito simulada -->
+            <v-card class="credit-card mx-auto" width="100%" max-width="500" elevation="5" hover>
+                <v-card-text>
+                    <div class="card-chip">
+                        <v-icon large>mdi-chip</v-icon>
+                    </div>
+                    <div class="card-number">
+                        {{ formatCardNumber(creditCard.number) }}
+                    </div>
+                    <div class="card-details">
+                        <div class="card-holder">
+                            <span>Titular</span>
+                            <div>{{ creditCard.name || 'NOMBRE DEL TITULAR' }}</div>
+                        </div>
+                        <div class="card-expiry">
+                            <span>Vence</span>
+                            <div>{{ creditCard.dateVenc || 'MM/AA' }}</div>
+                        </div>
+                    </div>
+                </v-card-text>
+            </v-card>
+
+            <!-- Formulario para ingresar los datos -->
             <v-card>
                 <v-card-title>Información de la Tarjeta de Crédito</v-card-title>
                 <v-card-text>
@@ -13,8 +36,17 @@
                         <v-text-field v-model="creditCard.magicNumber" label="Código de seguridad (CVV)"
                             :rules="[cvvRule]" required maxlength="3" type="number"></v-text-field>
 
-                        <v-text-field v-model="creditCard.dateVenc" label="Fecha de vencimiento (MM/AA)"
-                            :rules="[expirationDateRule]" required maxlength="5"></v-text-field>
+                        <!-- Nueva sección para la fecha de vencimiento -->
+                        <v-row>
+                            <v-col cols="6">
+                                <v-select v-model="dateMonth" :items="months" label="Mes" required
+                                    :rules="[requiredRule]"></v-select>
+                            </v-col>
+                            <v-col cols="6">
+                                <v-select v-model="dateYear" :items="years" label="Año" required
+                                    :rules="[requiredRule]"></v-select>
+                            </v-col>
+                        </v-row>
                     </v-form>
                 </v-card-text>
                 <v-card-actions>
@@ -28,66 +60,140 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router'
 import { API_URL } from '@/main';
 
 export default {
-    setup() {
-        const creditCard = ref({
-            id: '',
-            userID: '',
-            name: '',
-            number: '',
-            magicNumber: '',
-            dateVenc: ''
-        });
-
-        const isValid = ref(false);
-        const router = useRouter();
-
-        // Al montar el componente, obtenemos el userID del localStorage
-        onMounted(() => {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user && user.id) {
-                creditCard.value.userID = user.id;
-            }
-        });
-
-        // Reglas de validación
-        const cardNumberRule = value =>
-            /^(\d{4}-){3}\d{4}$/.test(value) || 'Formato inválido. Use XXXX-XXXX-XXXX-XXXX';
-        const cvvRule = value =>
-            /^\d{3}$/.test(value) || 'El CVV debe ser un número de 3 dígitos';
-        const expirationDateRule = value =>
-            /^\d{2}\/\d{2}$/.test(value) || 'Formato inválido. Use MM/AA';
-
-        const handleBack = () => {
-            router.push('/profile');
+    data() {
+        return {
+            creditCard: {
+                id: '',
+                userID: '',
+                name: '',
+                number: '',
+                magicNumber: '',
+                dateVenc: '',
+            },
+            isValid: false,
+            dateMonth: null,
+            dateYear: null,
+            months: Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0')),
+            years: Array.from({ length: 7 }, (_, i) => (24 + i).toString().padStart(2, '0')),
+            // Reglas de validación
+            cardNumberRule: (value) =>
+                /^(\d{4}-){3}\d{4}$/.test(value) || 'Formato inválido. Use XXXX-XXXX-XXXX-XXXX',
+            cvvRule: (value) =>
+                /^\d{3}$/.test(value) || 'El CVV debe ser un número de 3 dígitos',
+            requiredRule: (value) => !!value || 'Este campo es requerido',
         };
-
-        const submitForm = () => {
-            axios.post(`${API_URL}/CreditCard`, creditCard.value)
+    },
+    mounted() {
+        // Al montar el componente, obtenemos el userID del localStorage
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.id) {
+            this.creditCard.userID = user.id;
+        }
+    },
+    watch: {
+        dateMonth() {
+            this.updateDateVenc();
+        },
+        dateYear() {
+            this.updateDateVenc();
+        },
+    },
+    methods: {
+        updateDateVenc() {
+            if (this.dateMonth && this.dateYear) {
+                this.creditCard.dateVenc = `${this.dateMonth}/${this.dateYear}`;
+            } else {
+                this.creditCard.dateVenc = '';
+            }
+        },
+        formatCardNumber(number) {
+            // Enmascarar todos los dígitos excepto los últimos cuatro
+            if (!number) return '•••• •••• •••• ••••';
+            const digitsOnly = number.replace(/-/g, '').replace(/\s+/g, '');
+            const maskedNumber = digitsOnly
+                .replace(/\d(?=\d{4})/g, '•')
+                .replace(/(.{4})/g, '$1 ')
+                .trim();
+            return maskedNumber;
+        },
+        handleBack() {
+            this.$router.push('/profile');
+        },
+        submitForm() {
+            axios
+                .post(`${API_URL}/CreditCard`, this.creditCard)
                 .then(() => {
-                    handleBack();
+                    // Mostrar alerta de éxito y navegar después de que el usuario haga clic en OK
+                    this.$swal.fire({
+                        title: '¡Tarjeta creada con éxito!',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                    }).then(() => {
+                        this.handleBack();
+                    });
                 })
                 .catch((error) => {
+                    // Mostrar alerta de error
+                    this.$swal.fire({
+                        title: 'Error al crear la tarjeta',
+                        text: error.response ? error.response.data.message : error.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                    });
                     console.log(error);
                 });
-        };
-
-        return {
-            creditCard,
-            isValid,
-            cardNumberRule,
-            cvvRule,
-            expirationDateRule,
-            handleBack,
-            submitForm
-        };
-    }
+        },
+    },
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.credit-card {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    border-radius: 15px;
+    position: relative;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card-chip {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.card-number {
+    margin-top: 60px;
+    font-size: 24px;
+    letter-spacing: 3px;
+    text-align: center;
+}
+
+.card-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+}
+
+.card-holder,
+.card-expiry {
+    font-size: 14px;
+}
+
+.card-holder span,
+.card-expiry span {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.card-holder div,
+.card-expiry div {
+    font-size: 16px;
+    text-transform: uppercase;
+}
+</style>
