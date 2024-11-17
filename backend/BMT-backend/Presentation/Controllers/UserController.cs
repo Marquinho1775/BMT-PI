@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BMT_backend.Handlers;
 using BMT_backend.Infrastructure;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Application.Services;
@@ -13,14 +12,14 @@ namespace BMT_backend.Presentation.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
-        private readonly OrderHandler _orderHandler;
+        private OrderService _orderService;
         private readonly MailService _mailManager;
         private readonly ICodeRepository _codeRepository;
 
-        public UserController(UserService userService, IConfiguration configuration, ICodeRepository codeRepository)
+        public UserController(UserService userService, IConfiguration configuration, ICodeRepository codeRepository, OrderService orderService)
         {
             _userService = userService;
-            _orderHandler = new OrderHandler(configuration);
+            _orderService = orderService;
             _mailManager = new MailService(configuration, codeRepository);
             _codeRepository = codeRepository;
         }
@@ -143,10 +142,9 @@ namespace BMT_backend.Presentation.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId))
                 return BadRequest(new { Message = "El ID del usuario es obligatorio." });
-
             try
             {
-                var toConfirmOrders = await Task.Run(() => _orderHandler.GetToConfirmUserOrders(userId));
+                var toConfirmOrders = await _orderService.GetToConfirmOrdersByUserId(userId);
                 return Ok(new { Success = true, Data = toConfirmOrders });
             }
             catch (Exception ex)
@@ -160,13 +158,12 @@ namespace BMT_backend.Presentation.Controllers
         {
             if (string.IsNullOrWhiteSpace(orderID))
                 return BadRequest(new { Message = "El ID de la orden es obligatorio." });
-
             try
             {
-                var denyResult = await Task.Run(() => _orderHandler.DenyOrder(orderID));
+                var denyResult = await Task.Run(() => _orderService.DenyOrder(orderID));
                 if (denyResult)
                 {
-                    var order = await Task.Run(() => _orderHandler.GetOrderById(orderID));
+                    var order = await Task.Run(() => _orderService.GetOrderDetailsById(orderID));
                     if (order == null)
                         return NotFound(new { Success = false, Message = $"Orden con ID {orderID} no encontrada." });
 

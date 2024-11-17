@@ -1,4 +1,4 @@
-﻿namespace BMT_backend.Domain.Entities
+﻿    namespace BMT_backend.Domain.Entities
 {
     public class Product
     {

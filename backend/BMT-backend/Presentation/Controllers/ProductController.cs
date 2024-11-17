@@ -137,7 +137,7 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpPut("update-stock")]
+        [HttpPut("UpdateStock")]
         public async Task<IActionResult> UpdateStock([FromBody] UpdateProductStockRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.ProductId))

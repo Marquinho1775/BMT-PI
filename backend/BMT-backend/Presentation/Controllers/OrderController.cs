@@ -1,8 +1,7 @@
 ﻿using BMT_backend.Domain.Entities;
-using BMT_backend.Handlers;
 using BMT_backend.Presentation.Requests;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using BMT_backend.Application.Services;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -10,24 +9,11 @@ namespace BMT_backend.Presentation.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        private readonly OrderHandler _orderHandler;
-        public OrderController(IConfiguration configuration)
-        {
-            _orderHandler = new OrderHandler(configuration);
-        }
+        private readonly OrderService _orderService;
 
-        [HttpGet]
-        public List<Order> GetOrders()
+        public OrderController(IConfiguration configuration, OrderService orderService)
         {
-            try
-            {
-                var orders = _orderHandler.GetOrders();
-                return orders;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            _orderService = orderService;
         }
 
         [HttpPost]
@@ -39,7 +25,7 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest();
                 }
-                var result = _orderHandler.CreateOrder(order);
+                var result = await _orderService.CreateOrder(order);
                 return Ok(new { id = result });
             }
             catch (Exception)
@@ -47,6 +33,21 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creando la orden");
             }
         }
+
+        [HttpGet]
+        public async Task<ActionResult<List<OrderDetails>>> GetOrders()
+        {
+            try
+            {
+                var orders = await _orderService.GetOrdersDetails();
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error obteniendo las ordenes");
+            }
+        }
+
         [HttpPost("AddProductToOrder")]
         public async Task<ActionResult<string>> AddProductToOrder(AddProductToOrderRequest orderProduct)
         {
@@ -56,29 +57,12 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest();
                 }
-                var result = _orderHandler.AddProductToOrder(orderProduct);
+                var result = await _orderService.AddProductToOrder(orderProduct);
                 return new JsonResult(result);
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error añadiendo producto a la orden");
-            }
-        }
-        [HttpPut("UpdateDeliverFee")]
-        public async Task<ActionResult<string>> UpdateDeliverFee(string orderId)
-        {
-            try
-            {
-                if (orderId == null)
-                {
-                    return BadRequest();
-                }
-                var result = _orderHandler.UpdateDeliveryFee(orderId);
-                return new JsonResult(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error actualizando la tarifa de envío");
             }
         }
     }

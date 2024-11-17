@@ -3,7 +3,6 @@ using BMT_backend.Presentation.Requests;
 using System.Data.SqlClient;
 using BMT_backend.Application.Interfaces;
 using BMT_backend.Domain.Entities;
-using BMT_backend.Handlers;
 
 namespace BMT_backend.Infrastructure.Data
 {

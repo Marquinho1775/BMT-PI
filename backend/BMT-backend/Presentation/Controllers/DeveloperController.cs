@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BMT_backend.Handlers;
 using BMT_backend.Infrastructure;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.DTOs;
 using BMT_backend.Application.Services;
-using BMT_backend.Infrastructure.Data;
+using BMT_backend.Application.Interfaces;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -15,15 +14,15 @@ namespace BMT_backend.Presentation.Controllers
         private ProductService _productService;
         private readonly UserService _userService;
         private readonly EnterpriseService _enterpriseService;
-        private readonly CodeRepository _codeRepository;
+        private readonly ICodeRepository _codeRepository;
         private MailService _mailManager;
 
-        private OrderHandler _orderHandler;
-        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, CodeRepository codeRepository, EnterpriseService enterpriseService)
+        private OrderService _orderService;
+        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService)
         {
             _userService = userService;
             _productService = productService;
-            _orderHandler = new OrderHandler(configuration);
+            _orderService = orderService;
             _mailManager = new MailService(configuration, codeRepository);
             _enterpriseService = enterpriseService;
         }
@@ -51,25 +50,24 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpGet("getToConfirmOrders")]
-        public List<OrderDetails> GetToConfirmOrders()
+        public async Task<List<OrderDetails>> GetToConfirmOrders()
         {
-            List<OrderDetails> toConfirmOrders = _orderHandler.GetToConfirmOrders();
+            List<OrderDetails> toConfirmOrders = await _orderService.GetToConfirmOrders();
             return toConfirmOrders;
         }
 
         [HttpPut("ConfirmOrder")]
-        public IActionResult ConfirmOrder(string orderID)
+        public async Task<IActionResult> ConfirmOrder(string orderID)
         {
-            if (_orderHandler.ConfirmOrder(orderID))
+            if (await _orderService.ConfirmOrder(orderID))
             {
                 try
                 {
-                    var order = _orderHandler.GetOrderById(orderID);
+                    var order = await _orderService.GetOrderDetailsById(orderID);
                     if (order == null)
                     {
                         return NotFound($"Order with ID {orderID} not found.");
                     }
-
                     _mailManager.SendConfirmationEmails(order);
                     return Ok("Order confirmed and emails sent.");
                 }
@@ -82,19 +80,17 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpPut("DenyOrder")]
-        public IActionResult DenyOrder(string orderID)
+        public async Task<IActionResult> DenyOrder(string orderID)
         {
-            if (_orderHandler.DenyOrder(orderID))
+            if (await _orderService.DenyOrder(orderID))
             {
                 try
                 {
-                    var order = _orderHandler.GetOrderById(orderID);
-                    Console.WriteLine(order);
+                    var order = await _orderService.GetOrderDetailsById(orderID);
                     if (order == null)
                     {
                         return NotFound($"Order with ID {orderID} not found.");
                     }
-
                     _mailManager.SendDenyEmail(order);
                     return Ok("Order cancelled, email sent.");
                 }

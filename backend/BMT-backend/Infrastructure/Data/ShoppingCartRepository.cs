@@ -33,9 +33,9 @@ namespace BMT_backend.Infrastructure.Data
             var query = "SELECT Id, UserId, Total " +
                         "FROM ShoppingCarts WHERE UserId = @userId";
             using var connection = new SqlConnection(_connectionString);
-           await connection.OpenAsync();
+            await connection.OpenAsync();
             using var command = new SqlCommand(query, connection);
-         command.Parameters.AddWithValue("@userId", userId);
+            command.Parameters.AddWithValue("@userId", userId);
             using var reader = await command.ExecuteReaderAsync();
             if (!reader.HasRows)
             {

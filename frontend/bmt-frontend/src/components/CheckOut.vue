@@ -395,40 +395,18 @@ export default {
             productId: item.product.id,
             amount: item.quantity,
             productsCost: item.subtotal,
+            date: parsedDate,
           };
           try {
             await axios.post(`${API_URL}/Order/AddProductToOrder`, orderProduct);
           } catch (error) {
             console.error('Error al agregar producto a la orden:', error);
           }
-          try {
-            await axios.put(API_URL + "/Product/UpdateStock", null, {
-                params: { productId: item.product.id, date: parsedDate, quantity: item.quantity },
-              });
-          } catch (error) {
-            console.error('Error al restar stock:', error);
-          }
-        }
-        try {
-          await axios.put(`${API_URL}/Order/UpdateDeliverFee`, null, {
-            params: { orderId: orderId },
-            headers: {
-              Accept: 'text/plain',
-            },
-          });
-          this.$swal.fire({
-            title: 'Pedido Realizado',
-            text: 'Su pedido ha sido realizado con éxito.',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          });
-        } catch (error) {
-          console.error('Error updating delivery fee:', error);
         }
       } catch (error) {
         console.error('Error al crear la orden:', error);
       }
-    },
+    },  
 
     clearCart() {
       axios

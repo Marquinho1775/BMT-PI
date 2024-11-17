@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using BMT_backend.Handlers;
 using BMT_backend.Domain.Entities;
 
 namespace BMT_backend.Presentation.Controllers

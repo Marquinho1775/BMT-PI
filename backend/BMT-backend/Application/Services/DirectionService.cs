@@ -28,5 +28,19 @@ namespace BMT_backend.Application.Services
         {
             return await _directionRepository.UpdateDirectionAsync(direction);
         }
+        public async Task<string> GetCoordinates(string directionId)
+        {
+            return await _directionRepository.GetCoordinates(directionId);
+        }
+
+        public async Task<bool> SoftDeleteDirectionAsync(string directionId)
+        {
+            return await _directionRepository.SoftDeleteDirectionAsync(directionId);
+        }
+
+        public async Task<bool> HardDeleteDirectionAsync(string directionId)
+        {
+            return await _directionRepository.HardDeleteDirectionAsync(directionId);
+        }
     }
 }

@@ -1,8 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using BMT_backend.Application.Interfaces;
-using BMT_backend.Handlers;
+﻿using BMT_backend.Application.Interfaces;
 
 namespace BMT_backend.Infrastructure
 {
