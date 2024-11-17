@@ -79,8 +79,8 @@ builder.Services.AddScoped<ICodeRepository>(provider =>
 builder.Services.AddScoped<IEnterpriseRepository>(provider =>
     new EnterpriseRepository(builder.Configuration.GetConnectionString("BMTContext")));
 
-//builder.Services.AddScoped<IShoppingCartRepository>(provider =>
-//    new ShoppingCartRepository(builder.Configuration.GetConnectionString("BMTContext")));
+builder.Services.AddScoped<IShoppingCartRepository>(provider =>
+    new ShoppingCartRepository(builder.Configuration.GetConnectionString("BMTContext")));
 
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<TagService>();
@@ -92,7 +92,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<CreditCardService>();
 builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped<EnterpriseService>();
-//builder.Services.AddScoped<ShoppingCartService>();
+builder.Services.AddScoped<ShoppingCartService>();
 
 
 var app = builder.Build();

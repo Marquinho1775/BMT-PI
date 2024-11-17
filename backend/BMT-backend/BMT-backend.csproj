@@ -19,6 +19,7 @@
     <None Remove="Application\Interfaces\I" />
     <None Remove="Application\Interfaces\NewFile.txt" />
     <None Remove="Application\Services\NewFile.txt" />
+    <None Remove="Domain\Entities\NewFile.txt" />
     <None Remove="Infrastructure\Data\NewFile.txt" />
   </ItemGroup>
 
