@@ -1,6 +1,7 @@
 ﻿using BMT_backend.Application.Interfaces;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace BMT_backend.Infrastructure.Data
@@ -156,13 +157,33 @@ namespace BMT_backend.Infrastructure.Data
             return Convert.ToInt32(quantity);
         }
 
+        public async Task<List<string>> GetEnterpriseProductsIdAsync(string enterpriseId)
+        {
+            var query = "SELECT Id FROM Products WHERE EnterpriseId = @EnterpriseId;";
+
+            using var _conection = new SqlConnection(_connectionString);
+            using var queryCommand = new SqlCommand(query, _conection);
+            queryCommand.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+
+            await _conection.OpenAsync();
+            using var reader = await queryCommand.ExecuteReaderAsync();
+            List<string> productsId = new List<string>();
+            while (await reader.ReadAsync())
+            {
+                productsId.Add(reader["Id"].ToString());
+            }
+            return productsId;
+        }
+
         public async Task<string> CheckExistingEnterpriseAsync(Enterprise enterprise)
         {
-            var query = "EXEC CheckEnterpriseExist @IdentificationNumber = @IdentificationNumber, @Name = @Name";
+            var query = "EXEC CheckEnterpriseExist @IdentificationNumber, @Name, @PhoneNumber, @Email";
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@IdentificationNumber", enterprise.IdentificationNumber);
             command.Parameters.AddWithValue("@Name", enterprise.Name);
+            command.Parameters.AddWithValue("@PhoneNumber", enterprise.PhoneNumber);
+            command.Parameters.AddWithValue("@Email", enterprise.Email);
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
             if (await reader.ReadAsync())
@@ -179,10 +200,14 @@ namespace BMT_backend.Infrastructure.Data
             using var connection = new SqlConnection(_connectionString);
             using var updateCommand = new SqlCommand(updateQuery, connection);
             updateCommand.Parameters.AddWithValue("@Id", updatedEnterprise.Id);
-            updateCommand.Parameters.AddWithValue("@Name", updatedEnterprise.Name);
-            updateCommand.Parameters.AddWithValue("@Description", updatedEnterprise.Description);
-            updateCommand.Parameters.AddWithValue("@Email", updatedEnterprise.Email);
-            updateCommand.Parameters.AddWithValue("@PhoneNumber", updatedEnterprise.PhoneNumber);
+            if (!string.IsNullOrEmpty(updatedEnterprise.Name))
+                updateCommand.Parameters.AddWithValue("@Name", updatedEnterprise.Name);
+            if (!string.IsNullOrEmpty(updatedEnterprise.Description))
+                updateCommand.Parameters.AddWithValue("@Description", updatedEnterprise.Description);
+            if (!string.IsNullOrEmpty(updatedEnterprise.Email))
+                updateCommand.Parameters.AddWithValue("@Email", updatedEnterprise.Email);
+            if (!string.IsNullOrEmpty(updatedEnterprise.PhoneNumber))
+                updateCommand.Parameters.AddWithValue("@PhoneNumber", updatedEnterprise.PhoneNumber);
             await connection.OpenAsync();
             bool result = await updateCommand.ExecuteNonQueryAsync() >= 1;
             await connection.CloseAsync();

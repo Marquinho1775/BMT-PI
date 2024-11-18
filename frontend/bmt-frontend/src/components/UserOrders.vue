@@ -76,8 +76,7 @@ export default {
         const response = await axios.get(API_URL + "/User/GetToConfirmOrders", {
           params: { userId: getUser().id },
         });
-        console.log(response.data);
-        this.orders = response.data;
+        this.orders = response.data.data;
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -85,9 +84,7 @@ export default {
     async denyOrder(orderId) {
       if (confirm("¿Estás seguro de que quieres rechazar este pedido?")) {
         try {
-          const response = await axios.put(API_URL + "/User/DenyOrder", null, {
-            params: { orderID: orderId },
-          });
+          const response = await axios.put(API_URL + "/User/DenyOrder?orderID=" + orderId);
 
           if (response.status === 200) {
             console.log(`Order ${orderId} denied successfully`);

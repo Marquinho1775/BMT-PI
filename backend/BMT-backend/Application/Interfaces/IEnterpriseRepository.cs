@@ -12,6 +12,7 @@ namespace BMT_backend.Application.Interfaces
         Task<Entrepreneur> GetEnterpriseAdministratorAsync(string enterpriseId);
         Task<List<Entrepreneur>> GetEnterpriseStaffAsync(string enterpriseId);
         Task<int> GetProductsQuantityAsync(string id);
+        Task<List<string>> GetEnterpriseProductsIdAsync(string enterpriseId);
         Task<string> CheckExistingEnterpriseAsync(Enterprise enterprise);
         Task<bool> UpdateEnterpriseAsync(UpdateEnterpriseRequest updatedEnterprise, List<string> fieldsToUpdate);
     }

@@ -17,7 +17,7 @@
           <tbody>
             <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber"
               @click="goToEnterprise(enterprise.id)">
-              <td>{{ enterprise.enterpriseName }}</td>
+              <td>{{ enterprise.name }}</td>
               <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
               <td>{{ enterprise.administrator.name }} {{ enterprise.administrator.lastname }}</td>
               <td>{{ enterprise.email }}</td>
@@ -56,28 +56,22 @@ export default {
       try {
         const token = getToken();
         const user = JSON.parse(localStorage.getItem('user'));
-
-        if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
-          console.error('Faltan datos del usuario');
-          return;
-        }
-        const obtainEntrepreneurResponse = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id,
+        const obtainEntrepreneurResponse = await axios.get(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id,
           {
             headers: {
               Authorization: `Bearer ${token}`
             }
           }
         );
-        const entrepreneur = obtainEntrepreneurResponse.data;
-        const enterprisesResponse = await axios.post(
-          API_URL + '/Entrepreneur/my-registered-enterprises?Identification=' + entrepreneur.identification,
+        const entrepreneurId = obtainEntrepreneurResponse.data.identification;
+        const enterprisesResponse = await axios.get(
+          API_URL + '/Entrepreneur/my-registered-enterprises?Identification=' + entrepreneurId,
           {
             headers: {
               Authorization: `Bearer ${token}`
             }
           });
-        this.enterprises = enterprisesResponse.data;
-
+        this.enterprises = enterprisesResponse.data.success;
       } catch (error) {
         console.error('Error al obtener las empresas:', error);
         if (error.response) {

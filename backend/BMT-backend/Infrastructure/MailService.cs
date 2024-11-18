@@ -64,10 +64,10 @@ namespace BMT_backend.Infrastructure
         }
         //☆*: .｡. o(≧▽≦)o .｡.:*☆`(*>﹏<*)′o(*^▽^*)┛ヾ(＠⌒ー⌒＠)ノ＼(((￣(￣(￣▽￣)￣)￣)))／(((o(*ﾟ▽ﾟ*)o)))♪(´▽｀)o(*￣▽￣*)ブ（づ￣3￣）づ╭❤️～(
 
-        public void SendCollabInviteEmail(CollabMail userData)
+        public async void SendCollabInviteEmail(CollabMail userData)
         {
             string link = "http://localhost:8080/acceptInvite/";
-            string code = _codeRepository.CreateCodeAsync(userData.Id).ToString();
+            string code = await _codeRepository.CreateCodeAsync(userData.Id);
             string title = "Invitación a colaborar en Business Tracker";
             string body = "<h1>Acepta tu invitación</h1>" +
                           "Hola!<br><br>Alguien piensa que puedes ser una parte clave de su emprendimiento.<br>" +

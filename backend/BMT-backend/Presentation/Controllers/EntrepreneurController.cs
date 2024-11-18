@@ -24,17 +24,21 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<bool>> CreateEntrepreneur(Entrepreneur entrepreneur)
+        public async Task<ActionResult<bool>> CreateEntrepreneur(CreateEntrepreneurRequest entrepreneur)
         {
             try
             {
                 if (entrepreneur == null
-                    || string.IsNullOrEmpty(entrepreneur.Username) || string.IsNullOrEmpty(entrepreneur.Identification))
+                    || string.IsNullOrEmpty(entrepreneur.UserId) || string.IsNullOrEmpty(entrepreneur.Identification))
                 {
                     return BadRequest("Username and Identification cannot be null or empty.");
                 }
-                var result = _entrepeneurService.CreateEntrepreneur(entrepreneur);
-                return new JsonResult(result);
+                var result = await _entrepeneurService.CreateEntrepreneur(entrepreneur.UserId, entrepreneur.Identification);
+                return Ok(new { Success = result });
+            }
+            catch (Exception ex) when (ex.Message.Contains("El emprendedor ya existe"))
+            {
+                return Conflict("Ya existe un emprendedor con este número de identificación.");
             }
             catch (Exception)
             {
@@ -52,8 +56,8 @@ namespace BMT_backend.Presentation.Controllers
                 {
                     return BadRequest("Identifications cannot be null or empty.");
                 }
-                var result = _entrepeneurService.AddEntrepreneurToEnterprise(request);
-                return new JsonResult(result);
+                var result = await _entrepeneurService.AddEntrepreneurToEnterprise(request);
+                return Ok(new { Success = result });
             }
             catch (Exception)
             {
@@ -61,7 +65,7 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpPost("my-registered-enterprises")]
+        [HttpGet("my-registered-enterprises")]
         public async Task<ActionResult<bool>> ConsultRegisteredEnterprises(string Identification)
         {
             try
@@ -71,8 +75,8 @@ namespace BMT_backend.Presentation.Controllers
                     BadRequest();
                 }
 
-                var result = _entrepeneurService.GetEnterprisesOfEntrepreneur(Identification);
-                return new JsonResult(result);
+                var result = await _entrepeneurService.GetEnterprisesOfEntrepreneur(Identification);
+                return Ok(new { Success = result }); 
 
             }
             catch
@@ -91,8 +95,8 @@ namespace BMT_backend.Presentation.Controllers
                     BadRequest();
                 }
 
-                var result = _entrepeneurService.GetEntrepreneurByUserId(id);
-                return new JsonResult(result);
+                var result = await _entrepeneurService.GetEntrepreneurByUserId(id);
+                return Ok(result);
 
             }
             catch

@@ -178,7 +178,7 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpPost("VerifyCode")]
+        [HttpPost("VerifyCode")]    
         public async Task<IActionResult> VerifyCode(ConfirmationCode codeModel)
         {
             try

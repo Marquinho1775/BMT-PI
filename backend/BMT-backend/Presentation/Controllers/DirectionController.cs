@@ -26,10 +26,10 @@ namespace BMT_backend.Presentation.Controllers
             {
                 var directions = await _directionService.GetDirectionsFromUserAsync(id);
 
-                if (directions != null && directions.Count > 0)
+                if (directions != null && directions.Count >= 0)
                     return Ok(new { Success = true, Data = directions });
                 else
-                    return NotFound(new { Success = false, Message = "No se encontraron direcciones para el usuario especificado." });
+                    return NotFound(new { Success = false, Message = "Internal server error." });
             }
             catch (Exception ex)
             {

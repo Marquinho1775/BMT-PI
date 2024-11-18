@@ -1,73 +1,97 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center vh-100">
-    <div id="form" class="card custom-card" style="max-width: 400px; width: 100%">
-      <h3 id="titulo" class="text-center card-header-custom">
-        Registro de usuario
-      </h3>
-      <div class="card-body">
-        <b-form @submit.prevent="registerUser" @reset="onReset">
-          <b-form-group id="input-group-name" label="Nombre: *">
-            <b-form-input class="input_place" v-model="formData.Name" placeholder="Ingresar nombre" required
-              maxlength="20" :state="nameValid" @input="validateName"></b-form-input>
-            <b-form-invalid-feedback v-if="!nameValid">
-              El nombre solo puede contener letras y tener máximo 20 caracteres.
-            </b-form-invalid-feedback>
-          </b-form-group>
+  <v-main class="d-flex justify-center align-center" style="min-height: 100vh;">
+    <v-container max-width="500px">
+      <v-card class="pa-4 elevation-2">
+        <v-card-title class="text-h5 text-center">Registro de usuario</v-card-title>
+        <v-divider></v-divider>
 
-          <b-form-group id="input-group-lastname" label="Apellidos: *">
-            <b-form-input class="input_place" v-model="formData.LastName" placeholder="Ingresar apellidos" required
-              maxlength="50" :state="lastnameValid" @input="validateLastName"></b-form-input>
-            <b-form-invalid-feedback v-if="!lastnameValid">
-              Los apellidos solo pueden contener letras y tener máximo 50 caracteres.
-            </b-form-invalid-feedback>
-          </b-form-group>
+        <v-card-text>
+          <v-form @submit.prevent="registerUser" @reset="onReset">
+            <!-- Nombre -->
+            <v-text-field
+              label="Nombre"
+              v-model="formData.Name"
+              placeholder="Ingresar nombre"
+              maxlength="20"
+              :error-messages="!nameValid ? ['El nombre solo puede contener letras y tener máximo 20 caracteres.'] : []"
+              @input="validateName"
+              required
+              outlined
+            ></v-text-field>
 
-          <b-form-group id="input-group-username" label="Nombre de usuario: *" label-for="username">
-            <b-form-input class="input_place" v-model="formData.Username" placeholder="Ingresar nombre de usuario"
-              required maxlength="20" :state="usernameValid" @input="validateUsername"></b-form-input>
-            <b-form-invalid-feedback v-if="!usernameValid">
-              El nombre de usuario solo puede contener letras, números, y los caracteres especiales -_´.
-            </b-form-invalid-feedback>
-          </b-form-group>
+            <!-- Apellidos -->
+            <v-text-field
+              label="Apellidos"
+              v-model="formData.LastName"
+              placeholder="Ingresar apellidos"
+              maxlength="50"
+              :error-messages="!lastnameValid ? ['Los apellidos solo pueden contener letras y tener máximo 50 caracteres.'] : []"
+              @input="validateLastName"
+              required
+              outlined
+            ></v-text-field>
 
-          <b-form-group id="input-group-email" label="Correo electronico: *" label-for="email">
-            <b-form-input class="input_place" v-model="formData.Email" type="email"
-              placeholder="Ingresar correo electronico" required :state="emailValid"
-              @input="validateEmail"></b-form-input>
-            <b-form-invalid-feedback v-if="!emailValid">
-              El correo debe tener el formato xxxx@xxx.xxx
-            </b-form-invalid-feedback>
-          </b-form-group>
+            <!-- Nombre de usuario -->
+            <v-text-field
+              label="Nombre de usuario"
+              v-model="formData.Username"
+              placeholder="Ingresar nombre de usuario"
+              maxlength="20"
+              :error-messages="!usernameValid ? ['El nombre de usuario solo puede contener letras, números, y los caracteres especiales -_´.'] : []"
+              @input="validateUsername"
+              required
+              outlined
+            ></v-text-field>
 
-          <b-form-group id="input-group-password" label="Contraseña: *" label-for="password">
-            <b-form-input class="input_place" v-model="formData.Password" type="password"
-              placeholder="Ingresar contraseña" required maxlength="16" :state="passwordValid"
-              @input="validatePassword"></b-form-input>
-            <b-form-invalid-feedback v-if="!passwordValid">
-              La contraseña debe tener máximo 16 caracteres, incluir una mayúscula, una minúscula, un número y un
-              carácter especial.
-            </b-form-invalid-feedback>
-          </b-form-group>
+            <!-- Correo electrónico -->
+            <v-text-field
+              label="Correo electrónico"
+              v-model="formData.Email"
+              type="email"
+              placeholder="Ingresar correo electrónico"
+              :error-messages="!emailValid ? ['El correo debe tener el formato xxxx@xxx.xxx'] : []"
+              @input="validateEmail"
+              required
+              outlined
+            ></v-text-field>
 
-          <b-form-group id="input-group-confirm-password" label="Confirmar Contraseña: *" label-for="confirm-password">
-            <b-form-input class="input_place" v-model="confirmPassword" type="password"
-              placeholder="Confirmar contraseña" required></b-form-input>
-            <b-form-invalid-feedback v-if="!passwordMismatch">
-              No coinciden las contraseñas.
-            </b-form-invalid-feedback>
-            <p v-if="passwordMismatch" class="text-danger">No coinciden las contraseñas</p>
-          </b-form-group>
+            <!-- Contraseña -->
+            <v-text-field
+              label="Contraseña"
+              v-model="formData.Password"
+              type="password"
+              placeholder="Ingresar contraseña"
+              maxlength="16"
+              :error-messages="!passwordValid ? ['La contraseña debe tener máximo 16 caracteres, incluir una mayúscula, una minúscula, un número y un carácter especial.'] : []"
+              @input="validatePassword"
+              required
+              outlined
+            ></v-text-field>
 
-          <div class="d-flex justify-content-between">
-            <b-button variant="secondary" @click="Volver">Volver</b-button>
-            <b-button variant="secondary">Limpiar</b-button>
-            <b-button type="submit" class="button" :disabled="passwordMismatch">Registrar</b-button>
-          </div>
-        </b-form>
-      </div>
-    </div>
-  </div>
+            <!-- Confirmar contraseña -->
+            <v-text-field
+              label="Confirmar contraseña"
+              v-model="confirmPassword"
+              type="password"
+              placeholder="Confirmar contraseña"
+              :error-messages="passwordMismatch ? ['No coinciden las contraseñas.'] : []"
+              required
+              outlined
+            ></v-text-field>
+
+            <!-- Botones de acción -->
+            <div class="d-flex justify-end mt-4">
+              <v-btn color="secondary" class="mr-2" outlined @click="Volver">Volver</v-btn>
+              <v-btn type="reset" color="secondary" outlined>Limpiar</v-btn>
+              <v-btn type="submit" color="primary" :disabled="passwordMismatch">Registrar</v-btn>
+            </div>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-container>
+  </v-main>
 </template>
+
 
 <script>
 import axios from 'axios';

@@ -1,6 +1,5 @@
 <template>
-	<v-app class="d-flex flex-column">
-		<AppHeader />
+	<v-main class="flex-grow-1">
     <v-container v-if = "loggedIn" class="d-flex justify-center align-center" style="min-height: 100vh;">
       <v-form @submit.prevent="handleSubmit" style="width: 100%; max-width: 500px;">
         <h1 v-if="title" class="text-center mb-5">{{ title }}</h1>
@@ -49,7 +48,7 @@
               @keydown="handleInput"
             ></v-text-field>
           </v-form>
-  </v-container>
+    </v-container>
         </v-card-text>
         <v-row class="mt-4" justify="space-between">
           <v-col cols="auto">
@@ -61,8 +60,7 @@
         </v-row>
       </v-card>
     </v-container>
-    <AppFooter />
-  </v-app>
+  </v-main>
 </template>
 
 <script>
@@ -124,19 +122,20 @@ export default {
     async handleSubmit() {
       try {
         const token = getToken();
-        const enterpriseResponse = await axios.get(API_URL + `/Enterprise/${this.enterpriseCode}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const enterpriseResponse = await axios.get(
+        `${API_URL}/Enterprise/GetEnterpriseById?enterpriseId=${this.enterpriseCode}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
         const codeTaken = {
           Code: this.verificationCode,
           Id: this.user.userId
         };
-        await axios.post(API_URL + '/Email/verifycode', codeTaken);
+        await axios.post(API_URL + '/User/VerifyCode', codeTaken);
 
-        this.enterprise = enterpriseResponse.data;
+        this.enterprise = enterpriseResponse.data.data;
         if (this.enterprise) {
           this.enterpriseExist = true;
           this.$swal.fire({
@@ -159,10 +158,13 @@ export default {
     },
 
     async acceptInvitation() {
+      console.log('Accepting invitation');
       try {
-        if (this.isEntrepeneur === false) {
+        if (this.isEntrepeneur == false) {
+          console.log('Registering entrepreneur');
           await this.registerEntrepreneur();
         }
+        console.log('Entrepreneur registered');
 
         const obtainEntrepreneurResponse = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + this.user.userId);
         this.entrepreneur = obtainEntrepreneurResponse.data;
@@ -185,34 +187,31 @@ export default {
           confirmButtonText: 'Ok'
         });
       }
-      this.sendConfirmationMail();
       this.goBack();
-    },
-
-    async sendConfirmationMail(){
-      await axios.post(API_URL + '/Email/sendconfirmationmail', {
-        Email: this.enterprise.email,
-        Id: this.user.username
-      });
     },
 
     async registerEntrepreneur() {
       try {
+        console.log(JSON.parse(localStorage.getItem('user')).id);
+        console.log(this.user.Identification.trim());
         const response = await axios.post(`${API_URL}/Entrepreneur`, {
-          id: '',
-          username: JSON.parse(localStorage.getItem('user')).username,
-          identification: this.identification,
+          userId: JSON.parse(localStorage.getItem('user')).id,
+          identification: this.user.Identification.trim(),
         });
-        const userId = JSON.parse(localStorage.getItem('user')).id;
-        await axios.post(`${API_URL}/User/Role?id=${encodeURIComponent(userId)}&role=${encodeURIComponent('emp')}`);
+        const user = JSON.parse(localStorage.getItem('user'));
+        user.role = 'emp';
+        localStorage.setItem('user', JSON.stringify(user));
+        console.log('User after role change:', user);
         return response.data;
       } catch (error) {
-        this.$swal.fire({
-          title: 'Error',
-          text: 'Hubo un error al anexarte a la empresa. Inténtalo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Ok'
-        });
+        if (error.response.status === 409) {
+          this.generateSweetAlert('Error', 'error', 'Ya existe un emprendedor con este número de identificación.');
+          throw error;
+        } else {
+          this.generateSweetAlert('Error', 'error', 'Hubo un error al registrar el emprendedor.');
+          console.error(error);
+          throw error;
+        }
       }
     },
 

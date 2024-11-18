@@ -11,19 +11,22 @@ namespace BMT_backend.Application.Services
     {
 
         private readonly IEntrepeneurRepository _entrepeneurRepository;
+        private UserService _userService;
 
-        public EntrepeneurService(IEntrepeneurRepository entrepeneurRepository)
+        public EntrepeneurService(IEntrepeneurRepository entrepeneurRepository, UserService userService)
         {
             _entrepeneurRepository = entrepeneurRepository;
+            _userService = userService;
         }
 
-        public async Task<bool> CreateEntrepreneur(Entrepreneur entrepreneur)
+        public async Task<bool> CreateEntrepreneur(string userId, string entrepreneurId)
         {
-            if (await _entrepeneurRepository.CheckIfEntryInTable("Entrepreneurs", "Identification", entrepreneur.Identification))
+            if (await _entrepeneurRepository.CheckIfEntryInTable("Entrepreneurs", "Identification", entrepreneurId))
             {
-                return false;
+                throw new System.Exception("El emprendedor ya existe");
             }
-            return await _entrepeneurRepository.CreateEntrepreneur(entrepreneur);
+            await _entrepeneurRepository.CreateEntrepreneur(userId, entrepreneurId);
+            return await _userService.UpdateRoleAsync(userId, "emp");
         }
 
         public async Task<bool> AddEntrepreneurToEnterprise(AddEntrepreneurToEnterpriseRequest request)

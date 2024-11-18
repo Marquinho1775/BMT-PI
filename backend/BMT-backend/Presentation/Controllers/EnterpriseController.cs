@@ -31,11 +31,16 @@ namespace BMT_backend.Presentation.Controllers
                 else
                     return StatusCode(500, new { Success = false, Message = "No se pudo crear la empresa." });
             }
+            catch (ArgumentException ex)
+            {
+                return Conflict(new { Success = false, Message = ex.Message });
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Success = false, Message = ex.Message });
+                return StatusCode(500, new { Success = false, Message = "Ocurrió un error interno del servidor." });
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetEnterprises()
@@ -67,6 +72,22 @@ namespace BMT_backend.Presentation.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Success = false, Message = "Error al obtener la empresa." });
+            }
+        }
+
+        [HttpGet("GetEnterpriseProducts")]
+        public async Task<IActionResult> GetEnterpriseProducts([FromQuery] string enterpriseId)
+        {
+            if (string.IsNullOrWhiteSpace(enterpriseId))
+                return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
+            try
+            {
+                var products = await _enterpriseService.GetEnterpriseProducts(enterpriseId);
+                return Ok(new { Success = true, Data = products });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener los productos de la empresa." });
             }
         }
 

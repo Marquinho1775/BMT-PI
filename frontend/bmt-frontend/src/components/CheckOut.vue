@@ -308,16 +308,11 @@ export default {
         if (!user || !user.id) {
           throw new Error('El usuario no tiene todos los campos requeridos');
         }
-        const response = await axios.post(
-          `${API_URL}/Direction/ObtainDirectionsFromUser`,
-          user,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await axios.get(
+          `${API_URL}/Direction/GetDirectionsFromUser?id=${user.id}` // Corregido,
+          ,{ headers: { Authorization: `Bearer ${token}` } }
         );
-        this.directions = response.data;
+        this.directions = response.data.data;
       } catch (error) {
         console.error('Error al obtener las direcciones del usuario:', error);
       }

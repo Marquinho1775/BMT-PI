@@ -1,120 +1,144 @@
 <template>
   <v-main>
-    <div class="enterprise-register-container d-flex justify-content-center align-items-center vh-100">
-      <div id="form" class="card custom-card my-4">
-        <h3 id="title" class="text-center card-header-custom">Agregar un producto</h3>
-        <div class="card-body">
-          <b-form @submit.prevent="addNewProduct" @reset="onReset">
-
+    <v-container
+      class="d-flex justify-center align-center"
+      style="min-height: 100vh;"
+    >
+      <v-card class="pa-4 elevation-2" max-width="600px" width="100%">
+        <v-card-title class="text-h5 text-center">
+          Agregar un producto
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text>
+          <v-form @submit.prevent="addNewProduct">
             <!-- Nombre del producto -->
-            <b-form-group id="group-name" label="Nombre del producto:" label-for="name">
-              <b-form-input id="name" class="form-input" v-model="productData.name"
-                placeholder="Ingresar el nombre del producto" required>
-              </b-form-input>
-            </b-form-group>
+            <v-text-field
+              v-model="productData.name"
+              label="Nombre del producto"
+              required
+              outlined
+            ></v-text-field>
 
             <!-- Descripción -->
-            <b-form-group id="group-description" label="Descripción:" label-for="description">
-              <b-form-input id="description" class="form-input" v-model="productData.description"
-                placeholder="Ingresar la descripción del producto" required>
-              </b-form-input>
-            </b-form-group>
+            <v-textarea
+              v-model="productData.description"
+              label="Descripción"
+              required
+              outlined
+            ></v-textarea>
 
             <!-- Tags -->
-            <b-form-group label="Etiquetas de producto:" label-for="tags-component-select">
-              <b-form-tags id="tags-component-select" v-model="value" size="lg" class="mb-2" add-on-change
-                no-outer-focus>
-                <template v-slot="{ tags, inputAttrs, inputHandlers, disabled, removeTag }">
-                  <b-form-select class="select-component" v-bind="inputAttrs" v-on="inputHandlers"
-                    :disabled="disabled || availableOptions.length === 0" :options="availableOptions">
-                    <template #first>
-                      <option disabled value="" class="'select-component'">Escoge una o varias etiquetas...</option>
-                    </template>
-                  </b-form-select>
-                  <ul v-if="tags.length > 0" class="list-inline d-inline-block mt-2">
-                    <li v-for="tag in tags" :key="tag" class="list-inline-item">
-                      <b-form-tag id="tag-component" class="custom-tag" @remove="removeTag(tag)" :title="tag"
-                        :disabled="disabled">{{ tag
-                        }}</b-form-tag>
-                    </li>
-                  </ul>
-                </template>
-              </b-form-tags>
-            </b-form-group>
+            <v-combobox
+              v-model="value"
+              :items="availableOptions"
+              label="Etiquetas de producto"
+              multiple
+              chips
+              outlined
+              clearable
+              item-value="value"
+              item-text="text"
+            ></v-combobox>
 
             <!-- Peso -->
-            <b-form-group id="group-weight" label="Peso (kg):" label-for="weight">
-              <b-form-input id="weight" class="form-input" v-model="productData.weight" type="text"
-                placeholder="Ingrese el peso del producto" required :state="weightValid" @input="validateWeight">
-              </b-form-input>
-              <b-form-invalid-feedback v-if="weightValid === false">Por favor, ingrese un peso
-                válido.</b-form-invalid-feedback>
-            </b-form-group>
+            <v-text-field
+              v-model="productData.weight"
+              label="Peso (kg)"
+              type="number"
+              required
+              outlined
+              :error-messages="weightValid === false ? ['Por favor, ingrese un peso válido.'] : []"
+              @input="validateWeight"
+            ></v-text-field>
 
             <!-- Precio -->
-            <b-form-group id="group-price" label="Precio:" label-for="price">
-              <b-form-input id="price" class="form-input price-input-bt" v-model="productData.price" type="text"
-                placeholder="Ingrese el precio del producto" required :state="priceValid" @input="validatePrice">
-              </b-form-input>
-              <b-form-invalid-feedback v-if="priceValid === false">Por favor, ingrese un precio
-                válido.</b-form-invalid-feedback>
-            </b-form-group>
+            <v-text-field
+              v-model="productData.price"
+              label="Precio"
+              type="number"
+              required
+              outlined
+              :error-messages="priceValid === false ? ['Por favor, ingrese un precio válido.'] : []"
+              @input="validatePrice"
+            ></v-text-field>
 
             <!-- Tipo de Producto -->
-            <b-form-group id="group-type" label="Tipo de producto:" label-for="type">
-              <b-form-radio-group id="type" v-model="productData.type" :options="['Perecedero', 'No perecedero']"
-                name="type">
-              </b-form-radio-group>
-            </b-form-group>
+            <v-radio-group v-model="productData.type" label="Tipo de producto" row>
+              <v-radio label="Perecedero" value="Perecedero"></v-radio>
+              <v-radio label="No perecedero" value="No perecedero"></v-radio>
+            </v-radio-group>
 
-            <div v-if="productData.type === 'No perecedero'">
-              <!-- Stock -->
-              <b-form-group id="group-stock" label="Cantidad de stock:" label-for="stock">
-                <b-form-input id="stock" class="form-input" v-model.number="productData.stock" type="number" min="0"
-                  step="1" placeholder="Ingrese la cantidad de stock" required :state="stockValid"
-                  @input="validateStock">
-                </b-form-input>
-                <b-form-invalid-feedback v-if="stockValid === false">Por favor, ingrese una cantidad de stock
-                  válida.</b-form-invalid-feedback>
-              </b-form-group>
-            </div>
+            <!-- Stock -->
+            <v-text-field
+              v-if="productData.type === 'No perecedero'"
+              v-model.number="productData.stock"
+              label="Cantidad de stock"
+              type="number"
+              min="0"
+              step="1"
+              required
+              outlined
+              :error-messages="stockValid === false ? ['Por favor, ingrese una cantidad de stock válida.'] : []"
+              @input="validateStock"
+            ></v-text-field>
 
-            <div v-if="productData.type === 'Perecedero'">
-              <!-- Días de la semana -->
-              <b-form-group id="group-weekdays" label="Días de disponibilidad:" label-for="weekdays">
-                <b-form-checkbox-group id="weekdays" v-model="productData.weekDaysAvailable" :options="weekdays"
-                  name="weekdays">
-                </b-form-checkbox-group>
-              </b-form-group>
+            <!-- Días de la semana -->
+            <v-checkbox-group
+              v-if="productData.type === 'Perecedero'"
+              v-model="productData.weekDaysAvailable"
+              label="Días de disponibilidad"
+              column
+            >
+              <v-checkbox v-for="day in weekdays" :key="day.value" :label="day.text" :value="day.value"></v-checkbox>
+            </v-checkbox-group>
 
-              <!-- Límite por día -->
-              <div v-if="productData.type === 'Perecedero'">
-                <b-form-group id="group-limit" label="Límite por día:" label-for="limit">
-                  <b-form-input id="limit" class="form-input" v-model.number="productData.limit" type="number" min="0"
-                    step="1" placeholder="Ingrese el límite por día" required :state="limitValid"
-                    @input="validateLimit">
-                  </b-form-input>
-                  <b-form-invalid-feedback v-if="limitValid === false">Por favor, ingrese un límite por día
-                    válido.</b-form-invalid-feedback>
-                </b-form-group>
-              </div>
-            </div>
+            <!-- Límite por día -->
+            <v-text-field
+              v-if="productData.type === 'Perecedero'"
+              v-model.number="productData.limit"
+              label="Límite por día"
+              type="number"
+              min="0"
+              step="1"
+              required
+              outlined
+              :error-messages="limitValid === false ? ['Por favor, ingrese un límite por día válido.'] : []"
+              @input="validateLimit"
+            ></v-text-field>
 
             <!-- Imagenes -->
-            <b-form-group label="Añada imagenes:" label-for="input-images">
-              <input id="input-images" type="file" multiple @change="handleFileChange" />
-            </b-form-group>
+            <v-file-input
+              label="Añada imágenes"
+              multiple
+              outlined
+              @change="handleFileChange"
+            ></v-file-input>
 
-            <div class="d-flex justify-content-between mt-4">
-              <b-button variant="secondary" class="custom-button" @click="goBack">Volver</b-button>
-              <b-button type="submit" class="custom-button" variant="primary">Registrar</b-button>
-            </div>
-          </b-form>
-        </div>
-      </div>
-    </div>
+            <!-- Botones de acción -->
+            <v-btn
+              color="secondary"
+              class="mt-4"
+              @click="goBack"
+              outlined
+              block
+            >
+              Volver
+            </v-btn>
+            <v-btn
+              color="primary"
+              class="mt-4"
+              type="submit"
+              block
+            >
+              Registrar
+            </v-btn>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-container>
   </v-main>
 </template>
+
 
 <script>
 import axios from 'axios'
@@ -156,49 +180,72 @@ export default {
   methods: {
     async addNewProduct() {
       try {
-        const response = await axios.post(API_URL + '/Product', {
-          id: '',
-          enterpriseId: this.enterpriseId,
-          name: this.productData.name,
-          description: this.productData.description,
-          weight: this.productData.weight,
-          price: this.productData.price,
-          
-          type: this.productData.type == "Perecedero" ? "Perishable" : "NonPerishable",
-          tags: this.value,
-          stock: this.productData.stock != null ? this.productData.stock : 0,
-          limit: this.productData.limit != null ? this.productData.limit : 0,
-          weekDaysAvailable: this.productData.weekDaysAvailable.sort().join(''),
-        });
-        const productId = response.data;
-        if (this.productData.images.length > 0) {
-          const formData = new FormData();
-          formData.append("ownerId", productId);
-          formData.append("ownerType", "Product");
-          for (const file of this.productData.images) {
-            formData.append("images", file);
-          }
-          await axios.post(API_URL + "/ImageFile/upload",
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+        const formData = new FormData();
+        formData.append('enterpriseId', this.enterpriseId);
+        formData.append('name', this.productData.name);
+        formData.append('description', this.productData.description);
+        formData.append('weight', this.productData.weight);
+        formData.append('price', this.productData.price);
+        formData.append('type', this.productData.type === "Perecedero" ? "Perishable" : "NonPerishable");
+
+        if (this.value && this.value.length > 0) {
+          this.value.forEach(tag => {
+            formData.append('Tags', tag);
+          });
         }
-        this.$swal.fire({
-          title: 'Éxito', text: 'Producto agregado exitosamente.', icon: 'success', confirmButtonText: 'Ok'
-        }).then(() => {
-          this.$router.push('/');
-        });
-      } catch (error) {
-        this.$swal.fire({
-          title: 'Error', text: 'Hubo un error al agregar el producto.', icon: 'error', confirmButtonText: 'Ok'
+
+        if (this.productData.type === "No perecedero") {
+          formData.append('stock', this.productData.stock != null ? this.productData.stock : 0);
+        } else if (this.productData.type === "Perecedero") {
+          formData.append('limit', this.productData.limit != null ? this.productData.limit : 0);
+
+          if (this.productData.weekDaysAvailable && this.productData.weekDaysAvailable.length > 0) {
+            this.productData.weekDaysAvailable.forEach(day => {
+              formData.append('WeekDaysAvailable', day);
+            });
+          }
+        }
+
+        if (this.productData.images && this.productData.images.length > 0) {
+          for (const file of this.productData.images) {
+            formData.append('ImagesFiles', file);
+          }
+        }
+
+        const response = await axios.post(API_URL + '/Product', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         });
 
+        if (response.data.success) {
+          this.$swal.fire({
+            title: 'Éxito',
+            text: 'Producto agregado exitosamente.',
+            icon: 'success',
+            confirmButtonText: 'Ok'
+          }).then(() => {
+            this.$router.push('/');
+          });
+        } else {
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al agregar el producto.',
+            icon: 'error',
+            confirmButtonText: 'Ok'
+          });
+        }
+      } catch (error) {
+        this.$swal.fire({
+          title: 'Error',
+          text: 'Hubo un error al agregar el producto.',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+        console.error('Error al agregar el producto:', error);
       }
     },
+
     validateWeight() {
       const str = this.productData.weight;
       this.weightValid = !isNaN(str) && !isNaN(parseFloat(str)) && str >= 0 && str !== null;
@@ -230,8 +277,11 @@ export default {
   },
   async created() {
     try {
-      const response = await axios.get(API_URL + '/Product/get-tags');
-      this.options = response.data;
+      const response = await axios.get(API_URL + '/Tag');
+      const array = response.data.data;
+      for (let i = 0; i < array.length; i++) {
+        this.options.push(array[i].name);
+      }
     } catch (error) {
       console.error('Error al obtener los tags:', error);
     }

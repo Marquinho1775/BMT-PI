@@ -9,10 +9,12 @@ namespace BMT_backend.Application.Services
     public class EnterpriseService
     {
         private readonly IEnterpriseRepository _enterpriseRepository;
+        private ProductService _productService;
 
-        public EnterpriseService(IEnterpriseRepository enterpriseRepository)
+        public EnterpriseService(IEnterpriseRepository enterpriseRepository, ProductService productService)
         {
             _enterpriseRepository = enterpriseRepository;
+            _productService = productService;
         }
 
         public async Task<bool> CreateEnterpriseAsync(Enterprise enterprise)
@@ -23,6 +25,10 @@ namespace BMT_backend.Application.Services
                 throw new ArgumentException("El número de identificación ya está en uso.");
             else if (existingEnterprise == "Name")
                 throw new ArgumentException("El nombre de la empresa ya está en uso.");
+            else if (existingEnterprise == "Email")
+                throw new ArgumentException("El correo electrónico ya está en uso.");
+            else if (existingEnterprise == "PhoneNumber")
+                throw new ArgumentException("El número de teléfono ya está en uso.");
             return await _enterpriseRepository.CreateEnterpriseAsync(enterprise);
         }
 
@@ -60,6 +66,18 @@ namespace BMT_backend.Application.Services
                 enterpriseDevDtos.Add(enterpriseDevDto);
             }
             return enterpriseDevDtos;
+        }
+
+        public async Task<List<Product>> GetEnterpriseProducts(string enterpriseId)
+        {
+            List<string> productsId =  await _enterpriseRepository.GetEnterpriseProductsIdAsync(enterpriseId);
+            List<Product> products = [];
+            foreach (string productId in productsId)
+            {
+                Product product = await _productService.GetProductDetailsByIdAsync(productId);
+                products.Add(product);
+            }
+            return products;
         }
 
         public async Task<bool> UpdateEnterpriseAsync(UpdateEnterpriseRequest updatedEnterprise)

@@ -19,28 +19,26 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<bool> CheckIfEntryInTable(string tableName, string columnName, string columnValue)
         {
-            var query = "select " + columnName + " from " + tableName + " where " + columnName + " = '" + columnValue + "'";
+            var query = "SELECT COUNT(1) FROM " + tableName + " WHERE " + columnName + " = @columnValue";
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
             {
+                command.Parameters.AddWithValue("@columnValue", columnValue);
                 await connection.OpenAsync();
-                int rowsAffected = await command.ExecuteNonQueryAsync();
-                return rowsAffected >= 1;
+                int count = (int)await command.ExecuteScalarAsync();
+                return count > 0;
             }
-
         }
 
-        public async Task<bool> CreateEntrepreneur(Entrepreneur entrepreneur)
+        public async Task<bool> CreateEntrepreneur(string UserId, string Identification)
         {
             var query = "insert into Entrepreneurs (UserId, Identification) " +
-                "values ((select Id from Users where UserName = @UserName), " +
-                        "@Identification);";
-
+                "values (@UserId, @Identification);";
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@UserName", entrepreneur.Username);
-                command.Parameters.AddWithValue("@Identification", entrepreneur.Identification);
+                command.Parameters.AddWithValue("@UserId", UserId);
+                command.Parameters.AddWithValue("@Identification", Identification);
                 await connection.OpenAsync();
                 int rowsAffected = await command.ExecuteNonQueryAsync();
                 return rowsAffected >= 1;

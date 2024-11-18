@@ -123,11 +123,12 @@ export default {
         .then((response) => {
           const shoppingCart = response.data;
           this.shoppingCartId = shoppingCart.id;
+          console.log('Carrito de compras:', shoppingCart);
           this.cartProducts = shoppingCart.cartProducts.map((item) => ({
             ...item,
             subtotal: (item.product.price * item.quantity).toFixed(2),
-            newQuantity: item.quantity, // Inicializar newQuantity
-            image: URL + item.product.imagesURLs[0],
+            newQuantity: item.quantity,
+            image: item.product.imagesURLs != null ? URL + item.product.imagesURLs[0] : 'https://via.placeholder.com/64',            
           }));
         })
         .catch((error) => {

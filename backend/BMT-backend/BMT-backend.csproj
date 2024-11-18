@@ -33,7 +33,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Domain\Views\" />
 		<Folder Include="wwwroot\" />
 		<Folder Include="wwwroot\uploads\" />
 	</ItemGroup>

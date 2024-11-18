@@ -68,7 +68,7 @@ namespace BMT_backend.Infrastructure.Data
             {
                 var cartProduct = new CartProduct
                 {
-                    Product = await _productRepository.GetProductByIdAsync(reader["ProductId"].ToString()),
+                    Product = await _productRepository.GetProductDetailsByIdAsync(reader["ProductId"].ToString()),
                     Quantity = int.Parse(reader["Quantity"].ToString()),
                     Subtotal = double.Parse(reader["Subtotal"].ToString())
                 };
