@@ -21,8 +21,9 @@ export default {
   methods: {
     async getProducts() {
       try {
-        const response = await axios.get(`${API_URL}/Product`);
-        this.products = response.data;
+        const response = await axios.get(`${API_URL}/Product/GetProductsDetails`);
+        this.products = response.data.data;
+        console.log('Products:', this.products); 
         this.URLImage();
       } catch (error) {
         console.error('Error fetching products:', error);

@@ -11,7 +11,7 @@
                                 <v-text-field
                                     label="Nombre del Emprendimiento"
                                     v-model="enterpriseData.name"
-                                    placeholder="Ingrese el nuevo nombre del emprendimiento"
+                                    :placeholder="enterprise.name"
                                     :rules="[enterpriseData.name ? validateName : null]"
                                     :error-messages="nameError"
                                     clearable
@@ -20,7 +20,7 @@
                                 <v-text-field
                                     label="Descripción"
                                     v-model="enterpriseData.description"
-                                    placeholder="Ingrese la nueva descripción"
+                                    :placeholder="enterprise.description"
                                     :rules="[enterpriseData.description ? validateDescription : null]"
                                     :error-messages="descriptionError"
                                     clearable
@@ -29,7 +29,7 @@
                                 <v-text-field
                                     label="Correo Empresarial"
                                     v-model="enterpriseData.email"
-                                    placeholder="Ingrese el nuevo correo empresarial"
+                                    :placeholder="enterprise.email"
                                     :rules="[enterpriseData.email ? validateEmail : null]"
                                     :error-messages="emailError"
                                     clearable
@@ -38,7 +38,7 @@
                                 <v-text-field
                                     label="Número de Teléfono"
                                     v-model="enterpriseData.phoneNumber"
-                                    placeholder="Ingrese el nuevo número de teléfono"
+                                    :placeholder="enterprise.phoneNumber"
                                     :rules="[enterpriseData.phoneNumber ? validatePhoneNumber : null]"
                                     :error-messages="phoneNumberError"
                                     clearable
@@ -78,7 +78,8 @@ export default {
             nameError: '',
             descriptionError: '',
             emailError: '',
-            phoneNumberError: ''
+            phoneNumberError: '',
+            enterprise: {}
         };
     },
     computed: {
@@ -94,8 +95,11 @@ export default {
     async created() {
         const enterpriseId = this.$route.params.id;
         try {
-            const response = await axios.get(`${API_URL}/Enterprise/${enterpriseId}`);
-            this.enterpriseData = { ...response.data };
+            const enterpriseResponse = await axios.get(`${API_URL}/Enterprise/GetEnterpriseById`, {
+                params: { enterpriseId }
+            });
+            this.enterprise = enterpriseResponse.data.data;
+            console.log("Información del emprendimiento:", this.enterprise);
         } catch (error) {
             console.error("Error al cargar la información del emprendimiento:", error);
         }
@@ -112,7 +116,7 @@ export default {
                 };
 
                 console.log("Datos a actualizar:", dataToUpdate);
-                const response = await axios.put(`${API_URL}/Enterprise/${dataToUpdate.id}`, dataToUpdate);
+                const response = await axios.put(`${API_URL}/Enterprise/UpdateEnterprise`, dataToUpdate);
                 await this.$swal.fire({
                     title: 'Actualización exitosa',
                     text: '¡La información del emprendimiento ha sido actualizada correctamente!',

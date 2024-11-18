@@ -18,7 +18,6 @@ import EditProfileInfo from './components/EditProfileInfo.vue';
 import EditEnterpriseInfo from './components/EditEnterpriseInfo.vue';
 
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
-import EntrepreneurProfilePage from './components/EntrepreneurProfilePage.vue';
 
 import EnterpriseRegisterForm from './components/EnterpriseRegisterForm.vue';
 import EnterpriseDashboard from './components/EnterpriseDashboard.vue';
@@ -31,7 +30,7 @@ import ProductRegisterForm from './components/ProductRegisterForm.vue';
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
-import ProductsConfirmationPage from './components/ProductsConfirmationPage.vue';
+import DeveloperOrderConfirmation from './components/DeveloperOrderConfirmation.vue';
 
 import CheckOut from './components/CheckOut.vue';
 import ProductCard from './components/ProductCard.vue';
@@ -70,35 +69,33 @@ axios.interceptors.request.use(config => {
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: "Home", component: HomePage },
+    { path: '/', name: "Home", component: HomePage }, // check
 
-    { path: '/register', name: "Register", component: UserRegisterForm },
-    { path: '/login', name: "Login", component: UserLoginForm },
-    { path: '/email-verification', name: "VerifyEmail", component: UserEmailVerification },
-    { path: '/profile', name: "Profile", component: UserProfilePage },
-    { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress },
-    { path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart },
-    { path: '/card-form', name: "CardForm", component: UserCardForm },
+    { path: '/register', name: "Register", component: UserRegisterForm }, //check
+    { path: '/login', name: "Login", component: UserLoginForm }, // check
+    { path: '/email-verification', name: "VerifyEmail", component: UserEmailVerification }, //check
+    { path: '/profile', name: "Profile", component: UserProfilePage }, //check
+    { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress }, //check
+    { path: '/card-form', name: "CardForm", component: UserCardForm }, // cheack
+    { path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart }, //check
 
-    { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
-    { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
-    { path: '/enterprise/:id/inventory', name: "EnterpriseInventory", component: EnterpriseInventory },
-    { path: '/enterprise/:id/edit', name: "EditEnterpriseInfo", component: EditEnterpriseInfo },
-    { path: '/enterprise/:id/invite', name: "CollaboratorRegisterForm", component: CollaboratorRegisterForm },
-    { path: '/acceptInvite', name: "AcceptInvitation", component: AcceptInvitation },
+    { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm }, // check
+    { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises }, //check
+    { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard }, //check
+    { path: '/enterprise/:id/inventory', name: "EnterpriseInventory", component: EnterpriseInventory }, //check. falta update de producto
+    { path: '/enterprise/:id/edit', name: "EditEnterpriseInfo", component: EditEnterpriseInfo }, // check
+    { path: '/enterprise/:id/invite', name: "CollaboratorRegisterForm", component: CollaboratorRegisterForm }, //check
+    { path: '/acceptInvite', name: "AcceptInvitation", component: AcceptInvitation }, //cheack
 
-    { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
-    { path: '/entrepreneur', name: "EntrepreneurProfile", component: EntrepreneurProfilePage },
-
-    { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },
-    { path: '/checkout', name: "CheckOut", component: CheckOut },
+    { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },  // check
+    { path: '/checkout', name: "CheckOut", component: CheckOut }, // check, falta alerta de confirmacion
+    { path: '/orders', name: "Orders", component: UserOrders }, //check
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
-    { path: '/products-confirmation', name: "ProductsConfirmation", component: ProductsConfirmationPage },
+    { path: '/products-confirmation', name: "ProductsConfirmation", component: DeveloperOrderConfirmation },
     { path: '/profile/edit', name: "EditProfile", component: EditProfileInfo },
-    { path: '/orders', name: "Orders", component: UserOrders },
   ]
 });
 

@@ -308,16 +308,11 @@ export default {
         if (!user || !user.id) {
           throw new Error('El usuario no tiene todos los campos requeridos');
         }
-        const response = await axios.post(
-          `${API_URL}/Direction/ObtainDirectionsFromUser`,
-          user,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+        const response = await axios.get(
+          `${API_URL}/Direction/GetDirectionsFromUser?id=${user.id}` // Corregido,
+          ,{ headers: { Authorization: `Bearer ${token}` } }
         );
-        this.directions = response.data;
+        this.directions = response.data.data;
       } catch (error) {
         console.error('Error al obtener las direcciones del usuario:', error);
       }
@@ -441,6 +436,7 @@ export default {
             productId: item.product.id,
             amount: item.quantity,
             productsCost: item.subtotal,
+            date: parsedDate,
           };
           try {
             await axios.post(
@@ -450,38 +446,11 @@ export default {
           } catch (error) {
             console.error('Error al agregar producto a la orden:', error);
           }
-          try {
-            await axios.put(`${API_URL}/Product/UpdateStock`, null, {
-              params: {
-                productId: item.product.id,
-                date: parsedDate,
-                quantity: item.quantity,
-              },
-            });
-          } catch (error) {
-            console.error('Error al restar stock:', error);
-          }
-        }
-        try {
-          await axios.put(`${API_URL}/Order/UpdateDeliverFee`, null, {
-            params: { orderId: orderId },
-            headers: {
-              Accept: 'text/plain',
-            },
-          });
-          Swal.fire({
-            title: 'Pedido Realizado',
-            text: 'Su pedido ha sido realizado con éxito.',
-            icon: 'success',
-            confirmButtonText: 'Ok',
-          });
-        } catch (error) {
-          console.error('Error updating delivery fee:', error);
         }
       } catch (error) {
         console.error('Error al crear la orden:', error);
       }
-    },
+    },  
 
     clearCart() {
       axios

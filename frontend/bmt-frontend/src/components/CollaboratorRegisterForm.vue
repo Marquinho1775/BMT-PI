@@ -38,9 +38,6 @@ import axios from 'axios';
 import {
   API_URL
 } from '@/main.js';
-import {
-  getToken
-} from '@/helpers/auth';
 
 export default {
   data() {
@@ -52,21 +49,6 @@ export default {
       enterpriseId: this.$route.params.id,
     };
   },
-  async created() {
-    const token = getToken();
-
-    try {
-      const response = await axios.get(`${API_URL}/Enterprise/${this.enterpriseId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      this.enterprise = response.data;
-    } catch (error) {
-      console.error('Error al cargar la empresa:', error);
-      this.errorMessage = 'No se pudo obtener información de la empresa';
-    }
-  },
   methods: {
     async handleSubmit() {
       try {
@@ -75,13 +57,13 @@ export default {
             username: this.collaboratorUsername
           }
         });
-        const collabUser = userDetailsResponse.data;
-		const collabMail = {
-			Email: collabUser.email,
-			Id: collabUser.id,
-			EntCode: this.enterpriseId,
-		};
-        axios.post(API_URL + '/Email/sendcollabmail', collabMail)
+        const collabUser = userDetailsResponse.data.data;
+        const collabMail = {
+          Email: collabUser.email,
+          Id: collabUser.id,
+          EntCode: this.enterpriseId,
+        };
+        axios.post(API_URL + '/Email/SendCollabMail', collabMail)
           .then(() => {
             this.$swal.fire({
               title: 'Envío exitoso',
@@ -113,7 +95,7 @@ export default {
       }
     },
     goBack() {
-      this.$router.push("/enterprise/" + this.enterprise.id);
+      this.$router.push("/enterprise/" + this.enterpriseId);
     }
   }
 };

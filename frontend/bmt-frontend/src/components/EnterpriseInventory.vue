@@ -194,25 +194,13 @@
     async created() {
       const enterpriseId = this.$route.params.id;
       this.enterpriseId = enterpriseId;
-      try {
-        const token = getToken();
-        const enterpriseResponse = await axios.get(API_URL + `/Enterprise/${enterpriseId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        this.enterprise = enterpriseResponse.data;
-        await this.getProducts();
-      } catch (error) {
-        console.error('Error al cargar la empresa:', error);
-        if (error.response) {
-          console.error('Detalles del error:', error.response.data);
-        }
-      }
+      await this.getProducts();
     },
     methods: {
       async getProducts() {
         try {
-          const response = await axios.get(`${API_URL}/Product/${this.enterprise.name}`);
-          this.products = response.data;
+          const response = await axios.get(`${API_URL}/Enterprise/GetEnterpriseProducts?enterpriseId=${this.enterpriseId}`);
+          this.products = response.data.data;
           this.URLImage();
         } catch (error) {
           console.error('Error al obtener productos:', error);
@@ -251,29 +239,12 @@
         this.isEditDialogOpen = false;
         this.editProductData = {}; 
       },
-      async getTagIdsByNames(tags) {
-        const token = getToken();
-        const tagIds = [];
-        try {
-          for (const tag of tags) {
-            const response = await axios.get(`${API_URL}/Product/get-tags-by-name/${tag}`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-            tagIds.push(...response.data);
-          }
-        } catch (error) {
-          console.error("Error al obtener IDs de los tags:", error);
-        }
-        return tagIds;
-      },
       async uploadImages() {
         try {
           const formData = new FormData();
           formData.append("ownerId", this.editProductData.id);
           formData.append("ownerType", "Product");
 
-
-          console.log("Imágenes seleccionadas:", this.editProductData.newImages);
           this.editProductData.newImages.forEach((file) => {
             formData.append("images", file);
           });
@@ -288,26 +259,18 @@
               },
             }
           );
-          console.log("Imágenes subidas correctamente");
         } catch (error) {
           console.error("Error al subir imágenes:", error);
         }
       },
       onImageChange() {
-        console.log("Imágenes seleccionadas:", this.editProductData.newImages);
       },
       async updateProduct() {
         try {
-            console.log(this.editProductData);
-
             if (this.editProductData.newImages && this.editProductData.newImages.length > 0) {
               this.editProductData.imagesURLs = [];
-              console.log("Subiendo nuevas imágenes...");
               await this.uploadImages();
             }
-
-            this.editProductData.tags = await this.getTagIdsByNames(this.editProductData.tags);
-
             const updatedProductData = {
                 ...this.editProductData,
                 enterpriseId: this.enterpriseId,
@@ -315,23 +278,17 @@
                 stock: Number(this.editProductData.stock),
                 limit: this.editProductData.limit ? Number(this.editProductData.limit) : null
             };
-
-
             if (!this.editProductData.newImages || this.editProductData.newImages.length === 0) {
                 delete updatedProductData.imagesURLs;
                 delete updatedProductData.newImages;
             }
-
             const token = getToken();
-
             await axios.put(
                 `${API_URL}/Product`,
                 updatedProductData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
             this.isEditDialogOpen = false;
-
             await this.$swal.fire({
                 title: 'Producto actualizado',
                 text: '¡Su producto ha sido actualizado correctamente!',
@@ -342,7 +299,6 @@
                     popup: 'swal-overlay',
                 }
             });
-            
             this.getProducts();
             this.closeEditDialog();
         } catch (error) {

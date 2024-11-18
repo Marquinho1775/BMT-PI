@@ -149,7 +149,7 @@ export default {
 
                 console.log("Datos a enviar:", dataToUpdate);
 
-                const response = await axios.put(`${API_URL}/User/UpdateProfile`, dataToUpdate);
+                const response = await axios.put(`${API_URL}/User/UpdateUser`, dataToUpdate);
 
                 if (dataToUpdate.username) user.username = dataToUpdate.username;
                 if (dataToUpdate.name) user.name = dataToUpdate.name;

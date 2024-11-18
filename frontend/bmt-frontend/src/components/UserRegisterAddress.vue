@@ -50,7 +50,7 @@ export default {
   data() {
     return {
       addressData: {
-        username: JSON.parse(localStorage.getItem('user')).username,
+        userId: JSON.parse(localStorage.getItem('user')).id,
         numDirection: '',
         coordinates: '',
         otherSigns: '',
@@ -62,8 +62,7 @@ export default {
   methods: {
     async registerAddress() {
       try {
-        const response = await axios.post(`${API_URL}/Direction/CreateDirection`, this.addressData);
-        console.log(response);
+        await axios.post(`${API_URL}/Direction`, this.addressData);
         await this.$swal.fire({
           title: 'Registro exitoso',
           text: '¡Su dirección ha sido registrada correctamente!',

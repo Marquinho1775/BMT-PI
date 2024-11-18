@@ -1,30 +1,54 @@
 <template>
-  <div class="d-flex justify-content-center align-items-center full-height background-main">
-    <div class="card custom-card">
-      <h3 class="text-center card-header-custom">Verifica tu correo</h3>
-      <div class="card-body">
-        <p class="text-center text-custom">Por favor introduce el código de verificación que se envió al correo
-          electrónico que proporcionaste</p>
-        <div class="form-group">
-          <label for="verificationCode" class="label-custom">Código de verificación</label>
-          <input type="text" class="form-control custom-placeholder" id="verificationCode" v-model="verificationCode"
-            placeholder="Inserte el código">
-        </div>
-        <div class="d-grid gap-2">
-          <button class="btn btn-custom btn-block mt-3" :disabled="isLoading" @click="verifyCode">
-            {{ isLoading ? 'Verificando...' : 'Verificar Correo' }}
-          </button>
-        </div>
-        <p class="text-center mt-3">
-          <a href="#" @click="resendCode" class="resend-link">¿No recibiste el código? Click para reenviar</a>
-        </p>
-        <div v-if="message" class="alert alert-danger mt-3" role="alert">
-          {{ message }}
-        </div>
+  <div class="d-flex justify-center align-center full-height background-main">
+    <v-card
+      class="py-8 px-6 text-center mx-auto ma-4 custom-card"
+      elevation="12"
+      max-width="450"
+      width="100%"
+    >
+      <h3 class="text-h6 mb-4 card-header-custom">Verifica tu correo</h3>
+
+      <div class="text-body-2 text-custom">
+        Por favor introduce el código de verificación que se envió al correo electrónico que proporcionaste
+        <br /> ({{ userEmail }})
       </div>
-    </div>
+
+      <!-- Sección del OTP Input de Vuetify -->
+      <v-sheet color="transparent" class="mt-4">
+        <v-otp-input
+          v-model="verificationCode"
+          type="password"
+          variant="solo"
+        ></v-otp-input>
+      </v-sheet>
+
+      <v-btn
+        class="my-4 btn-custom"
+        :loading="isLoading"
+        :disabled="isLoading"
+        block
+        @click="verifyCode"
+      >
+        {{ isLoading ? 'Verificando...' : 'Verificar Correo' }}
+      </v-btn>
+
+      <div class="text-caption mt-2">
+        ¿No recibiste el código? 
+        <a href="#" @click.prevent="resendCode" class="resend-link">Haz click para reenviar</a>
+      </div>
+
+      <v-alert
+        v-if="message"
+        type="error"
+        class="mt-3"
+        dense
+      >
+        {{ message }}
+      </v-alert>
+    </v-card>
   </div>
 </template>
+
 
 <script>
 import { getUser } from '@/helpers/auth';
@@ -34,9 +58,10 @@ import { API_URL } from '@/main.js';
 export default {
   data() {
     return {
-      verificationCode: '',
+      verificationCode: '', // Cambiado para trabajar con OTP de Vuetify
       message: '',
-      isLoading: false
+      isLoading: false,
+      userEmail: getUser().email,
     };
   },
   mounted() {
@@ -49,22 +74,26 @@ export default {
       try {
         const codeTaken = {
           Code: this.verificationCode,
-          Id: getUser().id
+          Id: getUser().id,
         };
-        await axios.post(API_URL + '/Email/verifycode', codeTaken)
+        await axios
+          .post(`${API_URL}/User/VerifyCode`, codeTaken)
           .then(() => {
-            this.$swal.fire({
-              title: 'Verificación exitosa',
-              text: '¡La cuenta ha sido verificada correctamente!',
-              icon: 'success',
-              confirmButtonText: 'Ok'
-            }).then(() => {
-              return axios.post(API_URL + '/Email/verifyaccount', codeTaken);
-            }).then(() => {
-              this.$router.push('/');
-            });
+            this.$swal
+              .fire({
+                title: 'Verificación exitosa',
+                text: '¡La cuenta ha sido verificada correctamente!',
+                icon: 'success',
+                confirmButtonText: 'Ok',
+              })
+              .then(() => {
+                return axios.post(`${API_URL}/User/VerifyAccount`, codeTaken);
+              })
+              .then(() => {
+                this.$router.push('/');
+              });
           })
-          .catch(error => {
+          .catch((error) => {
             console.error('Error en la verificación:', error);
             this.message = 'Error en la verificación. Inténtalo de nuevo más tarde.';
           });
@@ -78,23 +107,24 @@ export default {
       try {
         const correo = {
           Email: getUser().email,
-          Id: getUser().id
+          Id: getUser().id,
         };
-        axios.post(API_URL + '/Email/sendemail', correo)
-          .then(response => {
-            console.log('Reenvío con exito:', response);
+        axios
+          .post(`${API_URL}/Email/sendemail`, correo)
+          .then((response) => {
+            console.log('Reenvío con éxito:', response);
             alert('Se ha enviado un correo con el código de verificación.');
           })
-          .catch(error => {
-            console.error('Error en la verificación:', error);
+          .catch((error) => {
+            console.error('Error en el reenvío:', error);
           });
       } catch (error) {
         this.message = 'Error en el envío del código.';
       } finally {
         this.isLoading = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -103,39 +133,21 @@ export default {
   height: 100vh;
 }
 
-.background-main {
-  background-color: #D1E4FF;
-}
-
 .custom-card {
-  width: 650px;
-  background-color: #9FC9FC;
-  border-radius: 20px;
-  margin: 0px;
+  max-width: 450px;
+  border-radius: 16px;
 }
 
 .card-header-custom {
   background-color: #36618E;
   color: white;
   padding: 20px;
-  border-radius: 20px 20px 0 0;
-  width: 100%;
-  height: 100%;
+  border-radius: 16px 16px 0 0;
 }
 
 .text-custom {
   font-weight: 550;
   color: #49454F;
-}
-
-.label-custom {
-  color: #49454F;
-  font-weight: 500;
-  padding: 5px;
-}
-
-.custom-placeholder {
-  background-color: #D0EDA0;
 }
 
 .btn-custom {
@@ -161,13 +173,8 @@ export default {
   text-decoration: underline;
 }
 
-.custom-placeholder::placeholder {
-  color: #49454F;
-  font-weight: 600;
-  opacity: 0.5;
-}
-
-.custom-placeholder:focus {
-  background-color: #D0EDA0;
+.otp-input {
+  display: flex;
+  justify-content: center;
 }
 </style>

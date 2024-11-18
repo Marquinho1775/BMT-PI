@@ -111,108 +111,54 @@ export default {
     };
   },
   mounted() {
-    this.getUserRole();
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    this.userRole = user.role || '';
   },
   methods: {
-    getUserRole() {
-      const user = JSON.parse(localStorage.getItem('user')) || {};
-      this.userRole = user.role || '';
-    },
-    generateSweetAlert(title, icon, text) {
-      this.$swal.fire({ title, icon, confirmButtonText: 'Ok', text });
-    },
     async submitForm() {
       try {
         let entrepreneurIdentification = this.entrepreneurData.identification.trim();
         if (entrepreneurIdentification !== '') {
-          const entrepreneurExists = await this.checkExistingEntrepreneur();
-          if (entrepreneurExists) {
-            this.generateSweetAlert('Error', 'error', 'Ya existe un emprendedor registrado con este número de identificación.');
-            return;
-          }
           await this.registerEntrepreneur();
-          await this.changeRole();
         } else {
           entrepreneurIdentification = await this.getExistingEntrepreneur();
         }
-        const enterpriseChecks = [
-          { value: this.enterpriseData.identificationNumber, message: 'Ya existe una empresa registrada con este número de identificación.', },
-          { value: this.enterpriseData.name, message: 'Ya existe una empresa registrada con este nombre.', },
-          { value: this.enterpriseData.email, message: 'Ya existe una empresa registrada con este correo electrónico.', },
-          { value: this.enterpriseData.phoneNumber, message: 'Ya existe una empresa registrada con este número de teléfono.', },
-        ];
-        for (const check of enterpriseChecks) {
-          const enterpriseExists = await this.checkExistingEnterprise(check.value);
-          if (enterpriseExists) {
-            this.generateSweetAlert('Error', 'error', check.message);
-            return;
-          }
-        }
+        console.log('Entrepreneur identification:', entrepreneurIdentification);
         await this.registerEnterprise();
         await this.addEntrepreneurToEnterprise(entrepreneurIdentification, this.enterpriseData.identificationNumber);
         this.generateSweetAlert('Registro exitoso', 'success', 'Se ha registrado exitosamente su empresa.');
         this.$router.push('/');
       } catch (error) {
-        this.generateSweetAlert('Error', 'error', 'Ocurrió un error durante el registro. Por favor, inténtalo de nuevo.');
         console.error(error);
-      }
-    },
-
-    async checkExistingEntrepreneur() {
-      try {
-        const response = await axios.get(`${API_URL}/Entrepreneur/CheckExistingEntrepreneur?identification=${this.entrepreneurData.identification.trim()}`);
-        return response.data;
-      } catch (error) {
-        this.generateSweetAlert('Error', 'error', 'Hubo un error al verificar si el emprendedor ya existe.');
-        console.error(error);
-        throw error;
       }
     },
 
     async registerEntrepreneur() {
       try {
         const response = await axios.post(`${API_URL}/Entrepreneur`, {
-          id: '',
-          username: JSON.parse(localStorage.getItem('user')).username,
+          userId: JSON.parse(localStorage.getItem('user')).id,
           identification: this.entrepreneurData.identification.trim(),
         });
-        return response.data;
-      } catch (error) {
-        this.generateSweetAlert('Error', 'error', 'Hubo un error al registrarse como emprendedor.');
-        console.error(error);
-        throw error;
-      }
-    },
-
-    async changeRole() {
-      try {
         const user = JSON.parse(localStorage.getItem('user'));
-        const userId = user.id;
-        const role = 'emp';
-        const url = `${API_URL}/User/Role?id=${encodeURIComponent(userId)}&role=${encodeURIComponent(role)}`;
-        await axios.post(url);
-        user.role = role;
+        user.role = 'emp';
         localStorage.setItem('user', JSON.stringify(user));
-      } catch (error) {
-        this.generateSweetAlert('Error', 'error', 'Hubo un error al cambiar el rol del usuario.');
-        console.error(error);
-        throw error;
-      }
-    },
-
-    async checkExistingEnterprise(identification) {
-      try {
-        const response = await axios.get(`${API_URL}/Enterprise/CheckExistingEnterprise?identification=${identification.trim()}`);
+        console.log('User after role change:', user);
         return response.data;
       } catch (error) {
-        this.generateSweetAlert('Error', 'error', 'Hubo un error al verificar si la empresa ya existe.');
-        console.error(error);
-        throw error;
+        if (error.response.status === 409) {
+          this.generateSweetAlert('Error', 'error', 'Ya existe un emprendedor con este número de identificación.');
+          throw error;
+        } else {
+          this.generateSweetAlert('Error', 'error', 'Hubo un error al registrar el emprendedor.');
+          console.error(error);
+          throw error;
+        }
       }
     },
 
     async registerEnterprise() {
       try {
+        console.log('Enterprise data:', this.enterpriseData);
         const response = await axios.post(`${API_URL}/Enterprise`, {
           id: '',
           identificationType: parseInt(this.enterpriseData.identificationType),
@@ -224,9 +170,15 @@ export default {
         });
         return response.data;
       } catch (error) {
-        this.generateSweetAlert('Error', 'error', 'Hubo un error al registrar su empresa. Inténtalo de nuevo.');
-        console.error(error);
-        throw error;
+        if (error.response.status === 409) {
+          const errorMessage = error.response.data.message;
+          this.generateSweetAlert('Error', 'error', errorMessage);
+          throw error;
+        } else {
+          this.generateSweetAlert('Error', 'error', 'Hubo un error al registrar la empresa.');
+          console.error(error);
+          throw error;
+        }
       }
     },
 
@@ -246,7 +198,7 @@ export default {
 
     async getExistingEntrepreneur() {
       const user = JSON.parse(localStorage.getItem('user'));
-      let response = await axios.post(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id, {
+      let response = await axios.get(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -283,6 +235,10 @@ export default {
     validatePhone() {
       const regex = /^[0-9]{8}$/;
       this.phoneValid = regex.test(this.enterpriseData.phoneNumber);
+    },
+
+    generateSweetAlert(title, icon, text) {
+      this.$swal.fire({ title, icon, confirmButtonText: 'Ok', text });
     },
 
     onReset(event) {
