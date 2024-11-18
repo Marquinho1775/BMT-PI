@@ -89,7 +89,7 @@ const router = createRouter({
 
     { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },  // check
     { path: '/checkout', name: "CheckOut", component: CheckOut }, // check, falta alerta de confirmacion
-    { path: '/orders', name: "Orders", component: UserOrders }, //check, sin cancelar
+    { path: '/orders', name: "Orders", component: UserOrders }, //check
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
