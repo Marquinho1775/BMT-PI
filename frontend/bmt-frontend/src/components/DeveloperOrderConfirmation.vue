@@ -22,7 +22,7 @@
                     </ul>
                   </li>
                 </ul>
-                <p>Peso: {{ item.weight }} kg</p>
+                <p>Peso: {{ item.order.weight }} kg</p>
                 <p>{{ getTotalProductQuantity(item.products || []) }} artículos • Costo: ₡{{ (item.order.orderCost ??
                   0).toFixed(2) }} + ₡{{ (item.order.deliveryFee ?? 0).toFixed(2) }} de envío</p>
                 <p v-if="item.order.orderDate">{{ new Date(item.order.orderDate).toLocaleDateString() }}</p>
@@ -30,11 +30,11 @@
               </v-col>
               <v-col class="d-flex flex-column align-center justify-center" cols="auto">
                 <v-btn size="x-large" class="mb-3 custom-btn" :style="{ backgroundColor: '#d0eda0', color: 'black' }"
-                  @click="confirmOrder(item.orderId)">
+                  @click="confirmOrder(item.order.orderId)">
                   Aceptar pedido
                 </v-btn>
                 <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }"
-                  @click="denyOrder(item.orderId)">
+                  @click="denyOrder(item.order.orderId)">
                   Rechazar pedido
                 </v-btn>
               </v-col>
@@ -68,53 +68,74 @@ export default {
       try {
         const response = await axios.get(API_URL + '/Developer/getToConfirmOrders');
         this.orders = response.data;
-        console.log(this.orders);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
     },
     async confirmOrder(orderId) {
-      if (confirm("¿Estás seguro de que quieres aceptar este pedido?")) {
-        try {
-          const response = await axios.put(API_URL + '/Developer/ConfirmOrder', null, {
-            params: { orderID: orderId }
-          });
+      this.$swal.fire({
+        title: '¿Aceptar pedido?',
+        text: "¿Estás seguro de que quieres aceptar este pedido?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#d0eda0',
+        cancelButtonColor: '#9fc9fc',
+        confirmButtonText: 'Aceptar',
+        cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await axios.put(API_URL + '/Developer/ConfirmOrder', null, {
+              params: { orderID: orderId }
+            });
 
-          if (response.status === 200) {
-            console.log(`Order ${orderId} confirmed successfully`);
-            this.orders = this.orders.filter(order => order.orderId !== orderId);
-          } else {
-            console.error(`Failed to confirm order ${orderId}`);
+            if (response.status === 200) {
+              this.$swal.fire('Aceptado', 'El pedido ha sido aceptado.', 'success');
+              this.orders = this.orders.filter(order => order.order.orderId !== orderId);
+            } else {
+              this.$swal.fire('Error', 'No se pudo aceptar el pedido.', 'error');
+            }
+          } catch (error) {
+            this.$swal.fire('Error', 'Hubo un problema al aceptar el pedido.', 'error');
           }
-        } catch (error) {
-          console.error("Error confirming order:", error);
         }
-      }
+      });
     },
     async denyOrder(orderId) {
-      if (confirm("¿Estás seguro de que quieres rechazar este pedido?")) {
-        try {
-          const response = await axios.put(API_URL + '/Developer/DenyOrder', null, {
-            params: { orderID: orderId }
-          });
+      this.$swal.fire({
+        title: '¿Rechazar pedido?',
+        text: "¿Estás seguro de que quieres rechazar este pedido?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d0eda0',
+        cancelButtonColor: '#9fc9fc',
+        confirmButtonText: 'Rechazar',
+        cancelButtonText: 'Cancelar'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await axios.put(API_URL + '/Developer/DenyOrder', null, {
+              params: { orderID: orderId }
+            });
 
-          if (response.status === 200) {
-            console.log(`Order ${orderId} denied successfully`);
-            this.orders = this.orders.filter(order => order.orderId !== orderId);
-          } else {
-            console.error(`Failed to deny order ${orderId}`);
+            if (response.status === 200) {
+              this.$swal.fire('Rechazado', 'El pedido ha sido rechazado.', 'success');
+              this.orders = this.orders.filter(order => order.order.orderId !== orderId);
+            } else {
+              this.$swal.fire('Error', 'No se pudo rechazar el pedido.', 'error');
+            }
+          } catch (error) {
+            this.$swal.fire('Error', 'Hubo un problema al rechazar el pedido.', 'error');
           }
-        } catch (error) {
-          console.error("Error denying order:", error);
         }
-      }
+      });
     },
     getTotalProductQuantity(products) {
-      if (!Array.isArray(products)) return 0; // Verificar si `products` es un arreglo válido
+      if (!Array.isArray(products)) return 0;
       return products.reduce((total, product) => total + product.quantity, 0);
     },
     groupProductsByEnterprise(products) {
-      if (!products || !Array.isArray(products)) return {}; // Verifica si `products` es un arreglo válido
+      if (!products || !Array.isArray(products)) return {};
       return products.reduce((grouped, product) => {
         (grouped[product.enterpriseName] = grouped[product.enterpriseName] || []).push(product);
         return grouped;
