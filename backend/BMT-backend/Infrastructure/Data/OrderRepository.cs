@@ -376,6 +376,21 @@ namespace BMT_backend.Infrastructure.Data
                 }
             }
         }
+
+        public async Task<bool> IsProductUsedInOrdersAsync(string productId)
+        {
+            var query = "SELECT COUNT(*) FROM Order_Product WHERE ProductId = @ProductId";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@ProductId", productId);
+                    var count = (int)await command.ExecuteScalarAsync();
+                    return count > 0; // Si el producto está asociado a al menos una orden
+                }
+            }
+        }
     }
 }
 

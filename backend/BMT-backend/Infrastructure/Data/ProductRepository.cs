@@ -334,5 +334,64 @@ namespace BMT_backend.Infrastructure.Data
             return rowsAffected > 0;
 
         }
+
+        public async Task<bool> DeleteProductAsync(string productId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Verificar si el producto está en uso en alguna orden
+                        var isUsedQuery = "SELECT COUNT(*) FROM Order_Product WHERE ProductId = @ProductId";
+                        using (var isUsedCommand = new SqlCommand(isUsedQuery, connection, transaction))
+                        {
+                            isUsedCommand.Parameters.AddWithValue("@ProductId", productId);
+                            var count = (int)await isUsedCommand.ExecuteScalarAsync();
+
+                            if (count > 0) // Producto en uso, realizar soft delete
+                            {
+                                var softDeleteQuery = "UPDATE dbo.Products SET IsSoftDeleted = 1 WHERE Id = @Id";
+                                using (var softDeleteCommand = new SqlCommand(softDeleteQuery, connection, transaction))
+                                {
+                                    softDeleteCommand.Parameters.AddWithValue("@Id", productId);
+                                    var rowsAffected = await softDeleteCommand.ExecuteNonQueryAsync();
+                                    if (rowsAffected > 0)
+                                    {
+                                        transaction.Commit();
+                                        return true; // Soft delete exitoso
+                                    }
+                                }
+                            }
+                            else // Producto no está en uso, realizar hard delete
+                            {
+                                var hardDeleteQuery = "DELETE FROM dbo.Products WHERE Id = @Id";
+                                using (var hardDeleteCommand = new SqlCommand(hardDeleteQuery, connection, transaction))
+                                {
+                                    hardDeleteCommand.Parameters.AddWithValue("@Id", productId);
+                                    var rowsAffected = await hardDeleteCommand.ExecuteNonQueryAsync();
+                                    if (rowsAffected > 0)
+                                    {
+                                        transaction.Commit();
+                                        return true; // Hard delete exitoso
+                                    }
+                                }
+                            }
+
+                            // Si no se afecta ninguna fila, hacemos rollback
+                            transaction.Rollback();
+                            return false;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw; // Propagamos la excepción
+                    }
+                }
+            }
+        }
     }
 }

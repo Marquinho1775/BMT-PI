@@ -156,5 +156,25 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, new { Success = false, Message = "Error al actualizar el stock del producto: " + ex.Message });
             }
         }
+
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> DeleteProduct(string productId)
+        {
+            if (string.IsNullOrEmpty(productId))
+                return BadRequest(new { Success = false, Message = "El identificador del producto es obligatorio." });
+
+            try
+            {
+                var result = await _productService.DeleteProductAsync(productId);
+                if (result)
+                    return Ok(new { Success = true, Message = "Producto eliminado correctamente." });
+                else
+                    return NotFound(new { Success = false, Message = "El producto no pudo ser encontrado." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error interno del servidor al eliminar el producto.", Details = ex.Message });
+            }
+        }
     }
 }
