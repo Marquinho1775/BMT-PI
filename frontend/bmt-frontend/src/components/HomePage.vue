@@ -1,42 +1,37 @@
 <template>
   <v-main class="flex-grow-1">
-    <v-container>
-      <productSearchGrid :products="products" />
-    </v-container>
+    <UserDashboard v-if="isUserLoggedIn" />
+    <productSearchGrid :products="products" v-else />
   </v-main>
 </template>
 
 <script>
+import { getToken } from '@/helpers/auth';
 import axios from 'axios';
-import { API_URL, URL } from '@/main.js';
+import { API_URL } from '@/main.js';
+
 export default {
   data() {
     return {
+      isUserLoggedIn: false,
       products: [],
     };
   },
-  mounted() {
-    this.getProducts();
+  created() {
+    this.isUserLoggedIn = getToken();
+    if (!this.isUserLoggedIn) {
+      this.getProducts();
+    }
   },
   methods: {
     async getProducts() {
       try {
         const response = await axios.get(`${API_URL}/Product/GetProductsDetails`);
         this.products = response.data.data;
-        console.log('Products:', this.products); 
         this.URLImage();
       } catch (error) {
         console.error('Error fetching products:', error);
       }
-    },
-    URLImage() {
-      this.products.forEach(product => {
-        if (Array.isArray(product.imagesURLs)) {
-          product.imagesURLs = product.imagesURLs.map(image => `${URL}${image}`);
-        } else {
-          console.warn(`El producto con ID ${product.id} no tiene una propiedad imagesURLs válida.`);
-        }
-      });
     },
   },
 };

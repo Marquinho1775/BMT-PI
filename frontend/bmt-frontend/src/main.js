@@ -38,6 +38,7 @@ import ProductSearchGrid from './components/ProductSearchGrid.vue';
 import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
+import UserDashboard from './components/UserDashboard.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -127,6 +128,7 @@ app.component('productSearchGrid', ProductSearchGrid);
 app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
+app.component('UserDashboard', UserDashboard);
 
 app.config.globalProperties.$swal = Swal;
 

@@ -22,7 +22,7 @@
                     </ul>
                   </li>
                 </ul>
-                <p>Peso: {{ item.weight }} kg</p>
+                <p>Peso: {{ item.order.weight }} kg</p>
                 <p>{{ getTotalProductQuantity(item.products || []) }} artículos
                   • Costo: ₡{{ (item.order.orderCost ??
                     0).toFixed(2) }} + ₡{{ (item.order.deliveryFee ?? 0).toFixed(2) }}

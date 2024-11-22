@@ -5,9 +5,9 @@
 				<v-img :src="image" height="200px" aspect-ratio="16/9" cover></v-img>
 			</v-carousel-item>
 		</v-carousel>
+		<v-card-title>{{ product.raw.name }}</v-card-title>
 		<v-row>
 			<v-col>
-				<v-card-title>{{ product.raw.name }}</v-card-title>
 				<v-card-subtitle>₡ {{ product.raw.price }}</v-card-subtitle>
 			</v-col>
 			<v-col class="text-right">
@@ -42,11 +42,11 @@
 					<v-chip v-for="(tag, index) in product.raw.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
 				</v-chip-group>
 				<v-card-text>
-					Descripción:
+					<strong>Descripción:</strong>
 					<br />
 					{{ product.raw.description }}
 					<br /><br />
-					Emprendimiento:
+					<strong>Emprendimiento:</strong>
 					<br />
 					{{ product.raw.enterpriseName }}
 				</v-card-text>
