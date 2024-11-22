@@ -76,5 +76,44 @@ namespace BMT_backend.Application.Services
             deliveryFee += weight * 200;
             return deliveryFee;
         }
+
+        public async Task<List<OrderDetails>> GetOrderReportsAsync(ReportRequest report)
+        {
+            this.ValidateReportData(report);
+
+            if (report.UserId != null)
+            {
+                return await _orderRepository.GetOrderReportsByUserIdAsync(report);
+            }
+            if (report.EnterpriseId != null)
+            {
+                return await _orderRepository.GetOrderReportsByEnterpriseIdAsync(report);
+            }
+            return await _orderRepository.GetOrderReportsAsync(report);
+        }
+
+        private void ValidateReportData(ReportRequest report)
+        {
+            if (report.FechaInicio == null)
+            {
+                throw new ArgumentException("La fecha de inicio es obligatoria.");
+            }
+            if (report.FechaFin == null)
+            {
+                throw new ArgumentException("La fecha de final es obligatoria.");
+            }
+            if ( report.statusInicial == null)
+            {
+                throw new ArgumentException("El estado inicial es obligatorio.");
+            }
+            if (report.statusFinal == null)
+            {
+                throw new ArgumentException("El estado final es obligatorio.");
+            }
+            if (report.FechaInicio > report.FechaFin)
+            {
+                throw new ArgumentException("La fecha de inicio no puede ser mayor a la fecha final.");
+            }
+        }
     }
 }
