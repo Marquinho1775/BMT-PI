@@ -157,7 +157,7 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        [HttpDelete("{productId}")]
+        [HttpDelete("Delete/{productId}")]
         public async Task<IActionResult> DeleteProduct(string productId)
         {
             if (string.IsNullOrEmpty(productId))

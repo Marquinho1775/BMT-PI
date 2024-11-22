@@ -385,7 +385,6 @@ export default {
       this.isEditDialogOpen = false;
     },
     async deleteDirection(directionId) {
-      // Implementa la lógica para eliminar una dirección
       const token = getToken();
       try {
         await axios.delete(`${API_URL}/Direction/Delete/${directionId}`, {

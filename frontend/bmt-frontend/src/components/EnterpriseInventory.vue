@@ -61,6 +61,9 @@
                   <v-btn icon @click="openEditDialog(product)">
                     <v-icon>mdi-pencil</v-icon>
                   </v-btn>
+                  <v-btn icon color="error" @click="confirmDelete(product)">
+                    <v-icon >mdi-delete</v-icon>
+                  </v-btn>
                 </td>
               </tr>
             </tbody>
@@ -318,7 +321,51 @@
         } finally {
             this.closeEditDialog();
         }
-    },
+      },
+      async confirmDelete(product) {
+        const result = await this.$swal.fire({
+          title: "¿Estás seguro?",
+          text: `Vas a borrar el producto: ${product.name}`,
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Sí, borrar",
+          cancelButtonText: "Cancelar",
+        });
+
+        if (result.isConfirmed) {
+          this.deleteProduct(product);
+        }
+      },
+      async deleteProduct(product) {
+        try {
+          // Llamada al backend
+          const response = await axios.delete(`${API_URL}/Product/Delete/${product.id}`);
+          
+          // Si el borrado fue exitoso
+          if (response.status === 200) {
+            // Elimina el producto del array local
+            this.products = this.products.filter((p) => p.id !== product.id);
+
+            // Muestra una alerta de éxito
+            this.$swal.fire({
+              title: "¡Borrado!",
+              text: `El producto ${product.name} ha sido eliminado.`,
+              icon: "success",
+            });
+          } else {
+            throw new Error("Error inesperado al borrar el producto.");
+          }
+        } catch (error) {
+          console.error(error);
+          this.$swal.fire({
+            title: "Error",
+            text: "No se pudo borrar el producto. Inténtalo nuevamente.",
+            icon: "error",
+          });
+        }
+      },
     }
   };
   </script>
