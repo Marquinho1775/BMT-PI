@@ -76,5 +76,10 @@ namespace BMT_backend.Application.Services
             deliveryFee += weight * 200;
             return deliveryFee;
         }
+
+        public async Task<bool> IsDirectionUsedInOrders(string directionId)
+        {
+            return await _orderRepository.IsDirectionUsedInOrdersAsync(directionId);
+        }
     }
 }

@@ -361,6 +361,21 @@ namespace BMT_backend.Infrastructure.Data
             }
             return products;
         }
+
+        public async Task<bool> IsDirectionUsedInOrdersAsync(string directionId)
+        {
+            var query = "SELECT COUNT(*) FROM Orders WHERE DirectionId = @DirectionId";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@DirectionId", directionId);
+                    var count = (int)await command.ExecuteScalarAsync();
+                    return count > 0; // Si existe al menos una orden asociada
+                }
+            }
+        }
     }
 }
 

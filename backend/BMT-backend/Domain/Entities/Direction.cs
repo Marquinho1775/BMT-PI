@@ -7,6 +7,6 @@
         public string NumDirection { get; set; }
         public string? OtherSigns { get; set; }
         public string Coordinates { get; set; }
-        public bool IsSoftDeleted { get; set; }
+        public bool SoftDeleted { get; set; }
     }
 }

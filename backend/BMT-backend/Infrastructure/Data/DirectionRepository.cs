@@ -17,7 +17,7 @@ namespace BMT_backend.Infrastructure.Data
         public async Task<List<Direction>> GetDirectionsFromUserAsync(string id)
         {
             var directions = new List<Direction>();
-            var query = "SELECT Id, NumDirection, OtherSigns, Coordinates FROM Directions WHERE UserId = @Id";
+            var query = "SELECT Id, NumDirection, OtherSigns, Coordinates FROM Directions WHERE UserId = @Id AND SoftDeleted = 0";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -33,7 +33,7 @@ namespace BMT_backend.Infrastructure.Data
                         Id = reader["Id"].ToString(),
                         NumDirection = reader["NumDirection"].ToString(),
                         OtherSigns = reader["OtherSigns"] as string,
-                        Coordinates = reader["Coordinates"].ToString()
+                        Coordinates = reader["Coordinates"].ToString(),
                     };
                     directions.Add(direction);
                 }
@@ -77,44 +77,59 @@ namespace BMT_backend.Infrastructure.Data
             return (string)await command.ExecuteScalarAsync();
         }
 
-        public async Task<bool> SoftDeleteDirectionAsync(string directionId)
+        public async Task<bool> DeleteDirectionAsync(string directionId)
         {
-            try
+            using (var connection = new SqlConnection(_connectionString))
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                await connection.OpenAsync();
+                using (var transaction = connection.BeginTransaction())
                 {
-                    await connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand("UPDATE dbo.Directions SET IsActive = 0 WHERE Id = @Id", connection))
+                    try
                     {
-                        command.Parameters.AddWithValue("@Id", directionId);
-                        return await command.ExecuteNonQueryAsync() > 0;
+                        var isUsedQuery = "SELECT COUNT(*) FROM Orders WHERE DirectionId = @DirectionId";
+                        using (var isUsedCommand = new SqlCommand(isUsedQuery, connection, transaction))
+                        {
+                            isUsedCommand.Parameters.AddWithValue("@DirectionId", directionId);
+                            var count = (int)await isUsedCommand.ExecuteScalarAsync();
+
+                            if (count > 0)
+                            {
+                                var softDeleteQuery = "UPDATE dbo.Directions SET SoftDeleted = 1 WHERE Id = @Id";
+                                using (var softDeleteCommand = new SqlCommand(softDeleteQuery, connection, transaction))
+                                {
+                                    softDeleteCommand.Parameters.AddWithValue("@Id", directionId);
+                                    var rowsAffected = await softDeleteCommand.ExecuteNonQueryAsync();
+                                    if (rowsAffected > 0)
+                                    {
+                                        transaction.Commit();
+                                        return true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var hardDeleteQuery = "DELETE FROM dbo.Directions WHERE Id = @Id";
+                                using (var hardDeleteCommand = new SqlCommand(hardDeleteQuery, connection, transaction))
+                                {
+                                    hardDeleteCommand.Parameters.AddWithValue("@Id", directionId);
+                                    var rowsAffected = await hardDeleteCommand.ExecuteNonQueryAsync();
+                                    if (rowsAffected > 0)
+                                    {
+                                        transaction.Commit();
+                                        return true;
+                                    }
+                                }
+                            }
+                            transaction.Rollback();
+                            return false;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in SoftDeleteDirectionAsync: {ex.Message}");
-                return false;
-            }
-        }
-        public async Task<bool> HardDeleteDirectionAsync(string directionId)
-        {
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
-                {
-                    await connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand("DELETE FROM dbo.Directions WHERE Id = @Id", connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", directionId);
-                        return await command.ExecuteNonQueryAsync() > 0;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in HardDeleteDirectionAsync: {ex.Message}");
-                return false;
             }
         }
     }

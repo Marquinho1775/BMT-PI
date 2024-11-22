@@ -75,47 +75,25 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, new { Success = false, Message = "Error interno del servidor al actualizar la dirección.", Details = ex.Message });
             }
         }
-        //[HttpDelete("{directionId}")]
-        //public async Task<IActionResult> SoftDeleteDirection(string directionId)
-        //{
-        //    if (string.IsNullOrEmpty(directionId))
-        //    {
-        //        return BadRequest(new { Success = false, Message = "El identificador de la dirección es obligatorio." });
-        //    }
 
-        //    try
-        //    {
-        //        var orderCount = await _directionService.CheckDirectionUsedInOrdersAsync(directionId);
+        [HttpDelete("Delete/{directionId}")]
+        public async Task<IActionResult> DeleteDirection(string directionId)
+        {
+            if (string.IsNullOrEmpty(directionId))
+                return BadRequest(new { Success = false, Message = "El identificador de la dirección es obligatorio." });
 
-        //        if (orderCount == 0)
-        //        {
-        //            var result = await _directionService.HardDeleteDirectionAsync(directionId);
-        //            if (result)
-        //            {
-        //                return Ok(new { Success = true, Message = "Dirección eliminada permanentemente." });
-        //            }
-        //            else
-        //            {
-        //                return StatusCode(500, new { Success = false, Message = "Error al eliminar la dirección permanentemente." });
-        //            }
-        //        }
-        //        else
-        //        {
-        //            var result = await _directionService.SoftDeleteDirectionAsync(directionId);
-        //            if (result)
-        //            {
-        //                return Ok(new { Success = true, Message = "Dirección marcada como eliminada." });
-        //            }
-        //            else
-        //            {
-        //                return StatusCode(500, new { Success = false, Message = "Error al marcar la dirección como eliminada." });
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { Success = false, Message = "Error interno del servidor al eliminar la dirección.", Details = ex.Message });
-        //    }
-        //}
+            try
+            {
+                var result = await _directionService.DeleteDirectionAsync(directionId);
+                if (result)
+                    return Ok(new { Success = true, Message = "Dirección eliminada." });
+                else
+                    return NotFound(new { Success = false, Message = "La dirección no pudo ser encontrada." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error interno del servidor al eliminar la dirección.", Details = ex.Message });
+            }
+        }
     }
 }

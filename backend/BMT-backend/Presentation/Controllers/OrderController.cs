@@ -65,5 +65,19 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error añadiendo producto a la orden");
             }
         }
+
+        [HttpGet("IsDirectionUsedInOrders")]
+        public async Task<ActionResult<bool>> IsDirectionUsedInOrders(string directionId)
+        {
+            try
+            {
+                var result = await _orderService.IsDirectionUsedInOrders(directionId);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si la dirección está en uso");
+            }
+        }
     }
 }
