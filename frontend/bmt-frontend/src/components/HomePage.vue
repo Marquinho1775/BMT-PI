@@ -4,14 +4,12 @@
       <productSearchGrid :products="products" />
     </v-container>
     <v-container>
-      <reports-table :titles="['Nombre', 'Edad', 'Ciudad']" :reports="[
-        ['Juan', 30, 'Madrid'],
-        ['Ana', 25, 'Barcelona'],
-        ['Luis', 28, 'Valencia']
-      ]" />
+
     </v-container>
 
-    <pending-orders-reports />
+    <pending-orders-reports :Type="1" />
+    <pending-orders-reports :Type="2" />
+    <pending-orders-reports :Type="3" />
 
   </v-main>
 </template>

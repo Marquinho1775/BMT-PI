@@ -1,6 +1,8 @@
 ﻿using BMT_backend.Application.Interfaces;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
+using BMT_backend.Presentation.DTOs;
+using System.Collections.Generic;
 
 namespace BMT_backend.Application.Services
 {
@@ -77,19 +79,100 @@ namespace BMT_backend.Application.Services
             return deliveryFee;
         }
 
-        public async Task<List<OrderDetails>> GetOrderReportsAsync(ReportRequest report)
+        public async Task<List<ReportDto>> GetOrderReportsAsync(ReportRequest report)
         {
             this.ValidateReportData(report);
 
+            List<OrderDetails> response = null;
+
             if (report.UserId != null)
             {
-                return await _orderRepository.GetOrderReportsByUserIdAsync(report);
+                response = await _orderRepository.GetOrderReportsByUserIdAsync(report);
             }
-            if (report.EnterpriseId != null)
+            else if (report.EnterpriseId != null)
             {
-                return await _orderRepository.GetOrderReportsByEnterpriseIdAsync(report);
+                
+                response = await _orderRepository.GetOrderReportsByEnterpriseIdAsync(report);
             }
-            return await _orderRepository.GetOrderReportsAsync(report);
+            else
+            {
+                response = await _orderRepository.GetOrderReportsAsync(report);
+            }
+
+            List<ReportDto> reportList = new List<ReportDto>();
+
+            if (report.statusInicial == 0)
+            {
+                reportList = FormatPendingOrders(response);
+            }
+            else if (report.statusInicial == 4)
+            {
+                //TODO Jose
+                reportList = FormatPendingOrders(response);
+            }
+            else
+            {
+                //TODO Jose
+                reportList = FormatPendingOrders(response);
+            }
+            return reportList;
+        }
+
+        private List<ReportDto> FormatPendingOrders(List<OrderDetails> orders)
+        {
+            List<ReportDto> reportList = new List<ReportDto>();
+
+            foreach (var order in orders)
+            {
+                ReportDto report = new ReportDto();
+                report.NumOrder = order.Order.OrderId;
+                report.Enterprises = getEnterprise(order);
+                report.ItemsCount = order.Products.Count;
+                report.DateOfCreation = (DateTime)order.Order.OrderDate;
+                report.DateOfDelivery = order.Order.DeliveryDate;
+                report.Status = StatusToString(order.Order.Status);
+                report.ProductCost = (double)order.Order.OrderCost;
+                report.FeeCost = (double)order.Order.DeliveryFee;
+                report.TotalCost = (double)order.Order.OrderCost;
+                reportList.Add(report);
+            }
+            return reportList;
+        }
+
+        private string StatusToString(int status)
+        {
+            switch (status)
+            {
+                case 0:
+                    return "No confirmado";
+                case 1:
+                    return "Confirmado";
+                case 2:
+                    return "Listo para envío";
+                case 3:
+                    return "Enviando";
+                case 4:
+                    return "Terminado";
+                case 5:
+                    return "Cancelado por usuario";
+                case 6:
+                    return "Cancelado por dev";
+                default:
+                    return "No confirmado";
+            }
+        }
+
+        private string getEnterprise(OrderDetails orden)
+        {
+            List<string> enterprises = new List<string>();
+            foreach (var product in orden.Products)
+            {
+                if (!enterprises.Contains(product.EnterpriseName))
+                {
+                    enterprises.Add(product.EnterpriseName);
+                }
+            }
+            return string.Join(", ", enterprises);
         }
 
         private void ValidateReportData(ReportRequest report)

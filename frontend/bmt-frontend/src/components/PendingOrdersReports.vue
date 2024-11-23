@@ -69,7 +69,9 @@
         </v-btn>
 
         <!-- Tabla con los datos del reporte -->
-        <reports-table v-if="reportData.length" :titles="tableTitles" :reports="reportData"></reports-table>
+        <reports-table v-if="reportData.length"
+            :titles="Type === 1 ? tableTitles1 : Type === 2 ? tableTitles2 : tableTitles3" :reports="reportData">
+        </reports-table>
     </v-card>
 </template>
 
@@ -79,6 +81,15 @@ import { API_URL } from '@/main.js';
 
 export default {
     name: 'PendingOrdersReport',
+    props: {
+        Type: {
+            type: Number,
+            required: true,
+        }
+        // 1: Reporte de pedidos pendientes
+        // 2: Reporte de pedidos entregados
+        // 3: Reporte de pedidos cancelados
+    },
     data() {
         return {
             // Fechas
@@ -104,13 +115,37 @@ export default {
             // Lista de emprendimientos (empresas)
             enterprises: [],
 
-            // Títulos de las columnas de la tabla
-            tableTitles: [
+            tableTitles1: [
+                'Número de orden',
                 'Emprendimientos asociados',
                 'Cantidad de ítems en la compra',
                 'Fecha de creación',
                 'Fecha de envío',
                 'Estado',
+                'Costo total de los ítems',
+                'Costo de envío',
+                'Costo total de la compra',
+            ],
+
+            tableTitles2: [
+                'Número de orden',
+                'Emprendimientos asociados',
+                'Cantidad de ítems en la compra',
+                'Fecha de creación',
+                'Fecha de envío',
+                'Fecha de recibido',
+                'Costo total de los ítems',
+                'Costo de envío',
+                'Costo total de la compra',
+            ],
+
+            tableTitles3: [
+                'Número de orden',
+                'Emprendimientos asociados',
+                'Cantidad de ítems en la compra',
+                'Fecha de creación',
+                'Fecha de cancelación',
+                'Cancelado por',
                 'Costo total de los ítems',
                 'Costo de envío',
                 'Costo total de la compra',
@@ -135,7 +170,7 @@ export default {
                 const obtainEntrepreneurResponse = await axios.get(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id);
                 const entrepreneurId = obtainEntrepreneurResponse.data.identification;
                 const enterprisesResponse = await axios.get(API_URL + '/Entrepreneur/my-registered-enterprises?Identification=' + entrepreneurId);
-                this.enterprises = enterprisesResponse.data.success;
+                this.enterprises = enterprisesResponse.data.data;
             } catch (error) {
                 console.error('Error al obtener las empresas:', error);
                 if (error.response) {
@@ -154,8 +189,8 @@ export default {
                     this.dropdownOptions = ['Mis pedidos', ...this.enterprises.map(e => e.name)];
                 } else if (userRole === 'dev') {
                     // Obtener lista de todas las empresas
-                    const response = await axios.get(API_URL + 'Enterprises');
-                    const allEnterprises = response.data;
+                    const response = await axios.get(API_URL + '/Enterprise');
+                    const allEnterprises = response.data.data;
                     this.enterprises = allEnterprises;
                     this.dropdownOptions = ['Todos los pedidos', ...allEnterprises.map(e => e.name)];
                 }
@@ -172,7 +207,7 @@ export default {
             this.endDate = this.tempEndDate;
             this.endDateDialog = false;
         },
-        generateReport() {
+        async generateReport() {
             // Validar que se hayan seleccionado las fechas y la opción
             if (!this.startDate || !this.endDate || !this.selectedOption) {
                 alert('Por favor, seleccione las fechas y una opción antes de generar el reporte.');
@@ -180,12 +215,30 @@ export default {
             }
 
             // Construir el cuerpo de la solicitud
-            const requestBody = {
-                fechaInicio: this.startDate,
-                fechaFin: this.endDate,
-                statusInicial: 0, // Status para pendientes (ajusta según tu lógica)
-                statusFinal: 3,   // Status para pendientes (ajusta según tu lógica)
-            };
+            let requestBody = {};
+
+            if (this.Type == 1) {
+                requestBody = {
+                    fechaInicio: this.startDate,
+                    fechaFin: this.endDate,
+                    statusInicial: 0,
+                    statusFinal: 3,
+                };
+            } else if (this.Type == 2) {
+                requestBody = {
+                    fechaInicio: this.startDate,
+                    fechaFin: this.endDate,
+                    statusInicial: 4,
+                    statusFinal: 4,
+                };
+            } else if (this.Type == 3) {
+                requestBody = {
+                    fechaInicio: this.startDate,
+                    fechaFin: this.endDate,
+                    statusInicial: 5,
+                    statusFinal: 6,
+                };
+            }
 
             // Lógica para userId y enterpriseId
             if (this.selectedOption === 'Mis pedidos') {
@@ -193,7 +246,6 @@ export default {
             } else if (this.selectedOption === 'Todos los pedidos') {
                 // No se envía userId ni enterpriseId
             } else {
-                // Buscar el enterpriseId basado en el nombre seleccionado
                 const enterprise = this.enterprises.find(
                     e => e.name === this.selectedOption
                 );
@@ -207,31 +259,57 @@ export default {
 
             console.log('Solicitud de reporte:', requestBody);
 
-            // Hacer la llamada a la API
-            axios
-                .post(API_URL + '/Order/OrderReports', requestBody)
-                .then(response => {
-                    const data = response.data;
-                    console.log('Datos del reporte:', data);
+            try {
+                const response = await axios.post(API_URL + '/Order/OrderReports', requestBody);
+                const data = response.data;
+                console.log('Datos del reporte:', data);
+
+                if (this.Type == 1) {
+
                     // Procesar los datos para adaptarlos a la tabla
-                    this.reportData = this.processData(data);
-                })
-                .catch(error => {
-                    console.error('Error al generar el reporte:', error);
-                });
-        },
-        processData(data) {
-            // Procesar los datos recibidos del API para adaptarlos al formato esperado por reports-table
-            return data.map(item => [
-                item.associatedEnterprises,
-                item.itemsCount,
-                item.creationDate,
-                item.shippingDate,
-                item.status,
-                item.totalItemsCost,
-                item.shippingCost,
-                item.totalPurchaseCost,
-            ]);
+                    this.reportData = data.map(item => ({
+                        numOrder: item.numOrder,
+                        enterprises: item.enterprises,
+                        itemsCount: item.itemsCount,
+                        dateOfCreation: item.dateOfCreation,
+                        dateOfDelivery: item.dateOfDelivery,
+                        status: item.status,
+                        productCost: item.productCost,
+                        feeCost: item.feeCost,
+                        totalCost: item.totalCost,
+                    }));
+                }
+                else if (this.Type == 2) {
+                    // Procesar los datos para adaptarlos a la tabla
+                    this.reportData = data.map(item => ({
+                        numOrder: item.numOrder,
+                        enterprises: item.enterprises,
+                        itemsCount: item.itemsCount,
+                        dateOfCreation: item.dateOfCreation,
+                        dateOfDelivery: item.dateOfDelivery,
+                        dateReceived: item.DateReceived,
+                        productCost: item.productCost,
+                        feeCost: item.feeCost,
+                        totalCost: item.totalCost,
+                    }));
+                }
+                else if (this.Type == 3) {
+                    // Procesar los datos para adaptarlos a la tabla
+                    this.reportData = data.map(item => ({
+                        numOrder: item.numOrder,
+                        enterprises: item.enterprises,
+                        itemsCount: item.itemsCount,
+                        dateOfCreation: item.dateOfCreation,
+                        dateOfCancelation: item.dateOfCancelation,
+                        canceledBy: item.canceledBy,
+                        productCost: item.productCost,
+                        feeCost: item.feeCost,
+                        totalCost: item.totalCost,
+                    }));
+                }
+            } catch (error) {
+                console.error('Error al generar el reporte:', error);
+            }
         },
     },
 };
