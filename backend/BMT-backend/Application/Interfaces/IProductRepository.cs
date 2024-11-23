@@ -21,5 +21,6 @@ namespace BMT_backend.Application.Interfaces
         Task<bool> UpdatePerishableDetailsAsync(string id, string date, int? quantity);
         Task<bool> UpdateNonPerishableStockAsync(string productId, int quantity);
         Task<bool> UpdatePerishableStockAsync(string productId, string date, int quantity);
+        Task<List<string>> SearchProductsIdAsync(string searchTerm);
     }
 }

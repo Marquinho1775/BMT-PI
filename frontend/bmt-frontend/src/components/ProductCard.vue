@@ -2,7 +2,7 @@
 	<v-card class="mx-auto" max-width="344" elevation="4">
 		<v-carousel show-arrows="hover" height="200px" hide-delimiters>
 			<v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
-				<v-img :src="image" height="200px" aspect-ratio="16/9" cover></v-img>
+				<v-img :src="imagesURLBase + image" height="200px" aspect-ratio="16/9" cover></v-img>
 			</v-carousel-item>
 		</v-carousel>
 		<v-row>
@@ -55,12 +55,10 @@
 	</v-card>
 </template>
 
-
-
 <script>
 
 import axios from 'axios';
-import { API_URL } from '@/main';
+import { API_URL, URL } from '@/main';
 
 export default {
 	name: 'ProductCard',
@@ -72,6 +70,7 @@ export default {
 	},
 	data() {
 		return {
+			imagesURLBase: URL,
 			isShow: false,
 			shoppingCartId: '',
 			productId: '',

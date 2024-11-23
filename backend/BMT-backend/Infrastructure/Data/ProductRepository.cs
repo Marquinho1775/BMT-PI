@@ -335,5 +335,27 @@ namespace BMT_backend.Infrastructure.Data
             return rowsAffected > 0;
 
         }
+        public async Task<List<string>> SearchProductsIdAsync(string searchTerm) {
+            var query = @"
+                SELECT
+                    p.Id
+                FROM
+                    Products p
+                    INNER JOIN CONTAINSTABLE(Products, (Name, Description), @SearchTerm) as Result
+                    ON p.Id = Result.[Key]
+                ORDER BY
+                    Result.RANK DESC;";
+            var productsId = new List<string>();
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@SearchTerm", searchTerm);
+            await connection.OpenAsync();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                productsId.Add(reader["Id"].ToString());
+            }
+            return productsId;
+        }
     }
 }

@@ -213,5 +213,29 @@ namespace BMT_backend.Infrastructure.Data
             await connection.CloseAsync();
             return result;
         }
+
+        public async Task<List<string>> SearchEnterprisesIdAsync(string searchTerm)
+        {
+            var query = @"
+                SELECT
+                    e.Id
+                FROM
+                    Enterprises e
+                    INNER JOIN CONTAINSTABLE(Enterprises, (Name, Description), @SearchTerm) as Result
+                    ON e.Id = Result.[Key]
+                ORDER BY
+                    Result.RANK DESC;";
+            var enterprisesId = new List<string>();
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@SearchTerm", searchTerm);
+            await connection.OpenAsync();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                enterprisesId.Add(reader["Id"].ToString());
+            }
+            return enterprisesId;
+        }
     }
 }

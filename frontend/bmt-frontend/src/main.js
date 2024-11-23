@@ -38,6 +38,7 @@ import ProductGrid from './components/ProductGrid.vue';
 import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
+import SearchResultPage from './components/SearchResultPage.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -90,6 +91,7 @@ const router = createRouter({
     { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },  // check
     { path: '/checkout', name: "CheckOut", component: CheckOut }, // check, falta alerta de confirmacion
     { path: '/orders', name: "Orders", component: UserOrders }, //check
+    { path: '/search/:searchText', name: "SearchResultPage", component: SearchResultPage}, //check
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },

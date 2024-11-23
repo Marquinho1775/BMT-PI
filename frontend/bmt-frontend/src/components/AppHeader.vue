@@ -1,15 +1,36 @@
 <template>
-  <v-app-bar :elevation="0" app color="#9FC9FC" scroll-behavior="hide" dark>
-    <v-toolbar-title>
+  <v-app-bar 
+    app color="#9FC9FC" 
+    scroll-behavior="hide"
+    elevation="0">
+
+    <v-app-bar-title>
       <v-btn variant="text" @click="handleHome">Business Tracker</v-btn>
-    </v-toolbar-title>
-    <v-spacer></v-spacer>
-      <v-btn v-if="role !== dev" icon color="primary" @click="goToCart">
-            <v-icon>mdi-cart</v-icon>
-      </v-btn>
+    </v-app-bar-title>
+
+    <v-text-field
+      v-model="searchText"
+      bg-color="white"
+      color="black"
+      :loading="loading"
+      placeholder="Buscar productos o empresas"
+      hide-details
+      density="compact"
+      variant="outlined"
+      style="max-width: 300px;"
+      append-inner-icon="mdi-magnify"
+      @click:append-inner="search"
+      @keyup.enter="search">
+    </v-text-field>
+
+    <v-btn v-if="role !== dev" icon color="primary" @click="goToCart">
+          <v-icon>mdi-cart</v-icon>
+    </v-btn>
+
     <v-btn v-if="!isLoggedIn" color="primary" @click="handleLogin">Iniciar Sesión</v-btn>
     <v-btn v-if="!isLoggedIn" color="secondary" @click="handleRegister">Registrarse</v-btn>
     <v-btn v-if="isLoggedIn" color="primary" @click="handleLogout">Cerrar Sesión</v-btn>
+
   </v-app-bar>
 </template>
 
@@ -17,9 +38,11 @@
 
 export default {
   name: 'AppHeader',
-
   data() {
     return {
+      searchText: '',
+      loaded: false,
+      loading: false,
       role: '',
       isLoggedIn: false,
     };
@@ -30,6 +53,16 @@ export default {
   },
 
   methods: {
+    async search() {
+      this.loading = true;
+      try {
+        const searchText = this.searchText.replace(/\s/g, '-');
+        await this.$router.push(`/search/${searchText}`);
+      } finally {
+        this.loading = false;
+      }
+    },
+
     getUserStatus() {
       const user = JSON.parse(localStorage.getItem('user')) || {};
       this.role = user.role;

@@ -1,6 +1,7 @@
 ﻿using BMT_backend.Infrastructure;
 using BMT_backend.Application.Interfaces;
 using BMT_backend.Application.Services;
+using BMT_backend.Application.Queries;
 using BMT_backend.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -97,6 +98,7 @@ builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped<EnterpriseService>();
 builder.Services.AddScoped<ShoppingCartService>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<SearchProductsAndEnterprisesQuerie>();
 
 
 var app = builder.Build();
