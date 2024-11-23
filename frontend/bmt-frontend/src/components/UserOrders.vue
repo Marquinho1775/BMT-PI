@@ -22,15 +22,15 @@
                     </ul>
                   </li>
                 </ul>
-                <p>Peso: {{ item.weight }} kg</p>
+                <p>Peso: {{ item.order.weight }} kg</p>
                 <p>{{ getTotalProductQuantity(item.products || []) }} artículos
                   • Costo: ₡{{ (item.order.orderCost ??
                     0).toFixed(2) }} + ₡{{ (item.order.deliveryFee ?? 0).toFixed(2) }}
                   de envío</p>
-                <p v-if="item.orderDate"> Fecha de creación del pedido: {{ new
-                  Date(item.orderDate).toLocaleDateString() }}</p>
-                <p v-if="item.orderDeliveryDate"> Fecha de entrega: {{ new
-                  Date(item.orderDeliveryDate).toLocaleDateString() }}</p>
+                <p v-if="item.order.orderDate"> Fecha de creación del pedido: {{ new
+                  Date(item.order.orderDate).toLocaleDateString() }}</p>
+                <p v-if="item.order.deliveryDate"> Fecha de entrega: {{ new
+                  Date(item.order.deliveryDate).toLocaleDateString() }}</p>
               </v-col>
               <v-col class="d-flex flex-column align-center justify-center" cols="auto">
                 <v-btn size="x-large" class="custom-btn" :style="{ backgroundColor: '#9fc9fc', color: 'black' }"
@@ -76,35 +76,40 @@ export default {
       }
     },
     async denyOrder(orderId) {
-      // Mostrar una confirmación estándar del navegador
-      console.log("Denying order", orderId);
-      if (confirm("¿Estás seguro de que quieres rechazar este pedido?")) {
-        try {
-          const response = await axios.put(`${API_URL}/User/DenyOrder`, null, {
-            params: { orderID: orderId },
-          });
+      this.$swal.fire({
+        title: '¿Cancelar pedido?',
+        text: "¿Estás seguro de que quieres cancelar este pedido?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d0eda0',
+        cancelButtonColor: '#9fc9fc',
+        confirmButtonText: 'Cancelar pedido',
+        cancelButtonText: 'Volver'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await axios.put(`${API_URL}/User/DenyOrder`, null, {
+              params: { orderID: orderId },
+            });
 
-          if (response.data.success) {
-            console.log(`Orden ${orderId} rechazada exitosamente`);
-            this.orders = this.orders.filter((order) => order.orderId !== orderId);
-            alert(`Orden ${orderId} rechazada exitosamente.`);
-          } else {
-            console.error(`Fallo al rechazar la orden ${orderId}: ${response.data.Message}`);
-            alert(`Error: ${response.data.Message}`);
+            if (response.data.success) {
+              this.$swal.fire('Cancelado', `El pedido ${orderId} ha sido cancelado.`, 'success');
+              this.orders = this.orders.filter((order) => order.order.orderId !== orderId);
+            } else {
+              this.$swal.fire('Error', `No se pudo cancelar el pedido: ${response.data.Message}`, 'error');
+            }
+          } catch (error) {
+            this.$swal.fire('Error', 'Ocurrió un problema al cancelar el pedido.', 'error');
           }
-        } catch (error) {
-          console.error("Error al rechazar la orden:", error);
-          alert("Ocurrió un error al rechazar la orden.");
         }
-      }
+      });
     },
-
     getTotalProductQuantity(products) {
-      if (!Array.isArray(products)) return 0; // Verificar si `products` es un arreglo válido
+      if (!Array.isArray(products)) return 0;
       return products.reduce((total, product) => total + product.quantity, 0);
     },
     groupProductsByEnterprise(products) {
-      if (!products || !Array.isArray(products)) return {}; // Verifica si `products` es un arreglo válido
+      if (!products || !Array.isArray(products)) return {};
       return products.reduce((grouped, product) => {
         (grouped[product.enterpriseName] = grouped[product.enterpriseName] || []).push(product);
         return grouped;
