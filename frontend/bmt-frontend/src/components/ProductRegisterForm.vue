@@ -1,144 +1,150 @@
 <template>
   <v-main>
-    <v-container
-      class="d-flex justify-center align-center"
-      style="min-height: 100vh;"
-    >
-      <v-card class="pa-4 elevation-2" max-width="600px" width="100%">
-        <v-card-title class="text-h5 text-center">
-          Agregar un producto
-        </v-card-title>
-        <v-divider></v-divider>
-        <v-card-text>
-          <v-form @submit.prevent="addNewProduct">
-            <!-- Nombre del producto -->
-            <v-text-field
-              v-model="productData.name"
-              label="Nombre del producto"
-              required
-              outlined
-            ></v-text-field>
+    <v-container class="fill-height">
+      <v-row align="center" justify="center">
+        <v-col cols="12" sm="8" md="6">
+          <v-card id="form" class = "my-4">
+            <v-card-title id="title" class="text-center">
+              Agregar un producto
+            </v-card-title>
+            <v-card-text>
+              <v-form ref="form" @submit.prevent="addNewProduct">
+                <!-- Nombre del producto -->
+                <v-text-field
+                  id="name"
+                  v-model="productData.name"
+                  label="Nombre del producto:"
+                  placeholder="Ingresar el nombre del producto"
+                  required
+                ></v-text-field>
 
-            <!-- Descripción -->
-            <v-textarea
-              v-model="productData.description"
-              label="Descripción"
-              required
-              outlined
-            ></v-textarea>
+                <!-- Descripción -->
+                <v-text-field
+                  id="description"
+                  v-model="productData.description"
+                  label="Descripción:"
+                  placeholder="Ingresar la descripción del producto"
+                  required
+                ></v-text-field>
 
-            <!-- Tags -->
-            <v-combobox
-              v-model="value"
-              :items="availableOptions"
-              label="Etiquetas de producto"
-              multiple
-              chips
-              outlined
-              clearable
-              item-value="value"
-              item-text="text"
-            ></v-combobox>
+                <!-- Tags -->
+                <v-autocomplete
+                  v-model="value"
+                  :items="availableOptions"
+                  label="Etiquetas de producto:"
+                  placeholder="Escoge una o varias etiquetas..."
+                  multiple
+                  chips
+                  deletable-chips
+                ></v-autocomplete>
 
-            <!-- Peso -->
-            <v-text-field
-              v-model="productData.weight"
-              label="Peso (kg)"
-              type="number"
-              required
-              outlined
-              :error-messages="weightValid === false ? ['Por favor, ingrese un peso válido.'] : []"
-              @input="validateWeight"
-            ></v-text-field>
+                <!-- Peso -->
+                <v-text-field
+                  id="weight"
+                  v-model="productData.weight"
+                  label="Peso (kg):"
+                  placeholder="Ingrese el peso del producto"
+                  required
+                  :error="weightValid === false"
+                  :error-messages="weightValid === false ? ['Por favor, ingrese un peso válido.'] : []"
+                  @input="validateWeight"
+                ></v-text-field>
 
-            <!-- Precio -->
-            <v-text-field
-              v-model="productData.price"
-              label="Precio"
-              type="number"
-              required
-              outlined
-              :error-messages="priceValid === false ? ['Por favor, ingrese un precio válido.'] : []"
-              @input="validatePrice"
-            ></v-text-field>
+                <!-- Precio -->
+                <v-text-field
+                  id="price"
+                  v-model="productData.price"
+                  label="Precio:"
+                  placeholder="Ingrese el precio del producto"
+                  required
+                  :error="priceValid === false"
+                  :error-messages="priceValid === false ? ['Por favor, ingrese un precio válido.'] : []"
+                  @input="validatePrice"
+                ></v-text-field>
 
-            <!-- Tipo de Producto -->
-            <v-radio-group v-model="productData.type" label="Tipo de producto" row>
-              <v-radio label="Perecedero" value="Perecedero"></v-radio>
-              <v-radio label="No perecedero" value="No perecedero"></v-radio>
-            </v-radio-group>
+                <!-- Tipo de Producto -->
+                <v-radio-group
+                  v-model="productData.type"
+                  label="Tipo de producto:"
+                  required
+                >
+                  <v-radio label="Perecedero" value="Perecedero"></v-radio>
+                  <v-radio label="No perecedero" value="No perecedero"></v-radio>
+                </v-radio-group>
 
-            <!-- Stock -->
-            <v-text-field
-              v-if="productData.type === 'No perecedero'"
-              v-model.number="productData.stock"
-              label="Cantidad de stock"
-              type="number"
-              min="0"
-              step="1"
-              required
-              outlined
-              :error-messages="stockValid === false ? ['Por favor, ingrese una cantidad de stock válida.'] : []"
-              @input="validateStock"
-            ></v-text-field>
+                <div v-if="productData.type === 'No perecedero'">
+                  <!-- Stock -->
+                  <v-text-field
+                    id="stock"
+                    v-model.number="productData.stock"
+                    label="Cantidad de stock:"
+                    placeholder="Ingrese la cantidad de stock"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    :error="stockValid === false"
+                    :error-messages="stockValid === false ? ['Por favor, ingrese una cantidad de stock válida.'] : []"
+                    @input="validateStock"
+                  ></v-text-field>
+                </div>
 
-            <!-- Días de la semana -->
-            <v-checkbox-group
-              v-if="productData.type === 'Perecedero'"
-              v-model="productData.weekDaysAvailable"
-              label="Días de disponibilidad"
-              column
-            >
-              <v-checkbox v-for="day in weekdays" :key="day.value" :label="day.text" :value="day.value"></v-checkbox>
-            </v-checkbox-group>
+                <div v-if="productData.type === 'Perecedero'">
+                  <!-- Días de la semana -->
+                  <div>
+                  <span>Días de disponibilidad:</span>
+                  <v-row>
+                    <v-col
+                    v-for="weekday in weekdays"
+                    :key="weekday.value"
+                    cols="auto"
+                    >
+                    <v-checkbox
+                      v-model="productData.weekDaysAvailable"
+                      :label="weekday.text"
+                      :value="weekday.value"
+                      dense
+                    ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                  </div>
 
-            <!-- Límite por día -->
-            <v-text-field
-              v-if="productData.type === 'Perecedero'"
-              v-model.number="productData.limit"
-              label="Límite por día"
-              type="number"
-              min="0"
-              step="1"
-              required
-              outlined
-              :error-messages="limitValid === false ? ['Por favor, ingrese un límite por día válido.'] : []"
-              @input="validateLimit"
-            ></v-text-field>
+                  <!-- Límite por día -->
+                  <v-text-field
+                    id="limit"
+                    v-model.number="productData.limit"
+                    label="Límite por día:"
+                    placeholder="Ingrese el límite por día"
+                    type="number"
+                    min="0"
+                    step="1"
+                    required
+                    :error="limitValid === false"
+                    :error-messages="limitValid === false ? ['Por favor, ingrese un límite por día válido.'] : []"
+                    @input="validateLimit"
+                  ></v-text-field>
+                </div>
+                
+                <!-- Imágenes -->
+                <v-file-input
+                  v-model="productData.images"
+                  label="Añada imágenes:"
+                  multiple
+                ></v-file-input>
 
-            <!-- Imagenes -->
-            <v-file-input
-              label="Añada imágenes"
-              multiple
-              outlined
-              @change="handleFileChange"
-            ></v-file-input>
-
-            <!-- Botones de acción -->
-            <v-btn
-              color="secondary"
-              class="mt-4"
-              @click="goBack"
-              outlined
-              block
-            >
-              Volver
-            </v-btn>
-            <v-btn
-              color="primary"
-              class="mt-4"
-              type="submit"
-              block
-            >
-              Registrar
-            </v-btn>
-          </v-form>
-        </v-card-text>
-      </v-card>
+                <!-- Botones -->
+                <v-row class="mt-4" justify="space-between">
+                  <v-btn color="secondary" @click="goBack">Volver</v-btn>
+                  <v-btn type="submit" color="primary">Registrar</v-btn>
+                </v-row>
+              </v-form>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </v-container>
   </v-main>
 </template>
-
 
 <script>
 import axios from 'axios'
@@ -200,9 +206,11 @@ export default {
           formData.append('limit', this.productData.limit != null ? this.productData.limit : 0);
 
           if (this.productData.weekDaysAvailable && this.productData.weekDaysAvailable.length > 0) {
+            let days = '';
             this.productData.weekDaysAvailable.forEach(day => {
-              formData.append('WeekDaysAvailable', day);
+              days += day;
             });
+            formData.append('WeekDaysAvailable', days);
           }
         }
 
@@ -265,10 +273,6 @@ export default {
     goBack() {
       this.$router.push('/');
     },
-    handleFileChange(event) {
-      const files = event.target.files;
-      this.productData.images = files;
-    },
   },
   computed: {
     availableOptions() {
@@ -290,35 +294,9 @@ export default {
 }
 </script>
 
-<style>
-#tags-component-select {
-  background-color: #D0EDA0;
-}
-
-.custom-button {
-  background-color: #36618E !important;
-  border-color: #36618E !important;
-  color: white !important;
-}
-
-#form .custom-tag {
-  background-color: #36618E !important;
-  border-color: #36618E !important;
-  color: white !important;
-}
-
-#form .b-form-tag {
-  background-color: #36618E !important;
-  border-color: #36618E !important;
-  color: white !important;
-}
-
-#form .b-form-tag .close {
-  color: white !important;
-}
-
-form .select-component {
-  background-color: #D0EDA0;
-  border: 1px solid #36618E;
+<style scoped>
+#form {
+  padding: 20px;
+  background-color: #f5f5f5;
 }
 </style>
