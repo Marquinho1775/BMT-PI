@@ -173,5 +173,18 @@ namespace BMT_backend.Application.Services
                 return false;
             }
         }
+
+        public async Task<List<YearlyEarningsReportDataDto>> GetYearlyEnterpriseDataAsync(YearlyEarningsReportDataRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.EnterpriseIds))
+                throw new ArgumentException("Los IDs de los emprendimientos son obligatorios.");
+
+            if (request.Year < 0)
+                throw new ArgumentException("El año no puede ser negativo.");
+
+            var data = await _enterpriseRepository.GetYearlyEnterpriseDataAsync(request.EnterpriseIds, request.Year);
+
+            return data;
+        }
     }
 }
