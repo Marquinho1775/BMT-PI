@@ -3,6 +3,14 @@
     <v-container>
       <productSearchGrid :products="products" />
     </v-container>
+    <v-container>
+
+    </v-container>
+
+    <pending-orders-reports :Type="1" />
+    <pending-orders-reports :Type="2" />
+    <pending-orders-reports :Type="3" />
+
   </v-main>
 </template>
 
@@ -23,7 +31,7 @@ export default {
       try {
         const response = await axios.get(`${API_URL}/Product/GetProductsDetails`);
         this.products = response.data.data;
-        console.log('Products:', this.products); 
+        console.log('Products:', this.products);
         this.URLImage();
       } catch (error) {
         console.error('Error fetching products:', error);

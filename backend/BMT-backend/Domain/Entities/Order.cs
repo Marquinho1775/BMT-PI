@@ -20,7 +20,8 @@ namespace BMT_backend.Domain.Entities
          * 2 Listo para envío
          * 3 Shipping
          * 4 Terminado
-         * 5 Cancelado
+         * 5 Cancelado user
+         * 6 Cancelado dv
          */ 
     }
 }
