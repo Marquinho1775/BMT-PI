@@ -116,36 +116,47 @@ namespace BMT_backend.Infrastructure.Data
         {
             try
             {
-                var query = "IF EXISTS (" +
-                            "SELECT 1 " +
-                            "FROM ShoppingCartProducts " +
-                            "WHERE ShoppingCartId = @shoppingCartId " +
-                            "AND ProductId = @productId" +
-                            ") " +
-                            "SELECT 'ProductExists' " +
-                            "ELSE " +
-                            "BEGIN " +
-                            "DECLARE @productPrice FLOAT = (SELECT Price FROM Products WHERE Id = @productId); " +
-                            "DECLARE @subtotal FLOAT = @productPrice; " +
-                            "INSERT INTO ShoppingCartProducts (ShoppingCartId, ProductId, Quantity, Subtotal) " +
-                            "VALUES (@shoppingCartId, @productId, 1, @subtotal); " +
-                            "UPDATE ShoppingCarts " +
-                            "SET Total = Total + @subtotal " +
-                            "WHERE Id = @shoppingCartId; " +
-                            "SELECT 'Success' AS Result; " +
-                            "END";
+                var query = @"
+                    DECLARE @productPrice float = (SELECT Price FROM Products WHERE Id = @productId);
+                    BEGIN TRANSACTION;
+
+                    IF EXISTS (
+                        SELECT 1 FROM ShoppingCartProducts
+                        WHERE ShoppingCartId = @shoppingCartId AND ProductId = @productId
+                    )
+                    BEGIN
+                        UPDATE ShoppingCartProducts SET
+                            Quantity = Quantity + 1,
+                            Subtotal = Subtotal + @productPrice
+                        WHERE ShoppingCartId = @shoppingCartId AND ProductId = @productId;
+                    END
+                    ELSE
+                    BEGIN
+                        INSERT INTO ShoppingCartProducts (ShoppingCartId, ProductId, Quantity, Subtotal)
+                        VALUES (@shoppingCartId, @productId, 1, @productPrice);
+                    END;
+
+                    UPDATE ShoppingCarts SET Total = Total + @productPrice
+                    WHERE Id = @shoppingCartId;
+
+                    COMMIT TRANSACTION;
+
+                    SELECT 'Success' AS Result;
+                    ";
                 using var connection = new SqlConnection(_connectionString);
                 await connection.OpenAsync();
                 using var command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue("@shoppingCartId", shoppingCartId);
                 command.Parameters.AddWithValue("@productId", productId);
-                return command.ExecuteScalar().ToString();
+                var result = await command.ExecuteScalarAsync();
+                return result?.ToString() ?? "No Result";
             }
             catch (Exception ex)
             {
-                return $"Error: {ex.Message}";
+                throw new ApplicationException("An error occurred while adding the product to the cart.");
             }
         }
+
 
         public async Task<bool> ChangeProductQuantityAsync(string shoppingCartId, string productId, int quantity)
         {

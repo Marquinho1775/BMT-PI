@@ -9,9 +9,13 @@
 </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Application\Services\NewFolder\**" />
     <Compile Remove="Domain\Entities\NewFolder\**" />
+    <Content Remove="Application\Services\NewFolder\**" />
     <Content Remove="Domain\Entities\NewFolder\**" />
+    <EmbeddedResource Remove="Application\Services\NewFolder\**" />
     <EmbeddedResource Remove="Domain\Entities\NewFolder\**" />
+    <None Remove="Application\Services\NewFolder\**" />
     <None Remove="Domain\Entities\NewFolder\**" />
   </ItemGroup>
 

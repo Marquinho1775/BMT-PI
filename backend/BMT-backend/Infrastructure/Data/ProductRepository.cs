@@ -255,19 +255,19 @@ namespace BMT_backend.Infrastructure.Data
             return rowsAffected > 0;
         }
 
-        public async Task<bool> UpdatePerishableDetailsAsync(string id, string date, int? quantity)
+        public async Task<bool> UpdatePerishableDetailsAsync(string id, string weekDaysAvailable, int? Limit)
         {
             var queryBuilder = new StringBuilder("UPDATE PerishableProducts SET ");
             var parameters = new List<SqlParameter>();
-            if (quantity.HasValue)
+            if (Limit.HasValue)
             {
                 queryBuilder.Append("Limit = @Limit, ");
-                parameters.Add(new SqlParameter("@Limit", quantity.Value));
+                parameters.Add(new SqlParameter("@Limit", Limit.Value));
             }
-            if (!string.IsNullOrEmpty(date))
+            if (!string.IsNullOrEmpty(weekDaysAvailable))
             {
                 queryBuilder.Append("WeekDaysAvailable = @WeekDaysAvailable, ");
-                parameters.Add(new SqlParameter("@WeekDaysAvailable", date));
+                parameters.Add(new SqlParameter("@WeekDaysAvailable", weekDaysAvailable));
             }
             if (parameters.Count > 0)
             {
@@ -283,6 +283,7 @@ namespace BMT_backend.Infrastructure.Data
             }
             return false;
         }
+
         public async Task<bool> UpdateNonPerishableStockAsync(string productId, int quantity)
         {
             const string query = @"

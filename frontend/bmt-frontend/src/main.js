@@ -34,7 +34,7 @@ import DeveloperOrderConfirmation from './components/DeveloperOrderConfirmation.
 
 import CheckOut from './components/CheckOut.vue';
 import ProductCard from './components/ProductCard.vue';
-import ProductSearchGrid from './components/ProductSearchGrid.vue';
+import ProductGrid from './components/ProductGrid.vue';
 import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
@@ -123,7 +123,7 @@ app.use(VueGoogleMaps, {
 });
 
 app.component('product-card', ProductCard);
-app.component('productSearchGrid', ProductSearchGrid);
+app.component('productGrid', ProductGrid);
 app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
