@@ -38,6 +38,7 @@ import ProductGrid from './components/ProductGrid.vue';
 import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
+import UserDashboard from './components/UserDashboard.vue';
 import SearchResultPage from './components/SearchResultPage.vue';
 
 import OrdersReports from './components/OrdersReports.vue';
@@ -143,6 +144,7 @@ app.component('orders-reports', OrdersReports);
 app.component('yearly-earnings', YearlyEarnings);
 app.component('StackedBarChart', StackedBarChart);
 app.component('LineChart', LineChart);
+app.component('UserDashboard', UserDashboard);
 
 app.config.globalProperties.$swal = Swal;
 

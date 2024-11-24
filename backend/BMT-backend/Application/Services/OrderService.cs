@@ -44,6 +44,11 @@ namespace BMT_backend.Application.Services
             return await _orderRepository.GetToConfirmOrdersByUserIdAsync(userId);
         }
 
+        public async Task<List<OrderDetails>> GetInProgressOrder(string userId)
+        {
+            return await _orderRepository.GetInProgressOrderAsync(userId);
+        }
+
         public async Task<bool> ConfirmOrder(string orderId)
         {
             return await _orderRepository.ConfirmOrderAsync(orderId);
@@ -52,7 +57,12 @@ namespace BMT_backend.Application.Services
         public async Task<bool> DenyOrder(string orderId)
         {
             return await _orderRepository.DenyOrderAsync(orderId);
-        }   
+        }
+
+        public async Task<List<Product>> GetOrderProductsAsync(string userId)
+        {
+            return await _orderRepository.GetOrderProductsAsync(userId);
+        }
 
         public async Task<bool> AddProductToOrder(AddProductToOrderRequest orderProduct)
         {
