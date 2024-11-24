@@ -3,9 +3,6 @@
     <v-container>
       <productGrid :products="products" />
     </v-container>
-    <v-container>
-
-    </v-container>
 
 
   </v-main>
