@@ -70,6 +70,27 @@ namespace BMT_backend.Infrastructure.Data
             }
             return productTags;
         }
+
+        public async Task<List<string>> GetTagsIdByTagsNameAsync(List<string> tagNames)
+        {
+            var tagsId = new List<string>();
+            var query = "SELECT Id FROM Tags WHERE Name = @tagName";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                foreach (var tagName in tagNames)
+                {
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@tagName", tagName);
+                    using var reader = await command.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
+                    {
+                        tagsId.Add(reader["Id"].ToString());
+                    }
+                }
+            }
+            return tagsId;
+        }
         
         public async Task<bool> UpdateTagAsync(Tag productTag)
         {
@@ -92,17 +113,39 @@ namespace BMT_backend.Infrastructure.Data
             return await command.ExecuteNonQueryAsync() > 0;
         }
 
-        public async Task<bool> AddProductTagsAsync(string productId, List<string> tags)
+        public async Task<bool> AddProductTagsAsync(string productId, List<string> tagsId)
         {
-            var query = "INSERT INTO ProductTags (ProductId, TagId) VALUES (@ProductId, (SELECT Id FROM Tags WHERE Name = @TagName))";
-            using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync();
-            foreach (var tag in tags)
+            if(tagsId.Count != 0)
             {
-                using var command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue("@ProductId", productId);
-                command.Parameters.AddWithValue("@TagName", tag);
-                await command.ExecuteNonQueryAsync();
+                var query = @"
+                    INSERT INTO ProductTags (ProductId, TagId) VALUES (@productId, @tagId)";
+                using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync();
+                foreach (var tag in tagsId)
+                {
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@productId", productId);
+                    command.Parameters.AddWithValue("@tagId", tag);
+                    await command.ExecuteNonQueryAsync();
+                }
+            }
+            return true;
+        }
+
+        public async Task<bool> DeleteProductTagsAsync(string productId, List<string> tagsId)
+        {
+            if (tagsId.Count != 0)
+            {
+                var query = "DELETE FROM ProductTags WHERE ProductId = @ProductId AND TagId = @TagId";
+                using var connection = new SqlConnection(_connectionString);
+                await connection.OpenAsync();
+                foreach (var tag in tagsId)
+                {
+                    using var command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@ProductId", productId);
+                    command.Parameters.AddWithValue("@TagId", tag);
+                    await command.ExecuteNonQueryAsync();
+                }
             }
             return true;
         }

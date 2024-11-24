@@ -6,40 +6,53 @@ namespace BMT_backend.Infrastructure
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IImageFileRepository _imageFileRepository;
+        private readonly ILogger<ImageFileService> _logger;
 
-        public ImageFileService(IWebHostEnvironment webHostEnvironment, IImageFileRepository imageFileRepository)
+        public ImageFileService(IWebHostEnvironment webHostEnvironment, IImageFileRepository imageFileRepository, ILogger<ImageFileService> logger)
         {
             _webHostEnvironment = webHostEnvironment;
             _imageFileRepository = imageFileRepository;
+            _logger = logger;
         }
 
-
-        public bool CreateProductImages(string productId, List<IFormFile> images)
+        public async Task<bool> CreateProductImages(string productId, List<IFormFile> images)
         {
             if (images == null || images.Count == 0)
             {
                 return false;
             }
             var uploadPath = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-            if (!Directory.Exists(uploadPath)) Directory.CreateDirectory(uploadPath);
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
             foreach (var image in images)
             {
                 if (image.Length > 0)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
                     var filePath = Path.Combine(uploadPath, fileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    try
                     {
-                        image.CopyToAsync(stream);
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await image.CopyToAsync(stream);
+                        }
+                        var relativePath = Path.Combine("uploads", fileName);
+                        await _imageFileRepository.CreateProductImageAsync(productId, relativePath);
                     }
-                    var relativePath = "uploads/" + fileName;
-                    _imageFileRepository.CreateProductImageAsync(productId, relativePath);
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error processing image {FileName}", image.FileName);
+                        return false;
+                    }
                 }
             }
             return true;
         }
 
-        public bool UpdateProfileImage(string userId, FormFile image)
+
+        public async Task<bool> UpdateProfileImage(string userId, FormFile image)
         {
             if (image.Length > 0)
             {
@@ -49,10 +62,10 @@ namespace BMT_backend.Infrastructure
                 var filePath = Path.Combine(uploadPath, fileName);
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    image.CopyToAsync(stream);
+                    await image.CopyToAsync(stream);
                 }
                 var relativePath = "uploads/" + fileName;
-                _imageFileRepository.UpdateProfileImageAsync(userId, relativePath);
+                await _imageFileRepository.UpdateProfileImageAsync(userId, relativePath);
                 return true;
             }
             return false;

@@ -1,24 +1,24 @@
 <template>
 	<v-card class="mx-auto" max-width="344" elevation="4">
 		<v-carousel show-arrows="hover" height="200px" hide-delimiters>
-			<v-carousel-item v-for="(image, index) in product.raw.imagesURLs" :key="index">
-				<v-img :src="image" height="200px" aspect-ratio="16/9" cover></v-img>
+			<v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
+				<v-img :src="imagesURLBase + image" height="200px" aspect-ratio="16/9" cover></v-img>
 			</v-carousel-item>
 		</v-carousel>
 		<v-row>
 			<v-col>
-				<v-card-title>{{ product.raw.name }}</v-card-title>
-				<v-card-subtitle>₡ {{ product.raw.price }}</v-card-subtitle>
+				<v-card-title>{{ product.name }}</v-card-title>
+				<v-card-subtitle>₡ {{ product.price }}</v-card-subtitle>
 			</v-col>
 			<v-col class="text-right">
-				<div v-if="product.raw.type === 'Perishable'">
-					<v-chip v-for="(day, index) in formatWeekDays(product.raw.weekDaysAvailable)" :key="index"
+				<div v-if="product.type === 'Perishable'">
+					<v-chip v-for="(day, index) in formatWeekDays(product.weekDaysAvailable)" :key="index"
 						color="info" size="small" class="white--text">
 						{{ day }}
 					</v-chip>
 				</div>
 				<div v-else>
-					<div v-if="product.raw.stock > 0">
+					<div v-if="product.stock > 0">
 						<v-chip color="success" class="white--text">Disponible</v-chip>
 					</div>
 					<div v-else>
@@ -39,28 +39,26 @@
 				<v-divider></v-divider>
 				<v-spacer></v-spacer>
 				<v-chip-group>
-					<v-chip v-for="(tag, index) in product.raw.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
+					<v-chip v-for="(tag, index) in product.tags" :key="index" class="mr-4">{{ tag }}</v-chip>
 				</v-chip-group>
 				<v-card-text>
 					Descripción:
 					<br />
-					{{ product.raw.description }}
+					{{ product.description }}
 					<br /><br />
 					Emprendimiento:
 					<br />
-					{{ product.raw.enterpriseName }}
+					{{ product.enterpriseName }}
 				</v-card-text>
 			</div>
 		</v-expand-transition>
 	</v-card>
 </template>
 
-
-
 <script>
 
 import axios from 'axios';
-import { API_URL } from '@/main';
+import { API_URL, URL } from '@/main';
 
 export default {
 	name: 'ProductCard',
@@ -72,6 +70,7 @@ export default {
 	},
 	data() {
 		return {
+			imagesURLBase: URL,
 			isShow: false,
 			shoppingCartId: '',
 			productId: '',
@@ -99,20 +98,13 @@ export default {
 			this.isShow = !this.isShow;
 		},
 		async addToCart() {
-			this.productId = this.product.raw.id;
+			this.productId = this.product.id;
 			let response = await axios
 				.put(API_URL + '/ShoppingCart/AddProductToCart?shoppingCartId=' + this.shoppingCartId + '&productId=' + this.productId, null)
 				.catch((error) => {
 					console.error('Error adding product to cart:', error);
 				});
-			if (response.data === "ProductExists") {
-				this.$swal.fire({
-					title: 'Ya está en el carrito',
-					text: 'Este producto ya está en el carrito',
-					icon: 'error',
-					confirmButtonText: 'Ok',
-				});
-			} else {
+			if (response.data === "Success") {
 				this.$swal.fire({
 					title: 'Producto añadido',
 					text: 'El producto se ha añadido al carrito',

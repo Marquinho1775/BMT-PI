@@ -11,8 +11,7 @@
                                 <v-text-field
                                     label="Nombre del Emprendimiento"
                                     v-model="enterpriseData.name"
-                                    :placeholder="enterprise.name"
-                                    :rules="[enterpriseData.name ? validateName : null]"
+                                    :rules="[validateName]"
                                     :error-messages="nameError"
                                     clearable
                                 ></v-text-field>
@@ -20,8 +19,7 @@
                                 <v-text-field
                                     label="Descripción"
                                     v-model="enterpriseData.description"
-                                    :placeholder="enterprise.description"
-                                    :rules="[enterpriseData.description ? validateDescription : null]"
+                                    :rules="[validateDescription]"
                                     :error-messages="descriptionError"
                                     clearable
                                 ></v-text-field>
@@ -29,8 +27,7 @@
                                 <v-text-field
                                     label="Correo Empresarial"
                                     v-model="enterpriseData.email"
-                                    :placeholder="enterprise.email"
-                                    :rules="[enterpriseData.email ? validateEmail : null]"
+                                    :rules="[validateEmail]"
                                     :error-messages="emailError"
                                     clearable
                                 ></v-text-field>
@@ -38,8 +35,7 @@
                                 <v-text-field
                                     label="Número de Teléfono"
                                     v-model="enterpriseData.phoneNumber"
-                                    :placeholder="enterprise.phoneNumber"
-                                    :rules="[enterpriseData.phoneNumber ? validatePhoneNumber : null]"
+                                    :rules="[validatePhoneNumber]"
                                     :error-messages="phoneNumberError"
                                     clearable
                                 ></v-text-field>
@@ -100,6 +96,9 @@ export default {
             });
             this.enterprise = enterpriseResponse.data.data;
             console.log("Información del emprendimiento:", this.enterprise);
+
+            // Actualizar enterpriseData con los datos existentes
+            this.enterpriseData = { ...this.enterprise };
         } catch (error) {
             console.error("Error al cargar la información del emprendimiento:", error);
         }
@@ -109,10 +108,10 @@ export default {
             try {
                 const dataToUpdate = {
                     id: this.$route.params.id,
-                    ...(this.enterpriseData.name ? { name: this.enterpriseData.name } : {}),
-                    ...(this.enterpriseData.description ? { description: this.enterpriseData.description } : {}),
-                    ...(this.enterpriseData.email ? { email: this.enterpriseData.email } : {}),
-                    ...(this.enterpriseData.phoneNumber ? { phoneNumber: this.enterpriseData.phoneNumber } : {})
+                    name: this.enterpriseData.name,
+                    description: this.enterpriseData.description,
+                    email: this.enterpriseData.email,
+                    phoneNumber: this.enterpriseData.phoneNumber
                 };
 
                 console.log("Datos a actualizar:", dataToUpdate);
