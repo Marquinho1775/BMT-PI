@@ -86,5 +86,10 @@ namespace BMT_backend.Application.Services
         {
             return await _orderRepository.IsProductUsedInOrdersAsync(productId);
         }
+
+        public async Task<bool> AreEnterpriseProductsInOrders(string enterpriseId)
+        {
+            return await _orderRepository.AreEnterpriseProductsInOrders(enterpriseId);
+        }
     }
 }

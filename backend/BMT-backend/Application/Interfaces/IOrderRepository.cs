@@ -24,5 +24,6 @@ namespace BMT_backend.Application.Interfaces
 
         Task<bool> IsDirectionUsedInOrdersAsync(string directionId);
         Task<bool> IsProductUsedInOrdersAsync(string productId);
+        Task<bool> AreEnterpriseProductsInOrders(string enterpriseId);
     }
 }

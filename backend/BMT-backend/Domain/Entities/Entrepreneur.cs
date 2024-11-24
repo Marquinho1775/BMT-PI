@@ -9,5 +9,7 @@
         public string? LastName { get; set; }
         public string? Email { get; set; }
         public bool? IsVerified { get; set; }
+
+        public bool? SoftDelete { get; set; }
     }
 }

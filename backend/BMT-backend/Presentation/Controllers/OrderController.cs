@@ -93,5 +93,19 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si el producto está en uso");
             }
         }
+
+        [HttpGet("AreEnterpriseProductsInOrders")]
+        public async Task<ActionResult<bool>> AreEnterpriseProductsInOrders(string enterpriseId)
+        {
+            try
+            {
+                var result = await _orderService.AreEnterpriseProductsInOrders(enterpriseId);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si el producto de la empresa está en la orden");
+            }
+        }
     }
 }

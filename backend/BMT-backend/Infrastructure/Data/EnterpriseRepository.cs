@@ -47,7 +47,7 @@ namespace BMT_backend.Infrastructure.Data
         public async Task<List<Enterprise>> GetEnterprisesAsync()
         {
             List<Enterprise> enterprises = new List<Enterprise>();
-            var query = "select * FROM Enterprises;";
+            var query = "select * FROM Enterprises WHERE SoftDeleted = 0;";
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
             await connection.OpenAsync();
@@ -69,7 +69,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<Enterprise> GetEnterpriseByIdAsync(string enterpriseId)
         {
-            var query = "SELECT * FROM Enterprises WHERE Id = @enterpriseId";
+            var query = "SELECT * FROM Enterprises WHERE Id = @enterpriseId AND SoftDeleted = 0";
             Enterprise enterprise = null;
             using var connection = new SqlConnection(_connectionString);
             using var command = connection.CreateCommand();
@@ -148,7 +148,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<int> GetProductsQuantityAsync(string id)
         {
-            var query = "SELECT COUNT(*) FROM Products p WHERE p.EnterpriseId = e.@Id) AS ProductQuantity";
+            var query = "SELECT COUNT(*) FROM Products p WHERE p.EnterpriseId = e.@Id AND SoftDeleted = 0) AS ProductQuantity";
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@Id", id);
@@ -159,7 +159,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<List<string>> GetEnterpriseProductsIdAsync(string enterpriseId)
         {
-            var query = "SELECT Id FROM Products WHERE EnterpriseId = @EnterpriseId;";
+            var query = "SELECT Id FROM Products WHERE EnterpriseId = @EnterpriseId AND SoftDeleted = 0;";
 
             using var _conection = new SqlConnection(_connectionString);
             using var queryCommand = new SqlCommand(query, _conection);
@@ -212,6 +212,73 @@ namespace BMT_backend.Infrastructure.Data
             bool result = await updateCommand.ExecuteNonQueryAsync() >= 1;
             await connection.CloseAsync();
             return result;
+        }
+
+        public async Task<bool> DeleteEnterpriseAsync(string enterpriseId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Verificar si hay productos en órdenes
+                        var productsInOrdersQuery = @"
+                        SELECT COUNT(1) 
+                        FROM Order_Product op
+                        JOIN Products p ON op.ProductId = p.Id
+                        WHERE p.EnterpriseId = @EnterpriseId;";
+
+                        bool productsInOrders;
+                        using (var command = new SqlCommand(productsInOrdersQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+                            var count = (int)await command.ExecuteScalarAsync();
+                            productsInOrders = count > 0;
+                        }
+
+                        // Borrar productos (soft delete si están en órdenes)
+                        string deleteProductsQuery = productsInOrders
+                            ? "UPDATE Products SET SoftDeleted = 1 WHERE EnterpriseId = @EnterpriseId;"
+                            : "DELETE FROM Products WHERE EnterpriseId = @EnterpriseId;";
+                        using (var command = new SqlCommand(deleteProductsQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+                            await command.ExecuteNonQueryAsync();
+                        }
+
+                        // Borrar registros de Entrepreneurs_Enterprises (always hard delete)
+                        const string deleteEntrepreneursQuery = @"
+                        DELETE FROM Entrepreneurs_Enterprises 
+                        WHERE EnterpriseId = @EnterpriseId;";
+                        using (var command = new SqlCommand(deleteEntrepreneursQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+                            await command.ExecuteNonQueryAsync();
+                        }
+
+                        // Borrar empresa (soft delete si había productos en órdenes)
+                        string deleteEnterpriseQuery = productsInOrders
+                            ? "UPDATE Enterprises SET SoftDeleted = 1 WHERE Id = @EnterpriseId;"
+                            : "DELETE FROM Enterprises WHERE Id = @EnterpriseId;";
+                        using (var command = new SqlCommand(deleteEnterpriseQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+                            await command.ExecuteNonQueryAsync();
+                        }
+
+                        // Confirmar la transacción
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
     }
 }
