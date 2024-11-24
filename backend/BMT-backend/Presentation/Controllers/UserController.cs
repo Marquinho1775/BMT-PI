@@ -160,7 +160,7 @@ namespace BMT_backend.Presentation.Controllers
                 return BadRequest(new { Message = "El ID de la orden es obligatorio." });
             try
             {
-                var denyResult = await Task.Run(() => _orderService.DenyOrder(orderID));
+                var denyResult = await Task.Run(() => _orderService.DenyOrder(orderID, 0));
                 if (denyResult)
                 {
                     var order = await Task.Run(() => _orderService.GetOrderDetailsById(orderID));

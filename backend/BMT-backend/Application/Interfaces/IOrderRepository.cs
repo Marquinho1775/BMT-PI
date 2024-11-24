@@ -15,7 +15,7 @@ namespace BMT_backend.Application.Interfaces
         Task<List<OrderDetails>> GetToConfirmOrdersByUserIdAsync(string userId);
 
         Task<bool> ConfirmOrderAsync(string orderId);
-        Task<bool> DenyOrderAsync(string orderId);
+        Task<bool> DenyOrderAsync(string orderId, int roleId);
         
         Task<bool> AddProductToOrderAsync(AddProductToOrderRequest orderProduct, double Weight, double totalCost);
         Task<bool> UpdateDeliveryFeeAsync(string orderId, double deliveryFee);

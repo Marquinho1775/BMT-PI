@@ -49,9 +49,9 @@ namespace BMT_backend.Application.Services
             return await _orderRepository.ConfirmOrderAsync(orderId);
         }
 
-        public async Task<bool> DenyOrder(string orderId)
+        public async Task<bool> DenyOrder(string orderId, int roleId)
         {
-            return await _orderRepository.DenyOrderAsync(orderId);
+            return await _orderRepository.DenyOrderAsync(orderId, roleId);
         }   
 
         public async Task<bool> AddProductToOrder(AddProductToOrderRequest orderProduct)
@@ -125,7 +125,7 @@ namespace BMT_backend.Application.Services
             foreach (var order in orders)
             {
                 ReportDto report = new ReportDto();
-                report.NumOrder = order.Order.OrderId;
+                report.NumOrder = order.Order.NumOrder;
                 report.Enterprises = getEnterprise(order);
                 report.ItemsCount = order.Products.Count;
                 report.DateOfCreation = (DateTime)order.Order.OrderDate;
