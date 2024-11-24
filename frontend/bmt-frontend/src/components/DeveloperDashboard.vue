@@ -55,8 +55,12 @@ export default {
     try {
       const datasetResponse = await axios.get(
         `${API_URL}/Developer/GetSystemTotalDeliverysFee`);
-        this.barChartDatasets = datasetResponse.data.data;
-        console.log(this.barChartDatasets);
+        const response = datasetResponse.data.data;
+        const array = [];
+        for (const key in response) {
+          array.push(response[key]);
+        }
+        this.LineDataset = array;
     }
     catch (error) {
       console.error('Error al cargar los datos:', error);

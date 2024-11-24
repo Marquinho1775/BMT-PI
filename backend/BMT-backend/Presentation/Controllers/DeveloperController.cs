@@ -76,19 +76,19 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
-        //[HttpGet("GetSystemTotalDeliverysFee")]
-        //public async Task<IActionResult> GetSystemDeliverysFee()
-        //{
-        //    try
-        //    {
-        //        var deliverysFee = await _GetSystemTotalDeliveryFeeQuery.GetSystemTotalDeliverysFee();
-        //        return Ok(new { Success = true, Data = deliverysFee });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { Success = false, Message = "Error al obtener las tarifas de envío del sistema." });
-        //    }
-        //}
+        [HttpGet("GetSystemTotalDeliverysFee")]
+        public async Task<IActionResult> GetSystemDeliverysFee()
+        {
+            try
+            {
+                var deliverysFee = await _GetSystemTotalDeliveryFeeQuery.GetSystemTotalDeliverysFee();
+                return Ok(new { Success = true, Data = deliverysFee });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las tarifas de envío del sistema." });
+            }
+        }
 
         [HttpPut("ConfirmOrder")]
         public async Task<IActionResult> ConfirmOrder(string orderID)
