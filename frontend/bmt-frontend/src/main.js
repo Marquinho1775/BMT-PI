@@ -41,6 +41,7 @@ import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
 import ReportsTable from './components/ReportsTable.vue';
+import YearlyEarnings from './components/YearlyEarnings.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -132,6 +133,7 @@ app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
 app.component('reports-table', ReportsTable);
 app.component('pending-orders-reports', PendingOrdersReports);
+app.component('yearly-earnings', YearlyEarnings);
 
 app.config.globalProperties.$swal = Swal;
 
