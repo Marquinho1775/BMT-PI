@@ -33,12 +33,19 @@ import DeveloperUsers from './components/DeveloperUsers.vue';
 import DeveloperOrderConfirmation from './components/DeveloperOrderConfirmation.vue';
 
 import CheckOut from './components/CheckOut.vue';
+
 import ProductCard from './components/ProductCard.vue';
-import ProductSearchGrid from './components/ProductSearchGrid.vue';
+import ProductGrid from './components/ProductGrid.vue';
 import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
 import UserDashboard from './components/UserDashboard.vue';
+import SearchResultPage from './components/SearchResultPage.vue';
+
+import OrdersReports from './components/OrdersReports.vue';
+import ReportsTable from './components/ReportsTable.vue';
+import YearlyEarnings from './components/YearlyEarnings.vue';
+import ReportsDashboard from './components/ReportsDashboard.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -91,6 +98,8 @@ const router = createRouter({
     { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },  // check
     { path: '/checkout', name: "CheckOut", component: CheckOut }, // check, falta alerta de confirmacion
     { path: '/orders', name: "Orders", component: UserOrders }, //check
+    { path: '/search/:searchText', name: "SearchResultPage", component: SearchResultPage }, //check
+    { path: '/reports', name: "ReportsDashboard", component: ReportsDashboard }, //check
 
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
@@ -124,10 +133,13 @@ app.use(VueGoogleMaps, {
 });
 
 app.component('product-card', ProductCard);
-app.component('productSearchGrid', ProductSearchGrid);
+app.component('productGrid', ProductGrid);
 app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
+app.component('reports-table', ReportsTable);
+app.component('orders-reports', OrdersReports);
+app.component('yearly-earnings', YearlyEarnings);
 app.component('UserDashboard', UserDashboard);
 
 app.config.globalProperties.$swal = Swal;

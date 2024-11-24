@@ -109,5 +109,21 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, new { Success = false, Message = "Error actualizando la empresa." });
             }
         }
+
+        [HttpPost("GetYearlyEarningsData")]
+        public async Task<IActionResult> GetYearlyEarningsData([FromBody] YearlyEarningsReportDataRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.EnterpriseIds))
+                return BadRequest(new { Message = "Los IDs de los emprendimientos son obligatorios." });
+            try
+            {
+                var result = await _enterpriseService.GetYearlyEnterpriseDataAsync(request);
+                return Ok(new { Success = true, Data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error interno del servidor.", Details = ex.Message });
+            }
+        }
     }
 }
