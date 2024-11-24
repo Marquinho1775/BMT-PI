@@ -77,7 +77,7 @@ namespace BMT_backend.Presentation.Controllers
 
             try
             {
-                var result = await _productTagService.UpdateProductTag(productTag);
+                var result = await _productTagService.UpdateTag(productTag);
                 if (result)
                     return Ok(new { Success = true, Message = "Etiqueta actualizada exitosamente." });
                 else
@@ -97,7 +97,7 @@ namespace BMT_backend.Presentation.Controllers
 
             try
             {
-                var result = await _productTagService.DeleteProductTag(name);
+                var result = await _productTagService.DeleteTag(name);
                 if (result)
                     return Ok(new { Success = true, Message = "Etiqueta eliminada exitosamente." });
                 else
