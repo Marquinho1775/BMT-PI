@@ -13,6 +13,7 @@ import UserRegisterAddress from './components/UserRegisterAddress.vue';
 import UserShoppingCart from './components/UserShoppingCart.vue';
 import UserCardForm from './components/UserCardForm.vue';
 import UserOrders from './components/UserOrders.vue';
+import UserDelete from './components/UserDeleteConfirmation.vue';
 
 import EditProfileInfo from './components/EditProfileInfo.vue';
 import EditEnterpriseInfo from './components/EditEnterpriseInfo.vue';
@@ -96,6 +97,8 @@ const router = createRouter({
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
     { path: '/products-confirmation', name: "ProductsConfirmation", component: DeveloperOrderConfirmation },
     { path: '/profile/edit', name: "EditProfile", component: EditProfileInfo },
+
+    { path: '/UserDeleteConfirmation', name: "DeleteUserConfirmation", component: UserDelete},
   ]
 });
 

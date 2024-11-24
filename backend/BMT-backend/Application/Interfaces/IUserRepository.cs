@@ -15,5 +15,6 @@ namespace BMT_backend.Application.Interfaces
         Task<bool> UpdateUserAsync(UpdateUserRequest request);
         Task<bool> UpdateAccountVerification(string id);
         Task<bool> UpdateRoleAsync(string id, string role);
+        Task<bool> DeleteUserAsync(string userId); // Nuevo método para borrar un usuario
     }
 }

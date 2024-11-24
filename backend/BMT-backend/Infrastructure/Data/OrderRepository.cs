@@ -413,14 +413,3 @@ namespace BMT_backend.Infrastructure.Data
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-

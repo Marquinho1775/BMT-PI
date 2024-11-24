@@ -14,6 +14,10 @@ namespace BMT_backend.Infrastructure.Data
             _connectionString = connectionString;
         }
 
+        public ProductRepository()
+        {
+        }
+
         public async Task<bool> CreateBaseProductAsync(Product product)
         {
             var query = @"

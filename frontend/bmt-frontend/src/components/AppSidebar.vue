@@ -21,6 +21,7 @@
         <v-list-item @click="goToUsers" prepend-icon="mdi-account-multiple" title="Usuarios"></v-list-item>
         <v-list-item @click="goToProductConfirmation" prepend-icon="mdi-list-status" title="Solicitudes de Pedidos"></v-list-item>
       </v-list-item-group>
+      <v-list-item @click="handleDeleteAccount" prepend-icon="mdi-account-remove" title="Eliminar cuenta"></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -76,6 +77,9 @@ export default {
     },
     closeDrawer() {
       this.sidebarDrawer = false;
+    },
+    handleDeleteAccount() {
+    this.$router.push('/userDeleteConfirmation'); // Ruta de la vista
     },
   },
 };

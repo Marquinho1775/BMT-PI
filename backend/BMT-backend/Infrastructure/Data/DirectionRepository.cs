@@ -14,6 +14,10 @@ namespace BMT_backend.Infrastructure.Data
             _connectionString = connectionString;
         }
 
+        public DirectionRepository()
+        {
+        }
+
         public async Task<List<Direction>> GetDirectionsFromUserAsync(string id)
         {
             var directions = new List<Direction>();

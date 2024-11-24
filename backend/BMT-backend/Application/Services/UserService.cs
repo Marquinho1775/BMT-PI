@@ -193,5 +193,12 @@ namespace BMT_backend.Application.Services
                 trimmedRequest.Password = null;
             return trimmedRequest;
         }
+
+        public async Task<bool> DeleteUserAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentException("El identificador del usuario no puede estar vacío.");
+            return await _userRepository.DeleteUserAsync(userId);
+        }
     }
 }

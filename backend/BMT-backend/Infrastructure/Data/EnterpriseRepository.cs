@@ -21,6 +21,10 @@ namespace BMT_backend.Infrastructure.Data
             _connectionString = connectionString;
         }
 
+        public EnterpriseRepository()
+        {
+        }
+
         public async Task<bool> CreateEnterpriseAsync(Enterprise enterprise)
         {
             var query = "insert into Enterprises (" +
