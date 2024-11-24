@@ -361,6 +361,142 @@ namespace BMT_backend.Infrastructure.Data
             }
             return products;
         }
+
+        public async Task<List<OrderDetails>> GetOrderReportsByUserIdAsync(ReportRequest report)
+        {
+            var query = @"
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                       u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
+                       d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
+                FROM Orders o
+                JOIN Users u ON o.UserId = u.Id
+                JOIN Directions d ON o.DirectionId = d.Id
+                WHERE o.UserId = @UserId AND o.OrderDate BETWEEN @FechaInicio AND @FechaFin AND o.Status BETWEEN @statusInicial AND @statusFinal;";
+            var parameters = new List<SqlParameter>
+            {
+                new("@UserId", report.UserId),
+                new("@FechaInicio", report.FechaInicio),
+                new("@FechaFin", report.FechaFin),
+                new("@statusInicial", report.statusInicial),
+                new("@statusFinal", report.statusFinal)
+            };
+            var orders = new List<OrderDetails>();
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+            await connection.OpenAsync();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var order = new OrderDetails
+                {
+                    Order = new Order
+                    {
+                        OrderId = reader["OrderId"].ToString(),
+                        UserId = reader["UserId"].ToString(),
+                        DirectionId = reader["DirectionId"].ToString(),
+                        PaymentMethod = reader["OrderPaymentMethod"].ToString(),
+                        OrderDate = Convert.ToDateTime(reader["OrderDate"]),
+                        DeliveryDate = reader["OrderDeliveryDate"].ToString(),
+                        OrderCost = Convert.ToDouble(reader["OrderCost"]),
+                        Weight = Convert.ToDouble(reader["Weight"]),
+                        DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
+                        Status = Convert.ToInt32(reader["Status"])
+                    },
+                    UserName = reader["UserName"].ToString(),
+                    Direction = reader["NumDirection"].ToString(),
+                    UserEmail = reader["UserEmail"].ToString(),
+                    OtherSigns = reader["OtherSigns"] as string,
+                    Coordinates = reader["Coordinates"].ToString(),
+                    Products = await GetProductsByOrderIdAsync(reader["OrderId"].ToString())
+                };
+                orders.Add(order);
+            }
+            return orders;
+        }
+
+
+        public async Task<List<OrderDetails>> GetOrderReportsByEnterpriseIdAsync(ReportRequest report)
+        {
+            var query = @"
+                SELECT o.OrderId
+                FROM Orders o
+                JOIN Order_Product op ON o.OrderId = op.OrderId
+                JOIN Products p ON op.ProductId = p.Id
+                WHERE p.EnterpriseId = @EnterpriseId AND o.OrderDate BETWEEN @FechaInicio AND @FechaFin AND o.Status BETWEEN @statusInicial AND @statusFinal;";
+            var parameters = new List<SqlParameter>
+            {
+                new("@EnterpriseId", report.EnterpriseId),
+                new("@FechaInicio", report.FechaInicio),
+                new("@FechaFin", report.FechaFin),
+                new("@statusInicial", report.statusInicial),
+                new("@statusFinal", report.statusFinal)
+            };
+            var orders = new List<OrderDetails>();
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+            await connection.OpenAsync();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var order = await GetOrderDetailsByIdAsync(reader["OrderId"].ToString());
+                orders.Add(order);
+            }
+            return orders;
+        }
+
+        public async Task<List<OrderDetails>> GetOrderReportsAsync(ReportRequest report)
+        {
+            var query = @"
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                       u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
+                       d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
+                FROM Orders o
+                JOIN Users u ON o.UserId = u.Id
+                JOIN Directions d ON o.DirectionId = d.Id
+                WHERE o.OrderDate BETWEEN @FechaInicio AND @FechaFin AND o.Status BETWEEN @statusInicial AND @statusFinal;";
+            var parameters = new List<SqlParameter>
+            {
+                new("@FechaInicio", report.FechaInicio),
+                new("@FechaFin", report.FechaFin),
+                new("@statusInicial", report.statusInicial),
+                new("@statusFinal", report.statusFinal)
+            };
+            var orders = new List<OrderDetails>();
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+            await connection.OpenAsync();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var order = new OrderDetails
+                {
+                    Order = new Order
+                    {
+                        OrderId = reader["OrderId"].ToString(),
+                        UserId = reader["UserId"].ToString(),
+                        DirectionId = reader["DirectionId"].ToString(),
+                        PaymentMethod = reader["OrderPaymentMethod"].ToString(),
+                        OrderDate = Convert.ToDateTime(reader["OrderDate"]),
+                        DeliveryDate = reader["OrderDeliveryDate"].ToString(),
+                        OrderCost = Convert.ToDouble(reader["OrderCost"]),
+                        Weight = Convert.ToDouble(reader["Weight"]),
+                        DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
+                        Status = Convert.ToInt32(reader["Status"])
+                    },
+                    UserName = reader["UserName"].ToString(),
+                    Direction = reader["NumDirection"].ToString(),
+                    UserEmail = reader["UserEmail"].ToString(),
+                    OtherSigns = reader["OtherSigns"] as string,
+                    Coordinates = reader["Coordinates"].ToString(),
+                    Products = await GetProductsByOrderIdAsync(reader["OrderId"].ToString())
+                };
+                orders.Add(order);
+            }
+            return orders;
+        }
     }
 }
 
