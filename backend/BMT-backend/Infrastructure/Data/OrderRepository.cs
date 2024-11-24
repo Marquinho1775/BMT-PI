@@ -92,7 +92,8 @@ namespace BMT_backend.Infrastructure.Data
             using var command = new SqlCommand(query, connection);
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            while (reader.Read()) {
+            while (reader.Read())
+            {
                 var order = new OrderDetails
                 {
                     Order = new Order
@@ -318,7 +319,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<bool> UpdateDeliveryFeeAsync(string orderId, double deliveryFee)
         {
-            var query = "UPDATE Orders SET DeliveryFee = @DeliveryFee WHERE OrderId = @OrderId";
+            var query = "UPDATE Orders SET DeliveryFee = DeliveryFee + @DeliveryFee WHERE OrderId = @OrderId";
             var parameters = new List<SqlParameter>
             {
                 new("@DeliveryFee", deliveryFee),
@@ -360,6 +361,26 @@ namespace BMT_backend.Infrastructure.Data
                 });
             }
             return products;
+        }
+
+        public async Task<double> GetProductEarningsByMonth(string productId, int month)
+        {
+            var query = @"
+                SELECT SUM(op.ProductsCost) AS Earnings
+                FROM Order_Product op
+                JOIN Orders o ON op.OrderId = o.OrderId
+                WHERE op.ProductId = @ProductId AND MONTH(o.OrderDate) = @Month AND o.Status = 4;";
+            var parameters = new List<SqlParameter>
+            {
+                new("@ProductId", productId),
+                new("@Month", month)
+            };
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+            await connection.OpenAsync();
+            var earnings = await command.ExecuteScalarAsync();
+            return earnings is DBNull ? 0 : Convert.ToDouble(earnings);
         }
     }
 }

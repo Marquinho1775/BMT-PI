@@ -27,18 +27,20 @@ import AcceptInvitation from './components/AcceptInvitation.vue';
 
 import ProductRegisterForm from './components/ProductRegisterForm.vue';
 
+import DeveloperDashboard from './components/DeveloperDashboard.vue';
 import DeveloperEnterprises from './components/DeveloperEnterprises.vue';
 import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
 import DeveloperOrderConfirmation from './components/DeveloperOrderConfirmation.vue';
-
 import CheckOut from './components/CheckOut.vue';
+import SearchResultPage from './components/SearchResultPage.vue';
+
 import ProductCard from './components/ProductCard.vue';
 import ProductGrid from './components/ProductGrid.vue';
 import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
-import SearchResultPage from './components/SearchResultPage.vue';
+import StackedBarChart from './components/StackedBarChart.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -93,6 +95,7 @@ const router = createRouter({
     { path: '/orders', name: "Orders", component: UserOrders }, //check
     { path: '/search/:searchText', name: "SearchResultPage", component: SearchResultPage}, //check
 
+    { path: '/developer-dashboard', name: "DeveloperDashboard", component: DeveloperDashboard },
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
     { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
     { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
@@ -129,6 +132,7 @@ app.component('productGrid', ProductGrid);
 app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
+app.component('StackedBarChart', StackedBarChart);
 
 app.config.globalProperties.$swal = Swal;
 
