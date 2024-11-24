@@ -41,6 +41,7 @@ import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
 import StackedBarChart from './components/StackedBarChart.vue';
+import LineChart from './components/LineChart.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -133,6 +134,7 @@ app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
 app.component('StackedBarChart', StackedBarChart);
+app.component('LineChart', LineChart);
 
 app.config.globalProperties.$swal = Swal;
 

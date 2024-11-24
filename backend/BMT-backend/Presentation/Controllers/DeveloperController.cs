@@ -19,9 +19,10 @@ namespace BMT_backend.Presentation.Controllers
         private readonly MailService _mailManager;
         private readonly OrderService _orderService;
         private readonly GetAllEnterprisesEarningsQuery _getAllEnterprisesEarningsQuery;
+        private readonly GetSystemTotalDeliveryFeeQuery _GetSystemTotalDeliveryFeeQuery;
 
 
-        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService, GetAllEnterprisesEarningsQuery getAllEnterprisesEarningsQuery)
+        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService, GetAllEnterprisesEarningsQuery getAllEnterprisesEarningsQuery, GetSystemTotalDeliveryFeeQuery getSystemTotalDeliveryFeeQuery)
         {
             _userService = userService;
             _productService = productService;
@@ -29,6 +30,7 @@ namespace BMT_backend.Presentation.Controllers
             _mailManager = new MailService(configuration, codeRepository);
             _enterpriseService = enterpriseService;
             _getAllEnterprisesEarningsQuery = getAllEnterprisesEarningsQuery;
+            _GetSystemTotalDeliveryFeeQuery = getSystemTotalDeliveryFeeQuery;
         }
 
         [HttpGet("getEnterprises")]
@@ -73,6 +75,20 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias de la empresa." });
             }
         }
+
+        //[HttpGet("GetSystemTotalDeliverysFee")]
+        //public async Task<IActionResult> GetSystemDeliverysFee()
+        //{
+        //    try
+        //    {
+        //        var deliverysFee = await _GetSystemTotalDeliveryFeeQuery.GetSystemTotalDeliverysFee();
+        //        return Ok(new { Success = true, Data = deliverysFee });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new { Success = false, Message = "Error al obtener las tarifas de envío del sistema." });
+        //    }
+        //}
 
         [HttpPut("ConfirmOrder")]
         public async Task<IActionResult> ConfirmOrder(string orderID)

@@ -100,6 +100,7 @@ builder.Services.AddScoped<OrderService>();
 builder.Services.AddScoped<SearchProductsAndEnterprisesQuery>();
 builder.Services.AddScoped<GetEnterpriseEarningsQuery>();
 builder.Services.AddScoped<GetAllEnterprisesEarningsQuery>();
+builder.Services.AddScoped<GetSystemTotalDeliveryFeeQuery>();
 
 
 var app = builder.Build();
