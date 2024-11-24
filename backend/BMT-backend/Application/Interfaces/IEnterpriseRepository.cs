@@ -16,5 +16,8 @@ namespace BMT_backend.Application.Interfaces
         Task<string> CheckExistingEnterpriseAsync(Enterprise enterprise);
         Task<bool> UpdateEnterpriseAsync(UpdateEnterpriseRequest updatedEnterprise, List<string> fieldsToUpdate);
         Task<List<string>> SearchEnterprisesIdAsync(string searchTerm);
+        Task<List<YearlyEarningsReportDataDto>> GetYearlyEnterpriseDataAsync(string enterpriseIds, int year);
+
+
     }
 }

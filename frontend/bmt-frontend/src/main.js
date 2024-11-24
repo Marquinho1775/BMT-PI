@@ -33,13 +33,17 @@ import DeveloperProducts from './components/DeveloperProducts.vue';
 import DeveloperUsers from './components/DeveloperUsers.vue';
 import DeveloperOrderConfirmation from './components/DeveloperOrderConfirmation.vue';
 import CheckOut from './components/CheckOut.vue';
-import SearchResultPage from './components/SearchResultPage.vue';
-
 import ProductCard from './components/ProductCard.vue';
 import ProductGrid from './components/ProductGrid.vue';
 import AppHeader from './components/AppHeader.vue';
 import AppSidebar from './components/AppSidebar.vue';
 import AppFooter from './components/AppFooter.vue';
+import SearchResultPage from './components/SearchResultPage.vue';
+
+import OrdersReports from './components/OrdersReports.vue';
+import ReportsTable from './components/ReportsTable.vue';
+import YearlyEarnings from './components/YearlyEarnings.vue';
+import ReportsDashboard from './components/ReportsDashboard.vue';
 import StackedBarChart from './components/StackedBarChart.vue';
 import LineChart from './components/LineChart.vue';
 
@@ -94,7 +98,8 @@ const router = createRouter({
     { path: '/enterprise/:id/new-product', name: "ProductRegisterForm", component: ProductRegisterForm },  // check
     { path: '/checkout', name: "CheckOut", component: CheckOut }, // check, falta alerta de confirmacion
     { path: '/orders', name: "Orders", component: UserOrders }, //check
-    { path: '/search/:searchText', name: "SearchResultPage", component: SearchResultPage}, //check
+    { path: '/search/:searchText', name: "SearchResultPage", component: SearchResultPage }, //check
+    { path: '/reports', name: "ReportsDashboard", component: ReportsDashboard }, //check
 
     { path: '/developer-dashboard', name: "DeveloperDashboard", component: DeveloperDashboard },
     { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
@@ -133,6 +138,9 @@ app.component('productGrid', ProductGrid);
 app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
+app.component('reports-table', ReportsTable);
+app.component('orders-reports', OrdersReports);
+app.component('yearly-earnings', YearlyEarnings);
 app.component('StackedBarChart', StackedBarChart);
 app.component('LineChart', LineChart);
 

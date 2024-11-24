@@ -1,5 +1,6 @@
 ﻿using BMT_backend.Application.Interfaces;
 using BMT_backend.Domain.Entities;
+using BMT_backend.Presentation.DTOs;
 using BMT_backend.Presentation.Requests;
 using System.Data;
 using System.Data.SqlClient;
@@ -237,5 +238,74 @@ namespace BMT_backend.Infrastructure.Data
             }
             return enterprisesId;
         }
+
+        public async Task<List<YearlyEarningsReportDataDto>> GetYearlyEnterpriseDataAsync(string enterpriseIds, int year)
+        {
+            var result = new List<YearlyEarningsReportDataDto>();
+
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+
+                string sqlQuery = @"
+                    -- CTE para calcular los datos mensuales
+                    WITH MonthlyData AS (
+                        SELECT 
+                            e.Name AS EnterpriseName,
+                            MONTH(o.OrderDate) AS Month,
+                            SUM(o.OrderCost) AS TotalPurchase,
+                            SUM(o.DeliveryFee) AS TotalDelivery,
+                            SUM(o.OrderCost + o.DeliveryFee) AS TotalCost
+                        FROM Orders o
+                        INNER JOIN Order_Product op ON o.OrderId = op.OrderId
+                        INNER JOIN Products p ON op.ProductId = p.Id
+                        INNER JOIN Enterprises e ON p.EnterpriseId = e.Id
+                        WHERE e.Id IN (SELECT value FROM STRING_SPLIT(@EnterpriseIds, ','))
+                          AND YEAR(o.OrderDate) = @Year
+                        GROUP BY e.Name, MONTH(o.OrderDate)
+                    )
+                    -- Consulta final para mostrar los resultados
+                    SELECT 
+                        EnterpriseName,
+                        DATENAME(MONTH, DATEADD(MONTH, Month - 1, '2024-01-01')) AS MonthName,
+                        TotalPurchase,
+                        TotalDelivery,
+                        TotalCost
+                    FROM MonthlyData
+                    UNION ALL
+                    SELECT 
+                        'Totales',
+                        CAST(@Year AS NVARCHAR),
+                        SUM(TotalPurchase),
+                        SUM(TotalDelivery),
+                        SUM(TotalCost)
+                    FROM MonthlyData;
+                    ";
+
+                using (var command = new SqlCommand(sqlQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@EnterpriseIds", enterpriseIds);
+                    command.Parameters.AddWithValue("@Year", year);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            result.Add(new YearlyEarningsReportDataDto
+                            {
+                                EnterpriseName = reader["EnterpriseName"].ToString(),
+                                MonthName = reader["MonthName"].ToString(),
+                                TotalPurchase = Convert.ToDecimal(reader["TotalPurchase"]),
+                                TotalDelivery = Convert.ToDecimal(reader["TotalDelivery"]),
+                                TotalCost = Convert.ToDecimal(reader["TotalCost"]),
+                            });
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
     }
 }

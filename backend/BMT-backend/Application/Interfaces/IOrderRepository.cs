@@ -23,5 +23,8 @@ namespace BMT_backend.Application.Interfaces
         Task<List<ProductDetails>> GetProductsByOrderIdAsync(string orderId);
         Task<double> GetProductEarningsByMonth(string productId, int month);
 
+        Task<List<OrderDetails>> GetOrderReportsByUserIdAsync(ReportRequest report);
+        Task<List<OrderDetails>> GetOrderReportsByEnterpriseIdAsync(ReportRequest report);
+        Task<List<OrderDetails>> GetOrderReportsAsync(ReportRequest report);
     }
 }
