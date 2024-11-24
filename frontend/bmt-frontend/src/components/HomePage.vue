@@ -7,9 +7,9 @@
 
     </v-container>
 
-    <pending-orders-reports :Type="1" />
-    <pending-orders-reports :Type="2" />
-    <pending-orders-reports :Type="3" />
+    <orders-reports :Type="1" />
+    <orders-reports :Type="2" />
+    <orders-reports :Type="3" />
 
   </v-main>
 </template>

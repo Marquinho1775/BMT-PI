@@ -33,7 +33,7 @@ import DeveloperUsers from './components/DeveloperUsers.vue';
 import DeveloperOrderConfirmation from './components/DeveloperOrderConfirmation.vue';
 
 import CheckOut from './components/CheckOut.vue';
-import PendingOrdersReports from './components/PendingOrdersReports.vue';
+import OrdersReports from './components/OrdersReports.vue';
 
 import ProductCard from './components/ProductCard.vue';
 import ProductSearchGrid from './components/ProductSearchGrid.vue';
@@ -131,7 +131,7 @@ app.component('AppHeader', AppHeader);
 app.component('AppSidebar', AppSidebar);
 app.component('AppFooter', AppFooter);
 app.component('reports-table', ReportsTable);
-app.component('pending-orders-reports', PendingOrdersReports);
+app.component('orders-reports', OrdersReports);
 
 app.config.globalProperties.$swal = Swal;
 

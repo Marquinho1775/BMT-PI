@@ -70,8 +70,7 @@
 
         <!-- Tabla con los datos del reporte -->
         <reports-table v-if="reportData.length"
-            :titles="Type === 1 ? tableTitles1 : Type === 2 ? tableTitles2 : tableTitles3" :reports="reportData">
-        </reports-table>
+            :titles="Type === 1 ? tableTitles1 : Type === 2 ? tableTitles2 : tableTitles3" :reports="reportData" />
     </v-card>
 </template>
 
@@ -80,7 +79,7 @@ import axios from 'axios';
 import { API_URL } from '@/main.js';
 
 export default {
-    name: 'PendingOrdersReport',
+    name: 'OrdersReport',
     props: {
         Type: {
             type: Number,
