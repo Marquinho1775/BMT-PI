@@ -8,6 +8,7 @@
       <v-list-item-group v-if="userRole === 'cli' || userRole === 'emp'">
         <v-list-item @click="handleProfileInfo" prepend-icon="mdi-account" title="Mi Perfil"></v-list-item>
         <v-list-item @click="handleOrders" prepend-icon="mdi-view-list " title="Mis pedidos"></v-list-item>
+        <v-list-item @click="handleReports" prepend-icon="mdi-chart-bar" title="Mis reportes"></v-list-item>
         <v-list-item-group v-if="userRole === 'emp'">
           <v-list-item @click="handleEntrepreneurEnterprises" prepend-icon="mdi-domain"
             title="Mis Emprendimientos"></v-list-item>
@@ -19,7 +20,9 @@
         <v-list-item @click="goToEnterprises" prepend-icon="mdi-domain" title="Emprendimientos"></v-list-item>
         <v-list-item @click="goToProducts" prepend-icon="mdi-package-variant" title="Productos"></v-list-item>
         <v-list-item @click="goToUsers" prepend-icon="mdi-account-multiple" title="Usuarios"></v-list-item>
-        <v-list-item @click="goToProductConfirmation" prepend-icon="mdi-list-status" title="Solicitudes de Pedidos"></v-list-item>
+        <v-list-item @click="handleReports" prepend-icon="mdi-chart-bar" title="Mis reportes"></v-list-item>
+        <v-list-item @click="goToProductConfirmation" prepend-icon="mdi-list-status"
+          title="Solicitudes de Pedidos"></v-list-item>
       </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
@@ -73,6 +76,9 @@ export default {
     },
     handleOrders() {
       this.$router.push('/orders');
+    },
+    handleReports() {
+      this.$router.push('/reports');
     },
     closeDrawer() {
       this.sidebarDrawer = false;

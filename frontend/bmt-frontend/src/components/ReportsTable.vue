@@ -3,7 +3,7 @@
         <thead>
             <tr>
                 <th v-for="(title, index) in titles" :key="index">
-                    {{ title }}
+                    <strong>{{ title }}</strong>
                 </th>
             </tr>
         </thead>
@@ -52,7 +52,8 @@ export default {
 }
 
 .reports-table th {
-    background-color: #f2f2f2;
+    background-color: #6991d1;
+    /* Fondo celeste */
     text-align: left;
 }
 

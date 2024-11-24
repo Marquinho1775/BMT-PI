@@ -1,13 +1,18 @@
 <template>
     <v-card class="pending-orders-report">
-        <!-- Botones y dropdown -->
-        <v-row align="center" justify="space-between">
-            <v-col cols="12" sm="4">
+        <v-row justify="center" class="mb-6">
+            <h2 class="report-title" v-if="Type === 1">Reporte de Pedidos Pendientes</h2>
+            <h2 class="report-title" v-else-if="Type === 2">Reporte de Pedidos Entregados</h2>
+            <h2 class="report-title" v-else-if="Type === 3">Reporte de Pedidos Cancelados</h2>
+        </v-row>
+        <!-- Botones y dropdown alineados a la derecha y más juntos -->
+        <v-row align="center" justify="flex-start">
+            <v-col cols="auto" class="mr-4">
                 <!-- Botón para seleccionar fecha de inicio -->
-                <v-btn color="primary" text @click="startDateDialog = true">
-                    Seleccionar Fecha de Inicio
+                <v-btn color="success" text @click="startDateDialog = true" class="date-button">
+                    <v-icon left>mdi-calendar</v-icon>
+                    {{ startDate ? formattedStartDate : 'Seleccionar Fecha de Inicio' }}
                 </v-btn>
-                <span v-if="startDate">Fecha de Inicio: {{ formattedStartDate }}</span>
 
                 <!-- Diálogo para la fecha de inicio -->
                 <v-dialog v-model="startDateDialog" max-width="380px">
@@ -30,12 +35,12 @@
                 </v-dialog>
             </v-col>
 
-            <v-col cols="12" sm="4">
+            <v-col cols="auto" class="mr-4">
                 <!-- Botón para seleccionar fecha final -->
-                <v-btn color="primary" text @click="endDateDialog = true">
-                    Seleccionar Fecha Final
+                <v-btn color="success" text @click="endDateDialog = true" class="date-button">
+                    <v-icon left>mdi-calendar</v-icon>
+                    {{ endDate ? formattedEndDate : 'Seleccionar Fecha Final' }}
                 </v-btn>
-                <span v-if="endDate">Fecha Final: {{ formattedEndDate }}</span>
 
                 <!-- Diálogo para la fecha final -->
                 <v-dialog v-model="endDateDialog" max-width="380px">
@@ -57,25 +62,34 @@
                 </v-dialog>
             </v-col>
 
-            <v-col cols="12" sm="3">
+            <v-col cols="auto">
                 <!-- Dropdown con opciones según el rol del usuario -->
-                <v-select v-model="selectedOption" :items="dropdownOptions" label="Seleccione una opción"></v-select>
+                <v-select v-model="selectedOption" :items="dropdownOptions" label="Seleccione una opción"
+                    class="ml-4"></v-select>
             </v-col>
         </v-row>
 
         <!-- Botón para generar reporte -->
-        <v-btn color="primary" @click="generateReport">
-            Generar Reporte
-        </v-btn>
+        <v-row justify="center" class="mt-4 mb-6">
+            <v-btn color="success" @click="generateReport">
+                Generar Reporte
+            </v-btn>
+            <v-btn color="secondary" @click="exportToPDF" :disabled="!reportData.length">
+                Exportar a PDF
+            </v-btn>
+        </v-row>
 
         <!-- Tabla con los datos del reporte -->
         <reports-table v-if="reportData.length"
             :titles="Type === 1 ? tableTitles1 : Type === 2 ? tableTitles2 : tableTitles3" :reports="reportData" />
     </v-card>
+    <v-divider></v-divider>
 </template>
 
 <script>
 import axios from 'axios';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import { API_URL } from '@/main.js';
 
 export default {
@@ -153,10 +167,10 @@ export default {
     },
     computed: {
         formattedStartDate() {
-            return this.startDate ? new Date(this.startDate).toLocaleDateString() : '';
+            return this.startDate ? new Date(this.startDate).toLocaleDateString('es-ES') : '';
         },
         formattedEndDate() {
-            return this.endDate ? new Date(this.endDate).toLocaleDateString() : '';
+            return this.endDate ? new Date(this.endDate).toLocaleDateString('es-ES') : '';
         },
     },
     created() {
@@ -169,7 +183,7 @@ export default {
                 const obtainEntrepreneurResponse = await axios.get(API_URL + '/Entrepreneur/GetEntrepreneurByUserId?id=' + user.id);
                 const entrepreneurId = obtainEntrepreneurResponse.data.identification;
                 const enterprisesResponse = await axios.get(API_URL + '/Entrepreneur/my-registered-enterprises?Identification=' + entrepreneurId);
-                this.enterprises = enterprisesResponse.data.data;
+                this.enterprises = enterprisesResponse.data.success;
             } catch (error) {
                 console.error('Error al obtener las empresas:', error);
                 if (error.response) {
@@ -310,6 +324,36 @@ export default {
                 console.error('Error al generar el reporte:', error);
             }
         },
+        exportToPDF() {
+            const doc = new jsPDF({ orientation: "landscape" });
+            let title = '';
+
+            if (this.Type === 1) {
+                title = 'Reporte de Pedidos Pendientes';
+            } else if (this.Type === 2) {
+                title = 'Reporte de Pedidos Entregados';
+            } else if (this.Type === 3) {
+                title = 'Reporte de Pedidos Cancelados';
+            }
+
+            doc.text(title, 20, 20);
+
+            const tableData = this.reportData.map((row) =>
+                Object.values(row)
+            );
+
+            const tableTitles = this.Type === 1 ? this.tableTitles1 : this.Type === 2 ? this.tableTitles2 : this.tableTitles3;
+
+            doc.autoTable({
+                head: [tableTitles],
+                body: tableData,
+                startY: 30,
+                theme: "grid",
+                headStyles: { fillColor: [169, 197, 255] },
+            });
+
+            doc.save(`${title.replace(/\s+/g, '_').toLowerCase()}.pdf`);
+        },
     },
 };
 </script>
@@ -329,5 +373,26 @@ export default {
 
 .reports-table {
     margin-top: 30px;
+}
+
+.report-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Estilos adicionales para los botones de fecha */
+.date-button {
+    display: flex;
+    align-items: center;
+}
+
+.date-button .v-icon {
+    margin-right: 8px;
+}
+
+/* Ajustes para el espaciado entre elementos alineados a la derecha */
+.mr-4 {
+    margin-right: 16px;
+    /* Puedes ajustar el valor según tus necesidades */
 }
 </style>
