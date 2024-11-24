@@ -28,6 +28,9 @@
       <v-btn color="success" @click="generateReport" :disabled="!isValid">
         Generar Reporte
       </v-btn>
+      <v-btn color="secondary" @click="exportToPDF" :disabled="!reportData.length">
+        Exportar a PDF
+      </v-btn>
     </v-row>
 
     <v-row>
@@ -70,6 +73,8 @@
 
 <script>
 import axios from "axios";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 import { API_URL } from "@/main.js";
 
 export default {
@@ -188,6 +193,24 @@ export default {
         this.reportError = true;
         this.reportData = [];
       }
+    },
+    exportToPDF() {
+      const doc = new jsPDF();
+      doc.text("Reporte de Ganancias Anuales", 20, 20);
+
+      const tableData = this.reportData.map((row) =>
+        Object.values(row)
+      );
+
+      doc.autoTable({
+        head: [this.tableTitles],
+        body: tableData,
+        startY: 30,
+        theme: "grid",
+        headStyles: { fillColor: [169, 197, 255] },
+      });
+
+      doc.save(`reporte_ganancias_${this.year}.pdf`);
     },
   },
   mounted() {
