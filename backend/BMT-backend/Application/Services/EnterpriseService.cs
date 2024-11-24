@@ -176,15 +176,23 @@ namespace BMT_backend.Application.Services
 
         public async Task<List<YearlyEarningsReportDataDto>> GetYearlyEnterpriseDataAsync(YearlyEarningsReportDataRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.EnterpriseIds))
-                throw new ArgumentException("Los IDs de los emprendimientos son obligatorios.");
-
-            if (request.Year < 0)
-                throw new ArgumentException("El año no puede ser negativo.");
+            if (!YearlyEarningsReportValidation(request))
+                throw new ArgumentException("Los datos del reporte anual no son válidos.");
 
             var data = await _enterpriseRepository.GetYearlyEnterpriseDataAsync(request.EnterpriseIds, request.Year);
 
             return data;
+        }
+
+        public bool YearlyEarningsReportValidation(YearlyEarningsReportDataRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.EnterpriseIds))
+                return false;
+
+            if (request.Year < 0)
+                return false;
+
+            return true;
         }
     }
 }
