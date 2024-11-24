@@ -169,7 +169,7 @@ export default {
       const datasets = data.map((item, index) => {
         const color = predefinedColors[index % predefinedColors.length];
         return {
-          label: item.productLabel,
+          label: item.label,
           data: item.earningsPerMonth,
           backgroundColor: color,
         };

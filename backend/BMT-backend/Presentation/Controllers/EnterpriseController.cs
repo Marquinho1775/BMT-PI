@@ -3,9 +3,6 @@ using BMT_backend.Application.Services;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
 using BMT_backend.Application.Queries;
-using System;
-using System.Threading.Tasks;
-using BMT_backend.Presentation.DTOs;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -86,7 +83,7 @@ namespace BMT_backend.Presentation.Controllers
                 return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
             try
             {
-                var products = await _enterpriseService.GetEnterpriseProducts(enterpriseId);
+                var products = await _enterpriseService.GetEnterpriseProductsDetails(enterpriseId);
                 return Ok(new { Success = true, Data = products });
             }
             catch (Exception ex)

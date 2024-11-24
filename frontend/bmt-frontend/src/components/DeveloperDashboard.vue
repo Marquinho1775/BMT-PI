@@ -1,5 +1,7 @@
 <template>
-  <v-container v-if="role === 'dev'">
+  <v-main class="flex-grow-1">
+    <h1 class="text-h4 py-4 px-4 mb-4">Dashboard de Desarrollador</h1>
+  <v-container>
     <v-row>
       <v-col cols="12" md="7">
         <v-card class="pa-4 elevation-3">
@@ -8,6 +10,7 @@
       </v-col>
     </v-row>
   </v-container>
+  </v-main>
 </template>
 
 <script>
@@ -21,14 +24,42 @@ export default {
   },
   data() {
     return {
-      barChartDatasets: [],
-      role:''
+      barChartDatasets: [
+        // {
+        //   label: 'Rompope',
+        //   data: [3000, 5000, 4000, 6000, 7000, 3000, 5000, 4000, 6000, 7000, 3000, 5000],
+        //   backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        // },
+        // {
+        //   label: 'Galletas navideñas',
+        //   data: [2000, 4000, 6000, 5000, 8000, 2000, 4000, 6000, 5000, 8000, 2000, 4000],
+        //   backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        // },
+        // {
+        //   label: 'Tamales',
+        //   data: [5000, 3000, 5000, 7000, 6000, 5000, 3000, 5000, 7000, 6000, 5000, 3000],
+        //   backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        // },
+        // {
+        //   label: 'Pan de maíz',
+        //   data: [4000, 6000, 7000, 3000, 5000, 4000, 6000, 7000, 3000, 5000, 4000, 6000],
+        //   backgroundColor: 'rgba(153, 102, 255, 0.6)',
+        // },
+        // {
+        //   label: 'Pan de yuca',
+        //   data: [6000, 5000, 8000, 2000, 4000, 6000, 5000, 8000, 2000, 4000, 6000, 5000],
+        //   backgroundColor: 'rgba(255, 206, 86, 0.6)',
+        // },
+        // {
+        //   label: 'Pan de elote',
+        //   data: [3000, 5000, 7000, 5000, 3000, 3000, 5000, 7000, 5000, 3000, 3000, 5000],
+        //   backgroundColor: 'rgba(255, 159, 64, 0.6)',
+        // }
+      ]
     };
   },
 
   async created() {
-    const user = JSON.parse(localStorage.getItem('user'));
-    this.role = user.role;
     try {
       const datasetResponse = await axios.get(
         `${API_URL}/Developer/GetAllEnterprisesEarnings`);
@@ -56,7 +87,7 @@ export default {
       const datasets = data.map((item, index) => {
         const color = predefinedColors[index % predefinedColors.length];
         return {
-          label: item.productLabel,
+          label: item.label,
           data: item.earningsPerMonth,
           backgroundColor: color,
         };

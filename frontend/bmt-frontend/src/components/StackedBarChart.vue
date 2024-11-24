@@ -173,7 +173,7 @@ export default {
 .chart-container {
   width: 100%;
   overflow-x: auto;
-  height: 400px;
+  height: 700px;
 }
 
 .chart-container ::v-deep canvas {

@@ -68,13 +68,25 @@ namespace BMT_backend.Application.Services
             return enterpriseDevDtos;
         }
 
-        public async Task<List<Product>> GetEnterpriseProducts(string enterpriseId)
+        public async Task<List<Product>> GetEnterpriseProductsDetails(string enterpriseId)
         {
             List<string> productsId =  await _enterpriseRepository.GetEnterpriseProductsIdAsync(enterpriseId);
             List<Product> products = [];
             foreach (string productId in productsId)
             {
                 Product product = await _productService.GetProductDetailsByIdAsync(productId);
+                products.Add(product);
+            }
+            return products;
+        }
+
+        public async Task<List<Product>> GetEnterpriseProducts(string enterpriseId)
+        {
+            List<string> productsId = await _enterpriseRepository.GetEnterpriseProductsIdAsync(enterpriseId);
+            List<Product> products = [];
+            foreach (string productId in productsId)
+            {
+                Product product = await _productService.GetProductByIdAsync(productId);
                 products.Add(product);
             }
             return products;

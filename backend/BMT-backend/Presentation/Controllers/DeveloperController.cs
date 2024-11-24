@@ -4,6 +4,7 @@ using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.DTOs;
 using BMT_backend.Application.Services;
 using BMT_backend.Application.Interfaces;
+using BMT_backend.Application.Queries;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -17,14 +18,17 @@ namespace BMT_backend.Presentation.Controllers
         private readonly ICodeRepository _codeRepository;
         private readonly MailService _mailManager;
         private readonly OrderService _orderService;
+        private readonly GetAllEnterprisesEarningsQuery _getAllEnterprisesEarningsQuery;
 
-        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService)
+
+        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService, GetAllEnterprisesEarningsQuery getAllEnterprisesEarningsQuery)
         {
             _userService = userService;
             _productService = productService;
             _orderService = orderService;
             _mailManager = new MailService(configuration, codeRepository);
             _enterpriseService = enterpriseService;
+            _getAllEnterprisesEarningsQuery = getAllEnterprisesEarningsQuery;
         }
 
         [HttpGet("getEnterprises")]
@@ -54,6 +58,20 @@ namespace BMT_backend.Presentation.Controllers
         {
             List<OrderDetails> toConfirmOrders = await _orderService.GetToConfirmOrders();
             return toConfirmOrders;
+        }
+
+        [HttpGet("GetAllEnterprisesEarnings")]
+        public async Task<IActionResult> GetAllEnterprisesEarnings()
+        {
+            try
+            {
+                var earnings = await _getAllEnterprisesEarningsQuery.GetAllEnterprisesEarningsAsync();
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias de la empresa." });
+            }
         }
 
         [HttpPut("ConfirmOrder")]

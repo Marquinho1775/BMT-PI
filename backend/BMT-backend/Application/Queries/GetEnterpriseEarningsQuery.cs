@@ -17,17 +17,17 @@ namespace BMT_backend.Application.Queries
             _enterpriseService = enterpriseService;
         }
 
-        public async Task<List<ProductEarningsDataset>> GetEnterpriseEarningsAsync (string enterpriseId)
+        public async Task<List<EarningsDatasetDto>> GetEnterpriseEarningsAsync (string enterpriseId)
         {
             try
             {
-                List<ProductEarningsDataset> earnings = [];
+                List<EarningsDatasetDto> earnings = [];
                 List<Product> products = await _enterpriseService.GetEnterpriseProducts(enterpriseId);
                 foreach (var product in products)
                 {
-                    ProductEarningsDataset productEarnings = new ProductEarningsDataset
+                    EarningsDatasetDto productEarnings = new EarningsDatasetDto
                     {
-                        ProductLabel = product.Name,
+                        Label = product.Name,
                         EarningsPerMonth = new List<double>(new double[12])
                     };
                     for (int i = 0; i < 12; i++)

@@ -97,8 +97,9 @@ builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped<EnterpriseService>();
 builder.Services.AddScoped<ShoppingCartService>();
 builder.Services.AddScoped<OrderService>();
-builder.Services.AddScoped<SearchProductsAndEnterprisesQuerie>();
+builder.Services.AddScoped<SearchProductsAndEnterprisesQuery>();
 builder.Services.AddScoped<GetEnterpriseEarningsQuery>();
+builder.Services.AddScoped<GetAllEnterprisesEarningsQuery>();
 
 
 var app = builder.Build();
