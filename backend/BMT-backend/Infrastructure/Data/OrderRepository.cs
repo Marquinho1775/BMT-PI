@@ -441,7 +441,10 @@ namespace BMT_backend.Infrastructure.Data
             while (await reader.ReadAsync())
             {
                 var order = await GetOrderDetailsByIdAsync(reader["OrderId"].ToString());
-                orders.Add(order);
+                if (!orders.Exists(o => o.Order.OrderId == order.Order.OrderId))
+                {
+                    orders.Add(order);
+                }
             }
             return orders;
         }

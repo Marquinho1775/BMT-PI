@@ -158,7 +158,7 @@ namespace BMT_backend.Application.Services
                 case 6:
                     return "Cancelado por dev";
                 default:
-                    return "No confirmado";
+                    return "Invalido";
             }
         }
 

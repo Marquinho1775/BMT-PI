@@ -3,14 +3,12 @@
     <v-container>
       <productGrid :products="products" />
     </v-container>
-
-
   </v-main>
 </template>
 
 <script>
 import axios from 'axios';
-import { API_URL} from '@/main.js';
+import { API_URL } from '@/main.js';
 export default {
   data() {
     return {
