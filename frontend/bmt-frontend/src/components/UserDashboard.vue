@@ -2,19 +2,20 @@
     <v-row>
         <v-col :cols="9">
             <v-container>
-                <productSearchGrid :products="products" />
+                <productGrid :products="products" />
             </v-container>
         </v-col>
         <v-col :cols="3">
             <v-row class="new align-center custom-header">
                 <v-container>
-                    <v-card elevation="4" height="450px">
+                    <v-card elevation="4" height="600px">
                         <v-card-title class="text-h6 mb-0">
                             <v-icon class="mr-2">mdi-package-variant-closed</v-icon>
                             Ordenes pendientes
                         </v-card-title>
 
-                        <v-virtual-scroll :items="orders" v-if="orders && orders.length" :item-height="70">
+                        <v-virtual-scroll class="component-scroller" :items="orders" v-if="orders && orders.length"
+                            :item-height="70">
                             <template v-slot:default="{ item }">
                                 <v-list-item :key="item.id" @click="openOrderDialog(item)">
                                     <v-list-item-content>
@@ -78,19 +79,18 @@
             <v-row class="new align-center custom-header">
                 <!-- Lista de productos de ordenes -->
                 <v-container>
-                    <v-card elevation="4" height="450px">
+                    <v-card elevation="4" height="600px">
                         <v-card-title class="text-h6 mb-0">
                             <v-icon class="mr-2">mdi-dolly</v-icon>
                             Compras recientes
                         </v-card-title>
-
-                        <v-virtual-scroll :items="orderProducts" v-if="orderProducts && orderProducts.length"
-                            :item-height="70">
+                        <v-virtual-scroll class="component-scroller" :items="orderProducts"
+                            v-if="orderProducts && orderProducts.length" :item-height="70">
                             <template v-slot:default="{ item }">
                                 <v-list-item :key="item.id" @click="openProductDialog(item)">
                                     <v-list-item-content>
                                         <v-img v-if="item.imagesURLs && item.imagesURLs.length"
-                                            :src="item.imagesURLs[0]" aspect-ratio="1" class="mr-2"></v-img>
+                                            :src="item.imagesURLs[0]" height="100" width="50"></v-img>
                                         <v-list-item-title>{{ item.name }}</v-list-item-title>
                                         <v-list-item-subtitle>₡{{ item.price }}</v-list-item-subtitle>
                                     </v-list-item-content>
@@ -100,6 +100,7 @@
                         </v-virtual-scroll>
                     </v-card>
                 </v-container>
+
                 <v-dialog v-model="productDialog" max-width="600px">
                     <v-card>
                         <v-card-title class="text-h5">
@@ -126,7 +127,6 @@
                         <v-card-actions>
                             <v-btn prepend-icon="mdi-plus" color="primary" @click="addToCart" text>Añadir al
                                 carrito</v-btn>
-
                             <v-spacer></v-spacer>
                             <v-btn text @click="productDialog = false">
                                 Cerrar
@@ -303,13 +303,13 @@ export default {
 
 
 <style lang="scss" scoped>
-.order-scroller {
-    max-height: 600px;
+.component-scroller {
+    max-height: 550px;
     overflow-y: auto;
 }
 
 .new {
-    margin-top: 10px;
+    margin-top: 9px;
     margin-right: 50px;
 }
 </style>
