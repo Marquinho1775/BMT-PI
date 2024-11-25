@@ -1,33 +1,34 @@
 <template>
+  <v-main class="d-flex justify-center align-center" style="min-height: 100vh;">
+    <v-container max-width="400px">
+      <v-card class="pa-0 elevation-4">
+        <!-- Encabezado del título -->
+        <v-card-title class="title-background text-h5">
+          Iniciar sesión
+        </v-card-title>
 
-  <body>
-    <div class="login-container">
-      <div class="d-flex justify-content-center align-items-center vh-100">
-        <div id="formLogin" class="card custom-card" style="max-width: 400px; width: 100%">
-          <h3 id="tituloLogin" class="text-center card-header-custom">Iniciar sesión</h3>
-          <div class="card-body">
-            <b-form @submit.prevent="loginUser">
+        <v-divider></v-divider>
 
-              <b-form-group id="input-group-email" label="Correo electrónico:">
-                <b-form-input id="email" v-model="loginForm.Email" type="email"
-                  placeholder="Ingresar correo electrónico" required></b-form-input>
-              </b-form-group>
+        <v-card-text>
+          <v-form @submit.prevent="loginUser">
+            <!-- Campo de correo -->
+            <v-text-field label="Correo electrónico" v-model="loginForm.Email" type="email"
+              placeholder="Ingresar correo electrónico" outlined required></v-text-field>
 
-              <b-form-group id="input-group-password" label="Contraseña:">
-                <b-form-input id="password" v-model="loginForm.Password" type="password"
-                  placeholder="Ingresar contraseña" required></b-form-input>
-              </b-form-group>
+            <!-- Campo de contraseña -->
+            <v-text-field label="Contraseña" v-model="loginForm.Password" type="password"
+              placeholder="Ingresar contraseña" outlined required></v-text-field>
 
-              <div class="d-flex justify-content-between">
-                <b-button variant="secondary" @click="Volver">Volver</b-button>
-                <b-button class="button" type="submit">Iniciar sesión</b-button>
-              </div>
-            </b-form>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+            <!-- Botones de acción -->
+            <div class="d-flex justify-end mt-4">
+              <v-btn color="secondary" class="mr-2" outlined @click="Volver">Volver</v-btn>
+              <v-btn type="submit" color="primary">Iniciar sesión</v-btn>
+            </div>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-container>
+  </v-main>
 </template>
 
 <script>
@@ -46,25 +47,28 @@ export default {
   methods: {
     async loginUser() {
       try {
-        const response = await axios.post(API_URL + '/User/login',
+        const response = await axios.post(
+          API_URL + '/User/login',
           {
             Email: this.loginForm.Email.trim(),
-            Password: this.loginForm.Password.trim()
+            Password: this.loginForm.Password.trim(),
           },
           {
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
             }
           }
         );
+
         if (response && response.data) {
           const { token, user } = response.data;
           if (token && user) {
             const result = await axios.get(API_URL + '/ShoppingCart/GetCartId?userId=' + user.id, {
               headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                Authorization: `Bearer ${token}`,
               },
             });
+
             localStorage.setItem('shoppingCartId', result.data);
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
@@ -73,12 +77,12 @@ export default {
               title: 'Inicio de sesión exitoso',
               text: '¡Haz iniciado sesión correctamente!',
               icon: 'success',
-              confirmButtonText: 'Ok'
+              confirmButtonText: 'Ok',
             }).then(() => {
               if (user.isVerified) {
-                window.location.href = "/";
+                window.location.href = '/';
               } else {
-                window.location.href = "/email-verification";
+                window.location.href = '/email-verification';
               }
             });
           } else {
@@ -93,62 +97,37 @@ export default {
           title: 'Error',
           text: 'Hubo un error al iniciar sesión. Inténtalo de nuevo.',
           icon: 'error',
-          confirmButtonText: 'Ok'
+          confirmButtonText: 'Ok',
         });
       }
     },
     Volver() {
-      window.location.href = "/";
+      window.location.href = '/';
     }
-  },
-  created() {
   }
 };
 </script>
 
-<style>
-.login-container {
-  background-color: #D1E4FF;
-}
-
-div.custom-card {
-  width: 650px;
-  background-color: #9FC9FC;
-  border-radius: 20px;
-  margin: 0px;
-}
-
-.card-header-custom {
-  background-color: #36618E;
+<style scoped>
+/* Estilo para el encabezado */
+.title-background {
+  background-color: #39517B;
+  /* Fondo del encabezado */
   color: white;
-  padding: 20px;
-  border-radius: 20px 20px 0 0;
+  /* Texto blanco */
+  padding: 16px;
+  /* Espaciado interno */
+  margin: 0;
+  /* Elimina márgenes */
+  border-radius: 4px 4px 0 0;
+  /* Redondea las esquinas superiores */
   width: 100%;
-  height: 100%;
-}
-
-.button {
-  background-color: #39517B;
-}
-
-.button:hover {
-  background-color: #02174B;
-}
-
-#form {
-  background-color: #9FC9FC;
-}
-
-#titulo {
-  color: white;
-  background-color: #39517B;
-}
-
-#email {
-  background-color: #D0EDA0;
-}
-
-#password {
-  background-color: #D0EDA0;
+  /* Abarca todo el ancho */
+  display: block;
+  /* Comportamiento de bloque */
+  text-align: center;
+  /* Centra el texto */
+  box-sizing: border-box;
+  /* Incluye el padding dentro del ancho total */
 }
 </style>
