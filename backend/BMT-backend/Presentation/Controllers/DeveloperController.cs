@@ -82,7 +82,7 @@ namespace BMT_backend.Presentation.Controllers
         [HttpPut("DenyOrder")]
         public async Task<IActionResult> DenyOrder(string orderID)
         {
-            if (await _orderService.DenyOrder(orderID))
+            if (await _orderService.DenyOrder(orderID, 1))
             {
                 try
                 {

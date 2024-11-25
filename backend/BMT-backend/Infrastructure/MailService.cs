@@ -144,7 +144,7 @@ namespace BMT_backend.Infrastructure
             string title = "Confirmación de orden";
             string body = "<h1>Confirmación de orden</h1>" +
                           "Hola!<br><br>Gracias por tu orden en Business Tracker.<br>" +
-                          "Tu orden ha sido confirmada.<br><br>" +
+                          $"Tu orden con id {order.Order.NumOrder} ha sido confirmada.<br><br>" +
                           "Detalles de la orden:<br>";
             foreach (var product in order.Products)
             {
@@ -220,7 +220,7 @@ namespace BMT_backend.Infrastructure
         {
             string title = "Orden cancelada";
             string body = "<h1>Orden cancelada</h1>" +
-                          $"Hola!<br><br>Te informamos que tu orden con la id {order.Order.OrderId} ha sido cancelada.<br>" +
+                          $"Hola!<br><br>Te informamos que tu orden con la id {order.Order.NumOrder} ha sido cancelada.<br>" +
                           "Si tienes alguna pregunta, no dudes en contactarnos.<br><br>" +
                           "¡Gracias por confiar en nosotros!<br><br>" +
                           "Saludos,<br>" +
