@@ -12,7 +12,7 @@
         public string? DateOfCancelation { get; set; }
 
         // Columna cambiante
-        public DateTime? DateReceived { get; set; }
+        public string? DateReceived { get; set; }
         public string? CancelBy { get; set; }
         public string? Status { get; set; }
 

@@ -95,7 +95,8 @@ namespace BMT_backend.Infrastructure.Data
             using var command = new SqlCommand(query, connection);
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            while (reader.Read()) {
+            while (reader.Read())
+            {
                 var order = new OrderDetails
                 {
                     Order = new Order
@@ -433,6 +434,21 @@ namespace BMT_backend.Infrastructure.Data
             return products;
         }
 
+        public async Task<bool> IsDirectionUsedInOrdersAsync(string directionId)
+        {
+            var query = "SELECT COUNT(*) FROM Orders WHERE DirectionId = @DirectionId";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@DirectionId", directionId);
+                    var count = (int)await command.ExecuteScalarAsync();
+                    return count > 0;
+                }
+            }
+        }
+
         public async Task<List<Product>> GetOrderProductsAsync(string userId)
         {
             var query = @"
@@ -448,24 +464,26 @@ namespace BMT_backend.Infrastructure.Data
             command.Parameters.AddRange(parameters.ToArray());
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync()) {
+            while (await reader.ReadAsync())
+            {
                 var product = await _productRepository.GetProductDetailsByIdAsync(reader["Id"].ToString());
-                if (!products.Exists(p => p.Id == product.Id)){
+                if (!products.Exists(p => p.Id == product.Id))
+                {
                     products.Add(product);
                 }
             }
             return products;
         }
 
-        public async Task<bool> IsDirectionUsedInOrdersAsync(string directionId)
+        public async Task<bool> IsProductUsedInOrdersAsync(string productId)
         {
-            var query = "SELECT COUNT(*) FROM Orders WHERE DirectionId = @DirectionId";
+            var query = "SELECT COUNT(*) FROM Order_Product WHERE ProductId = @ProductId";
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
                 using (var command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@DirectionId", directionId);
+                    command.Parameters.AddWithValue("@ProductId", productId);
                     var count = (int)await command.ExecuteScalarAsync();
                     return count > 0;
                 }
@@ -612,21 +630,6 @@ namespace BMT_backend.Infrastructure.Data
             }
             return orders;
         }
-        public async Task<bool> IsProductUsedInOrdersAsync(string productId)
-        {
-            var query = "SELECT COUNT(*) FROM Order_Product WHERE ProductId = @ProductId";
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                await connection.OpenAsync();
-                using (var command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@ProductId", productId);
-                    var count = (int)await command.ExecuteScalarAsync();
-                    return count > 0;
-                }
-            }
-        }
-
         public async Task<bool> AreEnterpriseProductsInOrders(string enterpriseId)
         {
             var query = @"
@@ -634,6 +637,7 @@ namespace BMT_backend.Infrastructure.Data
             FROM Products p
             JOIN Order_Product op ON p.Id = op.ProductId
             WHERE p.EnterpriseId = @EnterpriseId";
+
             using (var connection = new SqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
@@ -647,4 +651,3 @@ namespace BMT_backend.Infrastructure.Data
         }
     }
 }
-
