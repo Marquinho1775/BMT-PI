@@ -300,7 +300,7 @@ export default {
                         itemsCount: item.itemsCount,
                         dateOfCreation: item.dateOfCreation,
                         dateOfDelivery: item.dateOfDelivery,
-                        dateReceived: item.DateReceived,
+                        dateReceived: item.dateReceived,
                         productCost: item.productCost,
                         feeCost: item.feeCost,
                         totalCost: item.totalCost,

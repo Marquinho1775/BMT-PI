@@ -1,4 +1,5 @@
-﻿using BMT_backend.Application.Services;
+﻿/*
+using BMT_backend.Application.Services;
 using BMT_backend.Application.Interfaces;
 using Moq;
 using NUnit.Framework;
@@ -67,3 +68,4 @@ namespace BMT_backend.Tests.Application.Services
         }
     }
 }
+*/

@@ -95,7 +95,8 @@ namespace BMT_backend.Infrastructure.Data
             using var command = new SqlCommand(query, connection);
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            while (reader.Read()) {
+            while (reader.Read())
+            {
                 var order = new OrderDetails
                 {
                     Order = new Order
@@ -448,9 +449,11 @@ namespace BMT_backend.Infrastructure.Data
             command.Parameters.AddRange(parameters.ToArray());
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync()) {
+            while (await reader.ReadAsync())
+            {
                 var product = await _productRepository.GetProductDetailsByIdAsync(reader["Id"].ToString());
-                if (!products.Exists(p => p.Id == product.Id)){
+                if (!products.Exists(p => p.Id == product.Id))
+                {
                     products.Add(product);
                 }
             }
@@ -647,4 +650,3 @@ namespace BMT_backend.Infrastructure.Data
         }
     }
 }
-
