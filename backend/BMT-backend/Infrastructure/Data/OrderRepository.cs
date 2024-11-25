@@ -282,11 +282,11 @@ namespace BMT_backend.Infrastructure.Data
             var query = "";
             if (roleId == 0)
             {
-                query = "UPDATE Orders SET Status = 5 WHERE OrderId = @OrderId";
+                query = "UPDATE Orders SET Status = 5, OrderDeliveryDate = GETDATE() WHERE OrderId = @OrderId";
             }
             else
             {
-                query = "UPDATE Orders SET Status = 6 WHERE OrderId = @OrderId";
+                query = "UPDATE Orders SET Status = 6, OrderDeliveryDate = GETDATE() WHERE OrderId = @OrderId";
             }
             var parameters = new List<SqlParameter> { new("@OrderId", orderId) };
             using var connection = new SqlConnection(_connectionString);

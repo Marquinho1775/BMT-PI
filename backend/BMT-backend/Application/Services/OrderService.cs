@@ -108,12 +108,10 @@ namespace BMT_backend.Application.Services
             else if (report.statusInicial == 4)
             {
                 //TODO Jose
-                reportList = FormatPendingOrders(response);
             }
             else
             {
-                //TODO Jose
-                reportList = FormatPendingOrders(response);
+                reportList = FormatCanceledOrders(response);
             }
             return reportList;
         }
@@ -133,7 +131,34 @@ namespace BMT_backend.Application.Services
                 report.Status = StatusToString(order.Order.Status);
                 report.ProductCost = (double)order.Order.OrderCost;
                 report.FeeCost = (double)order.Order.DeliveryFee;
-                report.TotalCost = (double)order.Order.OrderCost;
+                report.TotalCost = (double)order.Order.OrderCost + report.FeeCost;
+                reportList.Add(report);
+            }
+            return reportList;
+        }
+
+        private List<ReportDto> FormatCanceledOrders(List<OrderDetails> orders)
+        {
+            List<ReportDto> reportList = new List<ReportDto>();
+
+            foreach (var order in orders)
+            {
+                ReportDto report = new ReportDto();
+                report.NumOrder = order.Order.NumOrder;
+                report.Enterprises = getEnterprise(order);
+                report.ItemsCount = order.Products.Count;
+                report.DateOfCreation = (DateTime)order.Order.OrderDate;
+                report.DateOfCancelation = order.Order.DeliveryDate;
+                if (order.Order.Status == 5)
+                {
+                    report.CancelBy = "Cliente";
+                }
+                else {
+                    report.CancelBy = "Administrador";
+                }
+                report.ProductCost = (double)order.Order.OrderCost;
+                report.FeeCost = (double)order.Order.DeliveryFee;
+                report.TotalCost = (double)order.Order.OrderCost + report.FeeCost;
                 reportList.Add(report);
             }
             return reportList;

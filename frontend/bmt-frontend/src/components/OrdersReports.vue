@@ -314,7 +314,7 @@ export default {
                         itemsCount: item.itemsCount,
                         dateOfCreation: item.dateOfCreation,
                         dateOfCancelation: item.dateOfCancelation,
-                        canceledBy: item.canceledBy,
+                        canceledBy: item.cancelBy,
                         productCost: item.productCost,
                         feeCost: item.feeCost,
                         totalCost: item.totalCost,
