@@ -153,6 +153,25 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
+        [HttpGet("GetInProgessOrder")]
+        public async Task<IActionResult> GetInProgressOrder([FromQuery] string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                return BadRequest(new { Message = "El ID del usuario es obligatorio." });
+            try
+            {
+                var inProgressOrder = await _orderService.GetInProgressOrder(userId);
+                if (inProgressOrder != null)
+                    return Ok(new { Success = true, Data = inProgressOrder });
+                else
+                    return NotFound(new { Success = false, Message = "No se encontró ninguna orden en progreso." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener la orden en progreso." });
+            }
+        }
+
         [HttpPut("DenyOrder")]
         public async Task<IActionResult> DenyOrder([FromQuery] string orderID)
         {
@@ -175,6 +194,25 @@ namespace BMT_backend.Presentation.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Success = false, Message = "Error al enviar el correo de notificación de cancelación." });
+            }
+        }
+
+        [HttpGet("GetOrderProducts")]
+        public async Task<IActionResult> GetOrderProducts (string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+                return BadRequest(new { Message = "El ID del usuario es obligatorio." });
+            try {
+
+                var products = await _orderService.GetOrderProductsAsync(userId);
+                if (products != null)
+                    return Ok(new { Success = true, Data = products });
+                else
+                    return NotFound(new { Success = false, Message = "No se encontraron productos." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener productos." });
             }
         }
 
