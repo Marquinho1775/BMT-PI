@@ -3,6 +3,7 @@ using BMT_backend.Domain.Entities;
 using System.Text.RegularExpressions;
 using BMT_backend.Presentation.DTOs;
 using BMT_backend.Presentation.Requests;
+using BMT_backend.Infrastructure.Data;
 
 namespace BMT_backend.Application.Services
 {
@@ -205,6 +206,16 @@ namespace BMT_backend.Application.Services
                 return false;
 
             return true;
+        }
+
+        public async Task<bool> DeleteEnterpriseAsync(string enterpriseId)
+        {
+            if (string.IsNullOrEmpty(enterpriseId))
+            {
+                throw new ArgumentException("El ID de la empresa no puede ser nulo o vacío.");
+            }
+
+            return await _enterpriseRepository.DeleteEnterpriseAsync(enterpriseId);
         }
     }
 }

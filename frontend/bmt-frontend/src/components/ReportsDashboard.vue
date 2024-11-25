@@ -6,7 +6,7 @@
         <orders-reports :Type="2" />
         <orders-reports :Type="3" />
 
-        <yearly-earnings v-if="userRole === 'dev'" />
+        <yearly-earnings v-if="userRole === 'dev' || 'emp'" />
     </v-main>
 </template>
 

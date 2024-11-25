@@ -33,14 +33,12 @@ namespace BMT_backend.Application.Services
             return await _directionRepository.GetCoordinates(directionId);
         }
 
-        public async Task<bool> SoftDeleteDirectionAsync(string directionId)
+        public async Task<bool> DeleteDirectionAsync(string directionId)
         {
-            return await _directionRepository.SoftDeleteDirectionAsync(directionId);
-        }
+            if (string.IsNullOrEmpty(directionId))
+                throw new ArgumentException("El identificador de la dirección no puede estar vacío.");
 
-        public async Task<bool> HardDeleteDirectionAsync(string directionId)
-        {
-            return await _directionRepository.HardDeleteDirectionAsync(directionId);
+            return await _directionRepository.DeleteDirectionAsync(directionId);
         }
     }
 }

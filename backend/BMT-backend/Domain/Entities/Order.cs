@@ -5,6 +5,7 @@ namespace BMT_backend.Domain.Entities
     public class Order
     {
         public string? OrderId { get; set; }
+        public string? NumOrder { get; set; }
         public string UserId { get; set; }
         public string DirectionId { get; set; }
         public string PaymentMethod { get; set; }
@@ -21,7 +22,7 @@ namespace BMT_backend.Domain.Entities
          * 3 Shipping
          * 4 Terminado
          * 5 Cancelado user
-         * 6 Cancelado dv
+         * 6 Cancelado dev
          */ 
     }
 }

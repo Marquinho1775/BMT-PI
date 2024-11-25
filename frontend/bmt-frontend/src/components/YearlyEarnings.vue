@@ -160,6 +160,23 @@ export default {
     closeDialog() {
       this.dialog = false;
     },
+    translateMonth(englishMonth) {
+      const months = {
+        January: "Enero",
+        February: "Febrero",
+        March: "Marzo",
+        April: "Abril",
+        May: "Mayo",
+        June: "Junio",
+        July: "Julio",
+        August: "Agosto",
+        September: "Septiembre",
+        October: "Octubre",
+        November: "Noviembre",
+        December: "Diciembre",
+      };
+      return months[englishMonth] || englishMonth; // Devuelve el nombre traducido o el original si no coincide
+    },
     async generateReport() {
       const selectedEnterpriseIds = this.selectedEnterprises.join(",");
       const requestData = {
@@ -183,7 +200,7 @@ export default {
         this.reportError = false;
         this.reportData = response.data.data.map((item) => ({
           Emprendimiento: item.enterpriseName,
-          Mes: item.monthName,
+          Mes: this.translateMonth(item.monthName),
           "Total de compra": item.totalPurchase,
           "Total de envío": item.totalDelivery,
           "Costo total de compra": item.totalCost,

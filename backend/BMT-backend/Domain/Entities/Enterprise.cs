@@ -13,5 +13,7 @@ namespace BMT_backend.Domain.Entities
         public Entrepreneur? Administrator { get; set; }
         public List<Entrepreneur>? Staff { get; set; }
 
+        public bool? SoftDelete { get; set; }
+
     }
 }
