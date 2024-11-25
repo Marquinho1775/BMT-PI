@@ -148,5 +148,13 @@ namespace BMT_backend.Application.Services
             if (product.Type == "Perishable" && product.Limit <= 0)
                 throw new ArgumentException("El límite de stock no puede ser menor o igual a 0.");
         }
+
+        public async Task<bool> DeleteProductAsync(string productId)
+        {
+            if (string.IsNullOrEmpty(productId))
+                throw new ArgumentException("El identificador del producto no puede estar vacío.");
+
+            return await _productRepository.DeleteProductAsync(productId);
+        }
     }
 }

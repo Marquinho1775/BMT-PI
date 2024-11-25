@@ -23,6 +23,9 @@ namespace BMT_backend.Application.Interfaces
         
         Task<List<ProductDetails>> GetProductsByOrderIdAsync(string orderId);
 
+        Task<bool> IsDirectionUsedInOrdersAsync(string directionId);
+        Task<bool> IsProductUsedInOrdersAsync(string productId);
+        Task<bool> AreEnterpriseProductsInOrders(string enterpriseId);
         Task<List<OrderDetails>> GetOrderReportsByUserIdAsync(ReportRequest report);
         Task<List<OrderDetails>> GetOrderReportsByEnterpriseIdAsync(ReportRequest report);
         Task<List<OrderDetails>> GetOrderReportsAsync(ReportRequest report);

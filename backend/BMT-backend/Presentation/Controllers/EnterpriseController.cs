@@ -125,5 +125,31 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, new { Success = false, Message = "Error interno del servidor.", Details = ex.Message });
             }
         }
+
+        [HttpDelete("Delete/{enterpriseId}")]
+        public async Task<IActionResult> DeleteEnterprise([FromRoute] string enterpriseId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(enterpriseId))
+                    return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
+
+                var result = await _enterpriseService.DeleteEnterpriseAsync(enterpriseId);
+
+                if (result)
+                    return Ok(new { Success = true, Message = "Empresa eliminada correctamente." });
+
+                return NotFound(new { Success = false, Message = "Empresa no encontrada." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Success = false,
+                    Message = "Error interno del servidor.",
+                    Details = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? ex.Message : null
+                });
+            }
+        }
     }
 }

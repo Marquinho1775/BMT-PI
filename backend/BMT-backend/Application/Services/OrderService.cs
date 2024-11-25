@@ -208,5 +208,20 @@ namespace BMT_backend.Application.Services
                 throw new ArgumentException("La fecha de inicio no puede ser mayor a la fecha final.");
             }
         }
+
+        public async Task<bool> IsDirectionUsedInOrders(string directionId)
+        {
+            return await _orderRepository.IsDirectionUsedInOrdersAsync(directionId);
+        }
+
+        public async Task<bool> IsProductUsedInOrders(string productId)
+        {
+            return await _orderRepository.IsProductUsedInOrdersAsync(productId);
+        }
+
+        public async Task<bool> AreEnterpriseProductsInOrders(string enterpriseId)
+        {
+            return await _orderRepository.AreEnterpriseProductsInOrders(enterpriseId);
+        }
     }
 }

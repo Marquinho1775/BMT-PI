@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
 using BMT_backend.Application.Services;

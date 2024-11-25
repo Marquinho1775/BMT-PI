@@ -66,6 +66,48 @@ namespace BMT_backend.Presentation.Controllers
             }
         }
 
+        [HttpGet("IsDirectionUsedInOrders")]
+        public async Task<ActionResult<bool>> IsDirectionUsedInOrders(string directionId)
+        {
+            try
+            {
+                var result = await _orderService.IsDirectionUsedInOrders(directionId);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si la dirección está en uso");
+            }
+        }
+
+        [HttpGet("isProductUsedInOrdersAsync")]
+        public async Task<ActionResult<bool>> IsProductUsedInOrdersAsync(string productId)
+        {
+            try
+            {
+                var result = await _orderService.IsProductUsedInOrders(productId);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si el producto está en uso");
+            }
+        }
+
+        [HttpGet("AreEnterpriseProductsInOrders")]
+        public async Task<ActionResult<bool>> AreEnterpriseProductsInOrders(string enterpriseId)
+        {
+            try
+            {
+                var result = await _orderService.AreEnterpriseProductsInOrders(enterpriseId);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si el producto de la empresa está en la orden");
+            }
+        }
+
         [HttpPost("OrderReports")]
         public async Task<IActionResult> GetOrderReports(ReportRequest report)
         {
