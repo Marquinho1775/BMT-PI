@@ -259,19 +259,19 @@ namespace BMT_backend.Infrastructure.Data
             return rowsAffected > 0;
         }
 
-        public async Task<bool> UpdatePerishableDetailsAsync(string id, string date, int? quantity)
+        public async Task<bool> UpdatePerishableDetailsAsync(string id, string weekDaysAvailable, int? Limit)
         {
             var queryBuilder = new StringBuilder("UPDATE PerishableProducts SET ");
             var parameters = new List<SqlParameter>();
-            if (quantity.HasValue)
+            if (Limit.HasValue)
             {
                 queryBuilder.Append("Limit = @Limit, ");
-                parameters.Add(new SqlParameter("@Limit", quantity.Value));
+                parameters.Add(new SqlParameter("@Limit", Limit.Value));
             }
-            if (!string.IsNullOrEmpty(date))
+            if (!string.IsNullOrEmpty(weekDaysAvailable))
             {
                 queryBuilder.Append("WeekDaysAvailable = @WeekDaysAvailable, ");
-                parameters.Add(new SqlParameter("@WeekDaysAvailable", date));
+                parameters.Add(new SqlParameter("@WeekDaysAvailable", weekDaysAvailable));
             }
             if (parameters.Count > 0)
             {
@@ -287,6 +287,7 @@ namespace BMT_backend.Infrastructure.Data
             }
             return false;
         }
+
         public async Task<bool> UpdateNonPerishableStockAsync(string productId, int quantity)
         {
             const string query = @"
@@ -393,6 +394,28 @@ namespace BMT_backend.Infrastructure.Data
                     }
                 }
             }
+        }
+        public async Task<List<string>> SearchProductsIdAsync(string searchTerm) {
+            var query = @"
+                SELECT
+                    p.Id
+                FROM
+                    Products p
+                    INNER JOIN CONTAINSTABLE(Products, (Name, Description), @SearchTerm) as Result
+                    ON p.Id = Result.[Key]
+                ORDER BY
+                    Result.RANK DESC;";
+            var productsId = new List<string>();
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue("@SearchTerm", searchTerm);
+            await connection.OpenAsync();
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                productsId.Add(reader["Id"].ToString());
+            }
+            return productsId;
         }
     }
 }

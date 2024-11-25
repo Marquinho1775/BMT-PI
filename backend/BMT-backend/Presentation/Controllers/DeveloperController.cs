@@ -15,9 +15,9 @@ namespace BMT_backend.Presentation.Controllers
         private readonly UserService _userService;
         private readonly EnterpriseService _enterpriseService;
         private readonly ICodeRepository _codeRepository;
-        private MailService _mailManager;
+        private readonly MailService _mailManager;
+        private readonly OrderService _orderService;
 
-        private OrderService _orderService;
         public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService)
         {
             _userService = userService;
@@ -71,7 +71,7 @@ namespace BMT_backend.Presentation.Controllers
                     _mailManager.SendConfirmationEmails(order);
                     return Ok("Order confirmed and emails sent.");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return StatusCode(500, "Error sending confirmation emails.");
                 }

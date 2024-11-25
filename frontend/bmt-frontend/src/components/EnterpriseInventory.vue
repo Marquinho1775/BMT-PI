@@ -162,6 +162,7 @@
         search: '',
         products: [],
         isEditDialogOpen: false,
+
         weekdays: [
           { text: 'Lunes', value: '1' },
           { text: 'Martes', value: '2' },
@@ -171,6 +172,7 @@
           { text: 'Sábado', value: '6' },
           { text: 'Domingo', value: '0' },
         ],
+
         editProductData: {
           name: '',
           description: '',
@@ -182,7 +184,7 @@
           imagesURLs: [],
           newImages: [],
           deliveryDays: [],
-          WeekDaysAvailable: '',
+          weekDaysAvailable: [],
         },
         enterpriseId: null,
       };
@@ -209,102 +211,123 @@
           console.error('Error al obtener productos:', error);
         }
       },
+      
       URLImage() {
         this.products.forEach(product => {
           if (Array.isArray(product.imagesURLs)) {
             product.imagesURLs = product.imagesURLs.map(image => 
-              image.startsWith("http") ? image : `${URL}${image}`
-            );
-          }
-        });
-      },
-      formatWeekDays(weekDaysString) {
-        if (!weekDaysString) {
-            return "Disponible todos los días";
-        }
-
-      const daysMap = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-        return weekDaysString
-            .split("")
-            .map(day => daysMap[Number(day.trim())])
-            .filter(Boolean)
-            .join(", ");
-      },
-      formatProductType(type) {
-        return type === "NonPerishable" ? "No perecedero" : type === "Perishable" ? "Perecedero" : "Desconocido";
-      },
-      openEditDialog(product) {
-        this.editProductData = { ...product }; 
-        this.isEditDialogOpen = true;
-      },
-      closeEditDialog() {
-        this.isEditDialogOpen = false;
-        this.editProductData = {}; 
-      },
-      async uploadImages() {
-        try {
-          const formData = new FormData();
-          formData.append("ownerId", this.editProductData.id);
-          formData.append("ownerType", "Product");
-
-          this.editProductData.newImages.forEach((file) => {
-            formData.append("images", file);
-          });
-
-          await axios.post(
-            `${API_URL}/ImageFile/upload`,
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${getToken()}`,
-              },
-            }
+            image.startsWith("http") ? image : `${URL}${image}`
           );
-        } catch (error) {
-          console.error("Error al subir imágenes:", error);
         }
-      },
-      onImageChange() {
-      },
-      async updateProduct() {
-        try {
-            if (this.editProductData.newImages && this.editProductData.newImages.length > 0) {
-              this.editProductData.imagesURLs = [];
-              await this.uploadImages();
+      });
+    },
+    
+    formatWeekDays(weekDaysString) {
+      if (!weekDaysString) {
+        return "Disponible todos los días";
+      }
+      const daysMap = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+      return weekDaysString
+      .toString()
+      .split("")
+      .map(day => daysMap[Number(day.trim())])
+      .filter(Boolean)
+      .join(", ");
+    },
+    
+    formatProductType(type) {
+      return type === "NonPerishable" ? "No perecedero" : type === "Perishable" ? "Perecedero" : "Desconocido";
+    },
+    
+    openEditDialog(product) {
+      this.editProductData = { ...product };
+      this.isEditDialogOpen = true;
+    },
+    
+    closeEditDialog() {
+      this.isEditDialogOpen = false;
+    },
+    onImageChange() {
+    },
+    async updateProduct() {
+      try {
+        const formData = new FormData();
+        formData.append('id', this.editProductData.id);
+        formData.append('enterpriseId', this.enterpriseId);
+        formData.append('name', this.editProductData.name);
+        formData.append('description', this.editProductData.description);
+        formData.append('weight', this.editProductData.weight);
+        formData.append('price', this.editProductData.price);
+        formData.append('type', this.editProductData.type);
+        
+        if (this.editProductData.tags && this.editProductData.tags.length > 0) {
+          this.editProductData.tags.forEach(tag => {
+            formData.append('Tags', tag);
+          });
+        }
+        
+        if (this.editProductData.type === "NonPerishable") {
+          formData.append('stock', this.editProductData.stock != null ? this.editProductData.stock : 0);
+        } 
+        
+        if (this.editProductData.type === "Perishable") {
+          formData.append('limit', this.editProductData.limit != null ? this.editProductData.limit : 0);
+        }
+        
+        if (this.editProductData.newImages && this.editProductData.newImages.length > 0) {
+          for (const file of this.editProductData.newImages) {
+            formData.append('ImagesFiles', file);
+          }
+        }
+        
+        const token = getToken();
+        const response = await axios.put(
+          `${API_URL}/Product`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`
             }
-            const updatedProductData = {
-                ...this.editProductData,
-                enterpriseId: this.enterpriseId,
-                price: Number(this.editProductData.price),
-                stock: Number(this.editProductData.stock),
-                limit: this.editProductData.limit ? Number(this.editProductData.limit) : null
-            };
-            if (!this.editProductData.newImages || this.editProductData.newImages.length === 0) {
-                delete updatedProductData.imagesURLs;
-                delete updatedProductData.newImages;
+          }
+        );        
+        
+        console.log('Response:', response.data);
+        if (response.data.success) {
+          this.$swal.fire({
+            title: 'Producto actualizado',
+            text: '¡Su producto ha sido actualizado correctamente!',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+            backdrop: true,
+            customClass: {
+              popup: 'swal-overlay',
             }
-            const token = getToken();
-            await axios.put(
-                `${API_URL}/Product`,
-                updatedProductData,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            this.isEditDialogOpen = false;
-            await this.$swal.fire({
-                title: 'Producto actualizado',
-                text: '¡Su producto ha sido actualizado correctamente!',
-                icon: 'success',
-                confirmButtonText: 'Ok',
-                backdrop: true,
-                customClass: {
-                    popup: 'swal-overlay',
-                }
+          });
+        } else {
+            this.$swal.fire({
+              title: 'Error',
+              text: 'Hubo un error al actualizar el producto.',
+              icon: 'error',
+              confirmButtonText: 'Ok'
             });
-            this.getProducts();
-            this.closeEditDialog();
+          }
         } catch (error) {
+          console.error('Error al actualizar producto:', error);
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al actualizar su producto. Inténtelo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Ok',
+            backdrop: true,
+            customClass: {
+              popup: 'swal-overlay',
+            }
+          });
+        }
+        await this.getProducts();
+        this.closeEditDialog();
+      }
             console.error('Error al actualizar producto:', error);
             this.isEditDialogOpen = false;
 

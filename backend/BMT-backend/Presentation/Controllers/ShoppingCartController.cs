@@ -33,6 +33,7 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating the shopping cart");
             }
         }
+
         [HttpGet]
         public async Task<ActionResult<ShoppingCart>> GetShoppingCartAsync(string userId)
         {
@@ -46,6 +47,7 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error getting the shopping cart");
             }
         }
+
         [HttpGet("GetCartId")]
         public async Task<ActionResult<string>> GetCartIdAsync(string userId)
         {
@@ -59,6 +61,7 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error getting the shopping cart");
             }
         }
+
         [HttpPut("AddProductToCart")]
         public async Task<ActionResult<bool>> AddProductToCartAsync(string shoppingCartId, string productId)
         {
@@ -72,6 +75,7 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error agregando producto al carrito");
             }
         }
+
         [HttpPut("ChangeProductQuantity")]
         public async Task<ActionResult<bool>> ChangeProductQuantityAsync(string shoppingCartId, string productId, int quantity)
         {
