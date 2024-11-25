@@ -107,5 +107,19 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error verificando si el producto de la empresa está en la orden");
             }
         }
+
+        [HttpPost("OrderReports")]
+        public async Task<IActionResult> GetOrderReports(ReportRequest report)
+        {
+            try
+            {
+                var orders = await _orderService.GetOrderReportsAsync(report);
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error obteniendo las ordenes");
+            }
+        }
     }
 }

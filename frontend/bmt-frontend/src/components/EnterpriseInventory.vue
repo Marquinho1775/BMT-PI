@@ -162,6 +162,7 @@
         search: '',
         products: [],
         isEditDialogOpen: false,
+
         weekdays: [
           { text: 'Lunes', value: '1' },
           { text: 'Martes', value: '2' },
@@ -171,6 +172,7 @@
           { text: 'Sábado', value: '6' },
           { text: 'Domingo', value: '0' },
         ],
+
         editProductData: {
           name: '',
           description: '',
@@ -182,7 +184,7 @@
           imagesURLs: [],
           newImages: [],
           deliveryDays: [],
-          WeekDaysAvailable: '',
+          weekDaysAvailable: [],
         },
         enterpriseId: null,
       };
@@ -213,57 +215,62 @@
         this.products.forEach(product => {
           if (Array.isArray(product.imagesURLs)) {
             product.imagesURLs = product.imagesURLs.map(image => 
-              image.startsWith("http") ? image : `${URL}${image}`
-            );
-          }
-        });
-      },
-      formatWeekDays(weekDaysString) {
-        if (!weekDaysString) {
-            return "Disponible todos los días";
-        }
-
-      const daysMap = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-        return weekDaysString
-            .split("")
-            .map(day => daysMap[Number(day.trim())])
-            .filter(Boolean)
-            .join(", ");
-      },
-      formatProductType(type) {
-        return type === "NonPerishable" ? "No perecedero" : type === "Perishable" ? "Perecedero" : "Desconocido";
-      },
-      openEditDialog(product) {
-        this.editProductData = { ...product }; 
-        this.isEditDialogOpen = true;
-      },
-      closeEditDialog() {
-        this.isEditDialogOpen = false;
-        this.editProductData = {}; 
-      },
-      async uploadImages() {
-        try {
-          const formData = new FormData();
-          formData.append("ownerId", this.editProductData.id);
-          formData.append("ownerType", "Product");
-
-          this.editProductData.newImages.forEach((file) => {
-            formData.append("images", file);
-          });
-
-          await axios.post(
-            `${API_URL}/ImageFile/upload`,
-            formData,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${getToken()}`,
-              },
-            }
+            image.startsWith("http") ? image : `${URL}${image}`
           );
-        } catch (error) {
-          console.error("Error al subir imágenes:", error);
+        }
+      });
+    },
+    
+    formatWeekDays(weekDaysString) {
+      if (!weekDaysString) {
+        return "Disponible todos los días";
+      }
+      const daysMap = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+      return weekDaysString
+      .toString()
+      .split("")
+      .map(day => daysMap[Number(day.trim())])
+      .filter(Boolean)
+      .join(", ");
+    },
+    
+    formatProductType(type) {
+      return type === "NonPerishable" ? "No perecedero" : type === "Perishable" ? "Perecedero" : "Desconocido";
+    },
+    
+    openEditDialog(product) {
+      this.editProductData = { ...product };
+      this.isEditDialogOpen = true;
+    },
+    
+    closeEditDialog() {
+      this.isEditDialogOpen = false;
+    },
+    onImageChange() {
+    },
+    async updateProduct() {
+      try {
+        const formData = new FormData();
+        formData.append('id', this.editProductData.id);
+        formData.append('enterpriseId', this.enterpriseId);
+        formData.append('name', this.editProductData.name);
+        formData.append('description', this.editProductData.description);
+        formData.append('weight', this.editProductData.weight);
+        formData.append('price', this.editProductData.price);
+        formData.append('type', this.editProductData.type);
+        
+        if (this.editProductData.tags && this.editProductData.tags.length > 0) {
+          this.editProductData.tags.forEach(tag => {
+            formData.append('Tags', tag);
+          });
+        }
+        
+        if (this.editProductData.type === "NonPerishable") {
+          formData.append('stock', this.editProductData.stock != null ? this.editProductData.stock : 0);
+        } 
+        
+        if (this.editProductData.type === "Perishable") {
+          formData.append('limit', this.editProductData.limit != null ? this.editProductData.limit : 0);
         }
       },
       onImageChange() {

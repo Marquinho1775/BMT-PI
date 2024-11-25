@@ -13,6 +13,7 @@ namespace BMT_backend.Application.Interfaces
 
         Task<List<OrderDetails>> GetToConfirmOrdersAsync();
         Task<List<OrderDetails>> GetToConfirmOrdersByUserIdAsync(string userId);
+        Task<List<OrderDetails>> GetInProgressOrderAsync(string userId);
 
         Task<bool> ConfirmOrderAsync(string orderId);
         Task<bool> DenyOrderAsync(string orderId);
@@ -25,5 +26,10 @@ namespace BMT_backend.Application.Interfaces
         Task<bool> IsDirectionUsedInOrdersAsync(string directionId);
         Task<bool> IsProductUsedInOrdersAsync(string productId);
         Task<bool> AreEnterpriseProductsInOrders(string enterpriseId);
+        Task<List<OrderDetails>> GetOrderReportsByUserIdAsync(ReportRequest report);
+        Task<List<OrderDetails>> GetOrderReportsByEnterpriseIdAsync(ReportRequest report);
+        Task<List<OrderDetails>> GetOrderReportsAsync(ReportRequest report);
+        Task<List<Product>> GetOrderProductsAsync(string userId);
+
     }
 }

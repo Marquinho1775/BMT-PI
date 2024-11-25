@@ -11,13 +11,13 @@ namespace BMT_backend.Application.Services
     public class ProductService
     {
         private readonly IProductRepository _productRepository;
-        private readonly ITagRepository _tagRepository;
+        private readonly TagService _tagService;
         private readonly IImageFileService _imageFileService;
 
-        public ProductService(IProductRepository _productRepository, ITagRepository tagRepository, IImageFileService imageFileService)
+        public ProductService(IProductRepository productRepository, TagService tagService, IImageFileService imageFileService)
         {
-            this._productRepository = _productRepository;
-            _tagRepository = tagRepository;
+            _productRepository = productRepository;
+            _tagService = tagService;
             _imageFileService = imageFileService;
         }
 
@@ -38,11 +38,12 @@ namespace BMT_backend.Application.Services
             }
             if (product.Tags != null && product.Tags.Count > 0)
             {
-                await _tagRepository.AddProductTagsAsync(product.Id, product.Tags);
+                List<string> tagsId = await _tagService.GetTagsIdByTagsName(product.Tags);
+                await _tagService.UpdateProductTags(product.Id, tagsId);
             }
             if (product.ImagesFiles != null && product.ImagesFiles.Count > 0)
             {
-                _imageFileService.CreateProductImages(product.Id, product.ImagesFiles);
+                await _imageFileService.CreateProductImages(product.Id, product.ImagesFiles);
             }
             return true;
         }
@@ -89,11 +90,11 @@ namespace BMT_backend.Application.Services
             var updated = await _productRepository.UpdateProductAsync(product);
             if (updated == null) return false;
 
-            if (product.Tags != null && product.Tags.Count > 0 && product.Tags[0] != null)
-                await _tagRepository.AddProductTagsAsync(product.Id, product.Tags);
+            List<string> tagsId = await _tagService.GetTagsIdByTagsName(product.Tags);
+            await _tagService.UpdateProductTags(product.Id, tagsId);
 
-            if (product.ImagesURLs != null && product.ImagesURLs.Count > 0)
-                _imageFileService.CreateProductImages(product.Id, product.ImagesFiles);
+            if (product.ImagesFiles != null && product.ImagesFiles.Count > 0)
+                await _imageFileService.CreateProductImages(product.Id, product.ImagesFiles);
 
             if (product.Type == "NonPerishable")
             {
