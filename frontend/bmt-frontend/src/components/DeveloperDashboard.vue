@@ -1,22 +1,31 @@
 <template>
   <v-main class="flex-grow-1">
-    <h1 class="text-h4 py-4 px-4 mb-4">Dashboard de Desarrollador</h1>
-  <v-container>
-    <v-row>
-      <v-col cols="12" md="7">
-        <v-card class="pa-4 elevation-3">
-          <StackedBarChart :datasets="barChartDatasets" :type="1"/>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="12" md="7">
-        <v-card class="pa-4 elevation-3">
-          <LineChart :dataset="LineDataset"/>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+    <div v-if="isLoading" class="d-flex justify-center align-center" style="height: 100vh">
+      <v-progress-circular
+        indeterminate
+        color="primary"
+        size="64"
+      ></v-progress-circular>
+    </div>
+    <div v-else>
+      <h1 class="text-h4 py-4 px-4 mb-4">Dashboard de Desarrollador</h1>
+      <v-container>
+        <v-row>
+          <v-col cols="12" md="7">
+            <v-card class="pa-4 elevation-3">
+              <StackedBarChart :datasets="barChartDatasets" :type="1"/>
+            </v-card>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" md="7">
+            <v-card class="pa-4 elevation-3">
+              <LineChart :dataset="LineDataset"/>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </div>
   </v-main>
 </template>
 
@@ -31,8 +40,10 @@ export default {
     StackedBarChart,
     LineChart,
   },
+  
   data() {
     return {
+      isLoading: true,
       barChartDatasets: [],
       LineDataset: []
     };
@@ -40,36 +51,29 @@ export default {
 
   async created() {
     try {
-      const datasetResponse = await axios.get(
-        `${API_URL}/Developer/GetAllEnterprisesEarnings`);
-        const dataFromBackend = datasetResponse.data.data;
-        this.barChartDatasets = this.processDatasetResponse(dataFromBackend);
-    }
-    catch (error) {
-      console.error('Error al cargar los datos:', error);
-      if (error.response) {
-        console.error('Detalles del error:', error.response.data);
-      }
-    }
+      const [datasetResponse1, datasetResponse2] = await Promise.all([
+        axios.get(`${API_URL}/Developer/GetAllEnterprisesEarnings`),
+        axios.get(`${API_URL}/Developer/GetSystemTotalDeliverysFee`)
+      ]);
 
-    try {
-      const datasetResponse = await axios.get(
-        `${API_URL}/Developer/GetSystemTotalDeliverysFee`);
-        const response = datasetResponse.data.data;
-        const array = [];
-        for (const key in response) {
-          array.push(response[key]);
-        }
-        this.LineDataset = array;
-    }
-    catch (error) {
+      const dataFromBackend = datasetResponse1.data.data;
+      this.barChartDatasets = this.processDatasetResponse(dataFromBackend);
+
+      const response = datasetResponse2.data.data;
+      const array = [];
+      for (const key in response) {
+        array.push(response[key]);
+      }
+      this.LineDataset = array;
+    } catch (error) {
       console.error('Error al cargar los datos:', error);
       if (error.response) {
         console.error('Detalles del error:', error.response.data);
       }
+    } finally {
+      this.isLoading = false;
     }
   },
-
   methods: {
     processDatasetResponse(data) {
       const predefinedColors = [

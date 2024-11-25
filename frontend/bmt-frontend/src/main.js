@@ -16,6 +16,7 @@ import UserOrders from './components/UserOrders.vue';
 
 import EditProfileInfo from './components/EditProfileInfo.vue';
 import EditEnterpriseInfo from './components/EditEnterpriseInfo.vue';
+import RedirectionerPage from './components/RedirectionerPage.vue';
 
 import EntrepreneurRegisteredEnterprises from './components/EntrepreneurRegisteredEnterprises.vue';
 
@@ -47,6 +48,7 @@ import YearlyEarnings from './components/YearlyEarnings.vue';
 import ReportsDashboard from './components/ReportsDashboard.vue';
 import StackedBarChart from './components/StackedBarChart.vue';
 import LineChart from './components/LineChart.vue';
+import PendingOrders from './components/PendingOrders.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
@@ -78,7 +80,8 @@ axios.interceptors.request.use(config => {
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', name: "Home", component: HomePage }, // check
+    { path: '/', name: "RedirectionerPage", component: RedirectionerPage }, // check
+    { path: '/home', name: "Home", component: HomePage }, // check
 
     { path: '/register', name: "Register", component: UserRegisterForm }, //check
     { path: '/login', name: "Login", component: UserLoginForm }, // check
@@ -145,6 +148,7 @@ app.component('yearly-earnings', YearlyEarnings);
 app.component('StackedBarChart', StackedBarChart);
 app.component('LineChart', LineChart);
 app.component('UserDashboard', UserDashboard);
+app.component('pending-orders', PendingOrders);
 
 app.config.globalProperties.$swal = Swal;
 
