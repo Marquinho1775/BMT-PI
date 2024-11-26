@@ -64,8 +64,8 @@
 
             <v-col cols="auto">
                 <v-card-actions>
-                    <v-select v-model="selectedOption" :items="dropdownOptions" label="Seleccione una opción"
-                        class="ml-4"></v-select>
+                    <v-select width="600px" v-model="selectedOption" :items="dropdownOptions"
+                        label="Seleccione una opción" class="ml-4"></v-select>
                 </v-card-actions>
             </v-col>
         </v-row>

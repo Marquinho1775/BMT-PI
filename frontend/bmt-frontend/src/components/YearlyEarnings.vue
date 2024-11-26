@@ -6,14 +6,14 @@
 
     <v-row align="center" justify="flex-start">
       <v-col cols="12" sm="4">
-        <v-text-field v-model="year" label="Año" type="number" min="1900" max="2100" placeholder="Ingrese el año"
-          outlined></v-text-field>
+        <v-btn color="success" @click="openDialog" outlined variant="tonal">
+          Seleccionar emprendimientos
+        </v-btn>
       </v-col>
 
       <v-col cols="12" sm="4">
-        <v-btn color="primary" @click="openDialog" outlined>
-          Seleccionar emprendimientos
-        </v-btn>
+        <v-text-field v-model="year" label="Año" type="number" min="1900" max="2100" placeholder="Ingrese el año"
+          outlined></v-text-field>
       </v-col>
     </v-row>
 
