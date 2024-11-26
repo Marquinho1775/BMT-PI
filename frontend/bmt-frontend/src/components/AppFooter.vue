@@ -3,13 +3,12 @@
       <v-col class="text-center white--text">
         &copy; 2024 Business Tracker. Todos los derechos reservados.
       </v-col>
-    </v-footer>
+  </v-footer>
 </template>
 
 <script>
   export default {
     name: 'AppFooter',
-  
   }
 </script>
 

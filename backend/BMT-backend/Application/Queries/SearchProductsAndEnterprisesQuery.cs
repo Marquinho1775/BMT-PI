@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace BMT_backend.Application.Queries
 {
-    public class SearchProductsAndEnterprisesQuerie
+    public class SearchProductsAndEnterprisesQuery
     {
         private readonly IProductRepository _productRepository;
         private readonly IEnterpriseRepository _enterpriseRepository;
@@ -15,7 +15,7 @@ namespace BMT_backend.Application.Queries
             "se", "que", "es", "su", "lo", "como", "más", "pero", "sus", "le", "ya", "si", "porque", "muy", "sin", "sobre"
         };
 
-        public SearchProductsAndEnterprisesQuerie(IProductRepository productRepository, IEnterpriseRepository enterpriseRepository)
+        public SearchProductsAndEnterprisesQuery(IProductRepository productRepository, IEnterpriseRepository enterpriseRepository)
         {
             _productRepository = productRepository;
             _enterpriseRepository = enterpriseRepository;

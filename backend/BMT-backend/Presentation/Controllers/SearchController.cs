@@ -8,9 +8,9 @@ namespace BMT_backend.Presentation.Controllers
     [ApiController]
     public class SearchController : ControllerBase
     {
-        private readonly SearchProductsAndEnterprisesQuerie _searchProductsAndEnterprisesQuerie;
+        private readonly SearchProductsAndEnterprisesQuery _searchProductsAndEnterprisesQuerie;
 
-        public SearchController(SearchProductsAndEnterprisesQuerie searchProductsAndEnterprisesQuerie)
+        public SearchController(SearchProductsAndEnterprisesQuery searchProductsAndEnterprisesQuerie)
         {
             _searchProductsAndEnterprisesQuerie = searchProductsAndEnterprisesQuerie;
         }

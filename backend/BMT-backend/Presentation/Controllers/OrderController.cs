@@ -2,6 +2,7 @@
 using BMT_backend.Presentation.Requests;
 using Microsoft.AspNetCore.Mvc;
 using BMT_backend.Application.Services;
+using System.Runtime.CompilerServices;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -114,6 +115,20 @@ namespace BMT_backend.Presentation.Controllers
             try
             {
                 var orders = await _orderService.GetOrderReportsAsync(report);
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error obteniendo las ordenes");
+            }
+        }
+
+        [HttpPost("GetOrdersByDateAndStatus")]
+        public async Task<ActionResult<List<OrderDetails>>> GetOrdersByDateAndStatus(ReportRequest request)
+        {
+            try
+            {
+                var orders = await _orderService.GetOrdersByDateAndStatusAsync(request);
                 return Ok(orders);
             }
             catch (Exception ex)

@@ -186,7 +186,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<int> GetNonPerishableStock(string productId)
         {
-            const string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @ProductId AND SoftDeleted = 0;";
+            const string query = "SELECT Stock FROM NonPerishableProducts WHERE ProductId = @ProductId";
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@ProductId", productId);

@@ -126,6 +126,28 @@ namespace BMT_backend.Application.Services
             return reportList;
         }
 
+        public async Task<List<OrderDetails>> GetOrdersByDateAndStatusAsync(ReportRequest report)
+        {
+            this.ValidateReportData(report);
+
+            List<OrderDetails> response = null;
+
+            if (report.UserId != null)
+            {
+                response = await _orderRepository.GetOrderReportsByUserIdAsync(report);
+            }
+            else if (report.EnterpriseId != null)
+            {
+
+                response = await _orderRepository.GetOrderReportsByEnterpriseIdAsync(report);
+            }
+            else
+            {
+                response = await _orderRepository.GetOrderReportsAsync(report);
+            }
+            return response;
+        }
+
         private List<ReportDto> FormatPendingOrders(List<OrderDetails> orders)
         {
             List<ReportDto> reportList = new List<ReportDto>();
