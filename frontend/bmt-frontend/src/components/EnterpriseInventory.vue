@@ -274,57 +274,84 @@ export default {
       // Puedes manejar cambios de imagen aquí si es necesario
     },
 
+    
     async updateProduct() {
       try {
+        const formData = new FormData();
+        formData.append('id', this.editProductData.id);
+        formData.append('enterpriseId', this.enterpriseId);
+        formData.append('name', this.editProductData.name);
+        formData.append('description', this.editProductData.description);
+        formData.append('weight', this.editProductData.weight);
+        formData.append('price', this.editProductData.price);
+        formData.append('type', this.editProductData.type);
+        
+        if (this.editProductData.tags && this.editProductData.tags.length > 0) {
+          this.editProductData.tags.forEach(tag => {
+            formData.append('Tags', tag);
+          });
+        }
+        
+        if (this.editProductData.type === "NonPerishable") {
+          formData.append('stock', this.editProductData.stock != null ? this.editProductData.stock : 0);
+        } 
+        
+        if (this.editProductData.type === "Perishable") {
+          formData.append('limit', this.editProductData.limit != null ? this.editProductData.limit : 0);
+        }
+        
         if (this.editProductData.newImages && this.editProductData.newImages.length > 0) {
-          this.editProductData.imagesURLs = [];
-          await this.uploadImages();
+          for (const file of this.editProductData.newImages) {
+            formData.append('ImagesFiles', file);
+          }
         }
-        const updatedProductData = {
-          ...this.editProductData,
-          enterpriseId: this.enterpriseId,
-          price: Number(this.editProductData.price),
-          stock: Number(this.editProductData.stock),
-          limit: this.editProductData.limit ? Number(this.editProductData.limit) : null
-        };
-        if (!this.editProductData.newImages || this.editProductData.newImages.length === 0) {
-          delete updatedProductData.imagesURLs;
-          delete updatedProductData.newImages;
-        }
+        
         const token = getToken();
-        await axios.put(
+        const response = await axios.put(
           `${API_URL}/Product`,
-          updatedProductData,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        this.isEditDialogOpen = false;
-        await this.$swal.fire({
-          title: 'Producto actualizado',
-          text: '¡Su producto ha sido actualizado correctamente!',
-          icon: 'success',
-          confirmButtonText: 'Ok',
-          backdrop: true,
-          customClass: {
-            popup: 'swal-overlay',
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`
+            }
           }
-        });
-        this.getProducts();
-        this.closeEditDialog();
-      } catch (error) {
-        console.error('Error al actualizar producto:', error);
-        this.isEditDialogOpen = false;
-
-        this.$swal.fire({
-          title: 'Error',
-          text: 'Hubo un error al actualizar su producto. Inténtelo de nuevo.',
-          icon: 'error',
-          confirmButtonText: 'Ok',
-          backdrop: true,
-          customClass: {
-            popup: 'swal-overlay',
+        );        
+        
+        console.log('Response:', response.data);
+        if (response.data.success) {
+          this.$swal.fire({
+            title: 'Producto actualizado',
+            text: '¡Su producto ha sido actualizado correctamente!',
+            icon: 'success',
+            confirmButtonText: 'Ok',
+            backdrop: true,
+            customClass: {
+              popup: 'swal-overlay',
+            }
+          });
+        } else {
+            this.$swal.fire({
+              title: 'Error',
+              text: 'Hubo un error al actualizar el producto.',
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            });
           }
-        });
-      } finally {
+        } catch (error) {
+          console.error('Error al actualizar producto:', error);
+          this.$swal.fire({
+            title: 'Error',
+            text: 'Hubo un error al actualizar su producto. Inténtelo de nuevo.',
+            icon: 'error',
+            confirmButtonText: 'Ok',
+            backdrop: true,
+            customClass: {
+              popup: 'swal-overlay',
+            }
+          });
+        }
+        await this.getProducts();
         this.closeEditDialog();
       }
     },
@@ -373,9 +400,8 @@ export default {
           icon: "error",
         });
       }
-    },
   }
-};
+}
 </script>
 
 <style scoped>
