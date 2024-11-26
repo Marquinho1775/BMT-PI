@@ -60,9 +60,14 @@ namespace BMT_backend.Application.Services
             {
                 EnterpriseDevDto enterpriseDevDto = new()
                 {
-                    Enterprise = enterprise,
+                    Administrator = enterprise.Administrator.Name + " " + enterprise.Administrator.LastName,
+                    Description = enterprise.Description,
+                    Email = enterprise.Email,
                     EmployeeQuantity = enterprise.Staff.Count,
-                    ProductQuantity = await _enterpriseRepository.GetProductsQuantityAsync(enterprise.Id)
+                    Name = enterprise.Name,
+                    PhoneNumber = enterprise.PhoneNumber,
+                    ProductQuantity = await _enterpriseRepository.GetProductsQuantityAsync(enterprise.Id),
+
                 };
                 enterpriseDevDtos.Add(enterpriseDevDto);
             }
