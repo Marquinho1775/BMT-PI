@@ -112,13 +112,13 @@ export default {
     async created() {
         this.userId = getUser().id;
         this.userRole = getUser().role;
-        if (this.userRole === 'cli') {
-            await this.getUserOrders();
-        } else if (this.userRole === 'emp') {
+        if (this.$route.params.id) {
             this.enterpriseId = this.$route.params.id;
             await this.getEnterpriseOrders();
-        } else {
+        } else if (this.userRole === 'dev') {
             await this.getAllOrders();
+        } else {
+            await this.getUserOrders();
         }
     },
     methods: {
