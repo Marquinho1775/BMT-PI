@@ -80,6 +80,7 @@
             headers: { Authorization: `Bearer ${token}` },
           });
   
+          this.deleteDialog = false;
           // Muestra confirmación y redirige al usuario
           this.$swal.fire({
             title: "¡Cuenta eliminada!",

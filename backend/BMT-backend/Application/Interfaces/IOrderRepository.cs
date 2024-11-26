@@ -23,6 +23,7 @@ namespace BMT_backend.Application.Interfaces
         
         Task<List<ProductDetails>> GetProductsByOrderIdAsync(string orderId);
         Task<double> GetProductEarningsByMonth(string productId, int month);
+        Task<double> GetProductEarningsByDay(string productId, DateTime date);
 
         Task<bool> IsDirectionUsedInOrdersAsync(string directionId);
         Task<bool> IsProductUsedInOrdersAsync(string productId);

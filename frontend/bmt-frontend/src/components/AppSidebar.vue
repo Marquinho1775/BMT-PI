@@ -5,8 +5,8 @@
     </v-list>
     <v-divider></v-divider>
     <v-list density="compact" nav>
+      <v-list-item @click="handleProfileInfo" prepend-icon="mdi-account" title="Mi Perfil"></v-list-item>
       <v-list-item-group v-if="userRole === 'cli' || userRole === 'emp'">
-        <v-list-item @click="handleProfileInfo" prepend-icon="mdi-account" title="Mi Perfil"></v-list-item>
         <v-list-item @click="handleOrders" prepend-icon="mdi-newspaper" title="Mis pedidos"></v-list-item>
         <v-list-item @click="handleReports" prepend-icon="mdi-chart-bar" title="Mis reportes"></v-list-item>
         <v-list-item-group v-if="userRole === 'emp'">
@@ -28,7 +28,6 @@
         <v-list-item @click="goToProductConfirmation" prepend-icon="mdi-list-status"
           title="Solicitudes de Pedidos"></v-list-item>
       </v-list-item-group>
-      <v-list-item @click="handleDeleteAccount" prepend-icon="mdi-account-remove" title="Eliminar cuenta"></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>

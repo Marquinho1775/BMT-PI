@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="text-h6">
-      {{ type === 0 ? 'Ganancias Mensuales por Producto' : 'Ganancias Mensuales por Empresa' }}
+      {{ type === 0 ? 'Ganancias Mensuales' : 'Ganancias Semanales' }}
     </v-card-title>
     <v-card-text>
       <div class="chart-container">
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { Bar } from 'vue-chartjs'
+import { Bar } from 'vue-chartjs';
 import {
   Chart as ChartJS,
   Title,
@@ -25,10 +25,8 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
-} from 'chart.js'
-// Importamos el plugin si es necesario en otros lugares
+} from 'chart.js';
 
-// Registramos los componentes y plugins de Chart.js
 ChartJS.register(
   Title,
   Tooltip,
@@ -36,31 +34,29 @@ ChartJS.register(
   BarElement,
   CategoryScale,
   LinearScale,
-  // Ya no necesitamos registrar ChartDataLabels si no lo usamos
-  // ChartDataLabels,
   {
     id: 'totalLabelPlugin',
     afterDatasetsDraw(chart) {
-      const { ctx, scales: { x, y } } = chart
-      const datasets = chart.data.datasets
-      const labels = chart.data.labels
+      const { ctx, scales: { x, y } } = chart;
+      const datasets = chart.data.datasets;
+      const labels = chart.data.labels;
 
       labels.forEach((label, index) => {
-        const total = datasets.reduce((sum, dataset) => sum + (dataset.data[index] || 0), 0)
-        const xPos = x.getPixelForValue(index)
-        const yPos = y.getPixelForValue(total)
+        const total = datasets.reduce((sum, dataset) => sum + (dataset.data[index] || 0), 0);
+        const xPos = x.getPixelForValue(index);
+        const yPos = y.getPixelForValue(total);
 
-        ctx.save()
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'bottom'
-        ctx.fillStyle = 'black'
-        ctx.font = 'bold 12px Arial'
-        ctx.fillText(total, xPos, yPos - 5)
-        ctx.restore()
-      })
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillStyle = 'black';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(total, xPos, yPos - 5);
+        ctx.restore();
+      });
     },
   }
-)
+);
 
 export default {
   name: 'StackedBarChart',
@@ -93,7 +89,7 @@ export default {
             stacked: true,
             title: {
               display: true,
-              text: 'Mes',
+              text: this.type === 0 ? 'Mes' : 'Día de la Semana',
             },
             ticks: {
               maxRotation: 0,
@@ -124,45 +120,40 @@ export default {
             intersect: false,
             callbacks: {
               label: function (context) {
-                const dataset = context.dataset
-                const dataIndex = context.dataIndex
-                const datasets = context.chart.data.datasets
+                const dataset = context.dataset;
+                const dataIndex = context.dataIndex;
+                const datasets = context.chart.data.datasets;
 
-                // Calculamos el total de ese mes
                 const total = datasets.reduce((sum, dataset) => {
-                  const value = dataset.data[dataIndex]
-                  return sum + (isNaN(value) ? 0 : value)
-                }, 0)
+                  const value = dataset.data[dataIndex];
+                  return sum + (isNaN(value) ? 0 : value);
+                }, 0);
 
-                const currentValue = dataset.data[dataIndex]
-                const percentage = ((currentValue / total) * 100).toFixed(1)
+                const currentValue = dataset.data[dataIndex];
+                const percentage = ((currentValue / total) * 100).toFixed(1);
 
-                let label = dataset.label || ''
+                let label = dataset.label || '';
                 if (label) {
-                  label += ': '
+                  label += ': ';
                 }
-                label += `${currentValue} (${percentage}%)`
-                return label
+                label += `${currentValue} (${percentage}%)`;
+                return label;
               },
             },
           },
-          // Desactivamos el plugin de datalabels para no mostrar porcentajes en las barras
-          // datalabels: {
-          //   display: false,
-          // },
         },
       },
-    }
+    };
   },
   computed: {
     chartData() {
       return {
         labels: this.labels,
         datasets: this.datasets,
-      }
+      };
     },
   },
-}
+};
 </script>
 
 <style scoped>

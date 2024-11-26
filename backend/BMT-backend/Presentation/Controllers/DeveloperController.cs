@@ -20,9 +20,10 @@ namespace BMT_backend.Presentation.Controllers
         private readonly OrderService _orderService;
         private readonly GetAllEnterprisesEarningsQuery _getAllEnterprisesEarningsQuery;
         private readonly GetSystemTotalDeliveryFeeQuery _GetSystemTotalDeliveryFeeQuery;
+        private readonly GetEnterpriseWeeklyEarningsQuery _getEnterpriseWeeklyEarningsQuery;
 
 
-        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService, GetAllEnterprisesEarningsQuery getAllEnterprisesEarningsQuery, GetSystemTotalDeliveryFeeQuery getSystemTotalDeliveryFeeQuery)
+        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService, GetAllEnterprisesEarningsQuery getAllEnterprisesEarningsQuery, GetSystemTotalDeliveryFeeQuery getSystemTotalDeliveryFeeQuery, GetEnterpriseWeeklyEarningsQuery getEnterpriseWeeklyEarningsQuery)
         {
             _userService = userService;
             _productService = productService;
@@ -31,6 +32,7 @@ namespace BMT_backend.Presentation.Controllers
             _enterpriseService = enterpriseService;
             _getAllEnterprisesEarningsQuery = getAllEnterprisesEarningsQuery;
             _GetSystemTotalDeliveryFeeQuery = getSystemTotalDeliveryFeeQuery;
+            _getEnterpriseWeeklyEarningsQuery = getEnterpriseWeeklyEarningsQuery;
         }
 
         [HttpGet("getEnterprises")]
@@ -73,6 +75,20 @@ namespace BMT_backend.Presentation.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias de la empresa." });
+            }
+        }
+
+        [HttpGet("GetSystemWeeklyEarnings")]
+        public async Task<IActionResult> GetSystemWeeklyEarnings()
+        {
+            try
+            {
+                var earnings = await _getEnterpriseWeeklyEarningsQuery.GetSystemWeeklyEarningsAsync();
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias semanales del sistema." });
             }
         }
 

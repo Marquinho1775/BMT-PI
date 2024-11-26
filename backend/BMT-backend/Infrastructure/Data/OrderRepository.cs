@@ -455,6 +455,29 @@ namespace BMT_backend.Infrastructure.Data
             return earnings is DBNull ? 0 : Convert.ToDouble(earnings);
         }
 
+        public async Task<double> GetProductEarningsByDay(string productId, DateTime date)
+        {
+            var query = @"
+            SELECT SUM(op.ProductsCost) AS Earnings
+            FROM Order_Product op WITH (NOLOCK)
+            JOIN Orders o WITH (NOLOCK) ON op.OrderId = o.OrderId
+            WHERE op.ProductId = @ProductId 
+              AND CAST(o.OrderDate AS DATE) = @Date 
+              AND o.Status = 4;";
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter("@ProductId", productId),
+                new SqlParameter("@Date", date.Date)
+            };
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+            await connection.OpenAsync();
+            var earnings = await command.ExecuteScalarAsync();
+            return earnings is DBNull ? 0 : Convert.ToDouble(earnings);
+        }
+
+
         public async Task<List<Product>> GetOrderProductsAsync(string userId)
         {
             var query = @"
