@@ -1,30 +1,17 @@
 <template>
-  <v-app-bar 
-    app color="#9FC9FC" 
-    scroll-behavior="hide"
-    elevation="0">
+  <v-app-bar app color="#9FC9FC" scroll-behavior="hide" elevation="0">
 
     <v-app-bar-title>
       <v-btn variant="text" @click="handleHome">Business Tracker</v-btn>
     </v-app-bar-title>
 
-    <v-text-field
-      v-model="searchText"
-      bg-color="white"
-      color="black"
-      :loading="loading"
-      placeholder="Buscar productos o empresas"
-      hide-details
-      density="compact"
-      variant="outlined"
-      style="max-width: 300px;"
-      append-inner-icon="mdi-magnify"
-      @click:append-inner="search"
-      @keyup.enter="search">
+    <v-text-field v-model="searchText" bg-color="white" color="black" :loading="loading"
+      placeholder="Buscar productos o empresas" hide-details density="compact" variant="outlined"
+      style="max-width: 300px;" append-inner-icon="mdi-magnify" @click:append-inner="search" @keyup.enter="search">
     </v-text-field>
 
     <v-btn v-if="role !== dev" icon color="primary" @click="goToCart">
-          <v-icon>mdi-cart</v-icon>
+      <v-icon>mdi-cart</v-icon>
     </v-btn>
 
     <v-btn v-if="!isLoggedIn" color="primary" @click="handleLogin">Iniciar Sesión</v-btn>
@@ -79,12 +66,14 @@ export default {
       localStorage.removeItem('user');
       this.isLoggedIn = false;
       this.$router.push('/');
+      location.reload();
     },
     handleRegister() {
       this.$router.push('/register');
     },
     handleHome() {
       this.$router.push('/');
+      location.reload();
     },
   },
 };

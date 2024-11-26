@@ -2,11 +2,7 @@
   <v-main>
     <h1>Sumario de las empresas del sistema</h1>
     <div class="reports-container">
-      <reports-table 
-        v-if="enterprises.length" 
-        :titles="tableTitles" 
-        :reports="enterprises"
-      />
+      <reports-table v-if="enterprises.length" :titles="tableTitles" :keys="tableKeys" :reports="enterprises" />
     </div>
   </v-main>
 </template>
@@ -27,6 +23,15 @@ export default {
         'Cantidad de empleados',
         'Número de teléfono',
         'Productos registrados',
+      ],
+      tableKeys: [
+        'name',
+        'administrator',
+        'description',
+        'email',
+        'employeeQuantity',
+        'phoneNumber',
+        'productQuantity',
       ],
     };
   },

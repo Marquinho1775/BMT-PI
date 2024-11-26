@@ -1,48 +1,30 @@
 <template>
   <div class="d-flex justify-center align-center full-height background-main">
-    <v-card
-      class="py-8 px-6 text-center mx-auto ma-4 custom-card"
-      elevation="12"
-      max-width="450"
-      width="100%"
-    >
-      <h3 class="text-h6 mb-4 card-header-custom">Verifica tu correo</h3>
+    <v-card class="pa-0 elevation-4" elevation="12" max-width="450" width="100%">
+      <v-card-title class="text-h6 mb-4 card-header-custom">Verifica tu correo</v-card-title>
 
-      <div class="text-body-2 text-custom">
+      <v-card-text class="text-center justify-center align-center">
         Por favor introduce el código de verificación que se envió al correo electrónico que proporcionaste
         <br /> ({{ userEmail }})
-      </div>
+      </v-card-text>
 
       <!-- Sección del OTP Input de Vuetify -->
       <v-sheet color="transparent" class="mt-4">
-        <v-otp-input
-          v-model="verificationCode"
-          type="password"
-          variant="solo"
-        ></v-otp-input>
+        <v-otp-input v-model="verificationCode" variant="solo"></v-otp-input>
       </v-sheet>
 
-      <v-btn
-        class="my-4 btn-custom"
-        :loading="isLoading"
-        :disabled="isLoading"
-        block
-        @click="verifyCode"
-      >
-        {{ isLoading ? 'Verificando...' : 'Verificar Correo' }}
-      </v-btn>
+      <v-card-actions>
+        <v-btn class="my-4 btn-custom" :loading="isLoading" :disabled="isLoading" block @click="verifyCode">
+          {{ isLoading ? 'Verificando...' : 'Verificar Correo' }}
+        </v-btn>
+      </v-card-actions>
 
-      <div class="text-caption mt-2">
-        ¿No recibiste el código? 
+      <v-card-text class="mt-2 text-center justify-center align-center">
+        ¿No recibiste el código?
         <a href="#" @click.prevent="resendCode" class="resend-link">Haz click para reenviar</a>
-      </div>
+      </v-card-text>
 
-      <v-alert
-        v-if="message"
-        type="error"
-        class="mt-3"
-        dense
-      >
+      <v-alert v-if="message" type="error" class="mt-3" dense>
         {{ message }}
       </v-alert>
     </v-card>
@@ -58,7 +40,7 @@ import { API_URL } from '@/main.js';
 export default {
   data() {
     return {
-      verificationCode: '', // Cambiado para trabajar con OTP de Vuetify
+      verificationCode: '',
       message: '',
       isLoading: false,
       userEmail: getUser().email,
@@ -139,10 +121,15 @@ export default {
 }
 
 .card-header-custom {
-  background-color: #36618E;
+  background-color: #39517B;
   color: white;
-  padding: 20px;
-  border-radius: 16px 16px 0 0;
+  padding: 16px;
+  margin: 0;
+  border-radius: 4px 4px 0 0;
+  width: 100%;
+  display: block;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .text-custom {

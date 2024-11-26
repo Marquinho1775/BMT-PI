@@ -2,11 +2,7 @@
   <v-main>
     <h1>Sumario de los usuarios del sistema</h1>
     <div class="reports-container">
-      <reports-table 
-        v-if="enterprises.length" 
-        :titles="tableTitles" 
-        :reports="enterprises"
-      />
+      <reports-table v-if="enterprises.length" :titles="tableTitles" :keys="tableKeys" :reports="enterprises" />
     </div>
   </v-main>
 </template>
@@ -25,6 +21,13 @@ export default {
         'Email',
         'Rol',
         'Empresas asociadas',
+      ],
+      tableKeys: [
+        'name',
+        'username',
+        'email',
+        'role',
+        'associatedCompanies',
       ],
     };
   },
