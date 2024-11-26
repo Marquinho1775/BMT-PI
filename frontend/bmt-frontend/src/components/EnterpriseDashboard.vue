@@ -94,14 +94,49 @@
           </v-row>
         </v-card-text>
       </v-card>
-      <v-row>
-        <v-col cols="12" md="7">
-        <StackedBarChart :datasets="barChartDatasets" :type="0"/>
-        </v-col>
-        <v-col cols="12" md="5">
-          <PendingOrders />
+
+      <!-- Sección de Selección de Gráfico -->
+      <v-row class="mb-6">
+        <v-col cols="12" md="4">
+          <v-select
+          label="Selecciona el gráfico"
+            :items="chartOptionsList"
+            v-model="selectedChart"
+            outlined
+          ></v-select>
         </v-col>
       </v-row>
+
+      <!-- Gráfico Seleccionado con Transición -->
+      <transition name="fade" mode="out-in">
+        <v-row v-if="selectedChart === 'Ganancias Mensuales'" key="Ganancias Mensuales">
+          <v-col cols="12" md="7">
+            <StackedBarChart
+              :datasets="barChartDatasets"
+              :type="0"
+              :labels="[
+                'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+              ]"
+            />
+          </v-col>
+          <v-col cols="12" md="5">
+            <PendingOrders />
+          </v-col>
+        </v-row>
+        <v-row v-else-if="selectedChart === 'Ganancias Semanales'" key="Ganancias Semanales">
+          <v-col cols="12" md="7">
+            <StackedBarChart
+              :datasets="weeklyBarChartDatasets"
+              :type="1"
+              :labels="['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
+            />
+          </v-col>
+          <v-col cols="12" md="5">
+            <PendingOrders />
+          </v-col>
+        </v-row>
+      </transition>
 
     </v-container>
   </v-main>
@@ -123,8 +158,13 @@ export default {
     return {
       enterprise: {},
       barChartDatasets: [],
+      weeklyBarChartDatasets: [],
+      selectedChart: 'Ganancias Mensuales',
+      chartOptionsList: [
+        'Ganancias Mensuales',
+        'Ganancias Semanales',
+      ],
     };
-
   },
   async created() {
     const enterpriseId = this.$route.params.id;
@@ -143,14 +183,28 @@ export default {
         console.error('Detalles del error:', error.response.data);
       }
     }
+
     try {
       const datasetResponse = await axios.get(
-        `${API_URL}/Enterprise/GetEnterpriseEarnings?enterpriseId=${enterpriseId}`);
-        const dataFromBackend = datasetResponse.data.data;
-        this.barChartDatasets = this.processDatasetResponse(dataFromBackend);
+        `${API_URL}/Enterprise/GetEnterpriseEarnings?enterpriseId=${enterpriseId}`
+      );
+      const dataFromBackend = datasetResponse.data.data;
+      this.barChartDatasets = this.processDatasetResponse(dataFromBackend);
+    } catch (error) {
+      console.error('Error al cargar los datos mensuales:', error);
+      if (error.response) {
+        console.error('Detalles del error:', error.response.data);
+      }
     }
-    catch (error) {
-      console.error('Error al cargar los datos:', error);
+
+    try {
+      const weeklyDatasetResponse = await axios.get(
+        `${API_URL}/Enterprise/GetEnterpriseWeeklyEarnings?enterpriseId=${enterpriseId}`
+      );
+      const weeklyDataFromBackend = weeklyDatasetResponse.data.data;
+      this.weeklyBarChartDatasets = this.processWeeklyDatasetResponse(weeklyDataFromBackend);
+    } catch (error) {
+      console.error('Error al cargar los datos semanales:', error);
       if (error.response) {
         console.error('Detalles del error:', error.response.data);
       }
@@ -179,6 +233,28 @@ export default {
       return datasets;
     },
 
+    processWeeklyDatasetResponse(data) {
+      const predefinedColors = [
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)',
+        'rgba(255, 159, 64, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(201, 203, 207, 0.6)',
+      ];
+
+      const datasets = data.map((item, index) => {
+        const color = predefinedColors[index % predefinedColors.length];
+        return {
+          label: item.label,
+          data: item.earningsPerMonth, // Tratar como earningsPerDay
+          backgroundColor: color,
+        };
+      });
+      return datasets;
+    },
+
     formatIdentification(identification) {
       if (identification && identification.length === 9) {
         return `${identification.slice(0, 1)}-${identification.slice(1, 5)}-${identification.slice(5)}`;
@@ -198,6 +274,16 @@ export default {
       this.$router.push(`/enterprise/${this.enterprise.id}/edit`);
     },
   },
+  computed: {
+    hasDataForSelectedChart() {
+      if (this.selectedChart === 'Ganancias Mensuales') {
+        return this.barChartDatasets.length > 0;
+      } else if (this.selectedChart === 'Ganancias Semanales') {
+        return this.weeklyBarChartDatasets.length > 0;
+      }
+      return false;
+    },
+  },
 };
 </script>
 
@@ -213,5 +299,11 @@ export default {
 }
 .v-divider {
   margin: 16px 0;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active en versiones anteriores de Vue */ {
+  opacity: 0;
 }
 </style>

@@ -12,11 +12,13 @@ namespace BMT_backend.Presentation.Controllers
     {
         private readonly EnterpriseService _enterpriseService;
         private readonly GetEnterpriseEarningsQuery _getEnrerpriseEarningsQuery;
+        private readonly GetEnterpriseWeeklyEarningsQuery _getEnterpriseWeeklyEarningsQuery;
 
-        public EnterpriseController(EnterpriseService enterpriseService, GetEnterpriseEarningsQuery getEnrerpriseEarningsQuery)
+        public EnterpriseController(EnterpriseService enterpriseService, GetEnterpriseEarningsQuery getEnrerpriseEarningsQuery, GetEnterpriseWeeklyEarningsQuery getEnterpriseWeeklyEarningsQuery)
         {
             _enterpriseService = enterpriseService;
             _getEnrerpriseEarningsQuery = getEnrerpriseEarningsQuery;
+            _getEnterpriseWeeklyEarningsQuery = getEnterpriseWeeklyEarningsQuery;
         }
 
         [HttpPost]
@@ -107,6 +109,23 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias de la empresa." });
             }
         }
+
+        [HttpGet("GetEnterpriseWeeklyEarnings")]
+        public async Task<IActionResult> GetEnterpriseWeeklyEarnings(string enterpriseId)
+        {
+            if (string.IsNullOrWhiteSpace(enterpriseId))
+                return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
+            try
+            {
+                var earnings = await _getEnterpriseWeeklyEarningsQuery.GetEnterpriseWeeklyEarningsAsync(enterpriseId);
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias semanales de la empresa." });
+            }
+        }
+
 
         [HttpPut("UpdateEnterprise")]
         public async Task<IActionResult> UpdateEnterprise([FromBody] UpdateEnterpriseRequest updatedEnterprise)

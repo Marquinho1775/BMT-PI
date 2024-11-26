@@ -101,6 +101,7 @@ builder.Services.AddScoped<SearchProductsAndEnterprisesQuery>();
 builder.Services.AddScoped<GetEnterpriseEarningsQuery>();
 builder.Services.AddScoped<GetAllEnterprisesEarningsQuery>();
 builder.Services.AddScoped<GetSystemTotalDeliveryFeeQuery>();
+builder.Services.AddScoped<GetEnterpriseWeeklyEarningsQuery>();
 
 
 var app = builder.Build();
