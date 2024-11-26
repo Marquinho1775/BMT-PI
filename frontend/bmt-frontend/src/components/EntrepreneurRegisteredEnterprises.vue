@@ -28,15 +28,13 @@
               <td>{{ enterprise.phoneNumber }}</td>
               <td>{{ enterprise.description }}</td>
               <td>
-                <!-- Botón de borrado -->
-                <v-btn 
-                  icon
+                <v-icon
                   color="red"
-                  style="font-size: 18px;"
+                  size="18"
                   @click.stop="confirmDeleteEnterprise(enterprise)"
                 >
-                  <v-icon style="font-size: 18px;">mdi-delete</v-icon>
-                </v-btn>
+                  mdi-delete
+                </v-icon>
               </td>
             </tr>
           </tbody>

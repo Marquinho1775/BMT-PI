@@ -479,14 +479,20 @@ export default {
     },
 
     resetForm() {
-      this.$refs.step1Form.reset();
-      this.$refs.step3Form.reset();
+      if (this.$refs.step1Form) {
+        this.$refs.step1Form.reset();
+      }
+      if (this.$refs.step3Form) {
+        this.$refs.step3Form.reset();
+      }
+
       this.cartProducts.forEach((item) => {
         if (item.product.type === 'Perishable') {
           item.deliveryDate = '';
           item.isDialogOpen = false;
         }
       });
+
       this.sinpeReceipt = null;
       this.isAddressOpen = false;
       this.isCreditCardMenuOpen = false;
@@ -494,6 +500,7 @@ export default {
       this.selectedAddress = null;
       this.paymentMethod = '';
     },
+
 
     getDayNames(dayNumbers) {
       const daysOfWeek = [

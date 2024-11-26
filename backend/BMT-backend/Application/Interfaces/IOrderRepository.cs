@@ -22,6 +22,7 @@ namespace BMT_backend.Application.Interfaces
         Task<bool> UpdateDeliveryFeeAsync(string orderId, double deliveryFee);
         
         Task<List<ProductDetails>> GetProductsByOrderIdAsync(string orderId);
+        Task<double> GetProductEarningsByMonth(string productId, int month);
 
         Task<bool> IsDirectionUsedInOrdersAsync(string directionId);
         Task<bool> IsProductUsedInOrdersAsync(string productId);

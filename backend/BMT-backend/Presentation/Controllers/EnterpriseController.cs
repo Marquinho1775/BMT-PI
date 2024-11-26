@@ -2,8 +2,7 @@
 using BMT_backend.Application.Services;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
-using System;
-using System.Threading.Tasks;
+using BMT_backend.Application.Queries;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -12,10 +11,12 @@ namespace BMT_backend.Presentation.Controllers
     public class EnterpriseController : ControllerBase
     {
         private readonly EnterpriseService _enterpriseService;
+        private readonly GetEnterpriseEarningsQuery _getEnrerpriseEarningsQuery;
 
-        public EnterpriseController(EnterpriseService enterpriseService)
+        public EnterpriseController(EnterpriseService enterpriseService, GetEnterpriseEarningsQuery getEnrerpriseEarningsQuery)
         {
             _enterpriseService = enterpriseService;
+            _getEnrerpriseEarningsQuery = getEnrerpriseEarningsQuery;
         }
 
         [HttpPost]
@@ -82,12 +83,28 @@ namespace BMT_backend.Presentation.Controllers
                 return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
             try
             {
-                var products = await _enterpriseService.GetEnterpriseProducts(enterpriseId);
+                var products = await _enterpriseService.GetEnterpriseProductsDetails(enterpriseId);
                 return Ok(new { Success = true, Data = products });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { Success = false, Message = "Error al obtener los productos de la empresa." });
+            }
+        }
+
+        [HttpGet("GetEnterpriseEarnings")]
+        public async Task<IActionResult> GetEnterpriseEarnings(string enterpriseId)
+        {
+            if (string.IsNullOrWhiteSpace(enterpriseId))
+                return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
+            try
+            {
+                var earnings = await _getEnrerpriseEarningsQuery.GetEnterpriseEarningsAsync(enterpriseId);
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias de la empresa." });
             }
         }
 
