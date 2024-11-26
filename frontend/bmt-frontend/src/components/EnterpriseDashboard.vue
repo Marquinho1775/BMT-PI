@@ -94,12 +94,12 @@
           </v-row>
         </v-card-text>
       </v-card>
-
       <v-row>
         <v-col cols="12" md="7">
-          <v-card class="pa-4 elevation-3">
         <StackedBarChart :datasets="barChartDatasets" :type="0"/>
-          </v-card>
+        </v-col>
+        <v-col cols="12" md="5">
+          <PendingOrders />
         </v-col>
       </v-row>
 
@@ -112,10 +112,12 @@ import axios from 'axios';
 import { API_URL } from '@/main.js';
 import { getToken } from '@/helpers/auth';
 import StackedBarChart from './StackedBarChart.vue';
+import PendingOrders from './PendingOrders.vue';
 
 export default {
   components: {
     StackedBarChart,
+    PendingOrders,
   },
   data() {
     return {

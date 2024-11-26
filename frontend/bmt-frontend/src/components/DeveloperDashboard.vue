@@ -12,16 +12,15 @@
       <v-container>
         <v-row>
           <v-col cols="12" md="7">
-            <v-card class="pa-4 elevation-3">
               <StackedBarChart :datasets="barChartDatasets" :type="1"/>
-            </v-card>
           </v-col>
+          <v-col cols="12" md="5">
+            <PendingOrders />
+        </v-col>
         </v-row>
         <v-row>
           <v-col cols="12" md="7">
-            <v-card class="pa-4 elevation-3">
               <LineChart :dataset="LineDataset"/>
-            </v-card>
           </v-col>
         </v-row>
       </v-container>
@@ -32,6 +31,7 @@
 <script>
 import StackedBarChart from './StackedBarChart.vue';
 import LineChart from './LineChart.vue';
+import PendingOrders from './PendingOrders.vue';
 import axios from 'axios';
 import { API_URL } from '@/main.js';
 
@@ -39,6 +39,7 @@ export default {
   components: {
     StackedBarChart,
     LineChart,
+    PendingOrders,
   },
   
   data() {

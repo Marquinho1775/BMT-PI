@@ -1,5 +1,5 @@
 <template>
-	<v-card class="mx-auto" max-width="344" elevation="4">
+	<v-card class="mx-auto" max-width="344" elevation="0">
 		<v-carousel show-arrows="hover" height="200px" hide-delimiters>
 			<v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
 				<v-img :src="imagesURLBase + image" height="200px" aspect-ratio="16/9" cover></v-img>

@@ -233,7 +233,7 @@ namespace BMT_backend.Infrastructure.Data
         {
             //Ocupo que me regrese los pedidos que estén en estado 0, 1, 2 o 3
             var query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, o.NumOrder,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                        d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
@@ -263,7 +263,8 @@ namespace BMT_backend.Infrastructure.Data
                                 OrderCost = Convert.ToDouble(reader["OrderCost"]),
                                 Weight = Convert.ToDouble(reader["Weight"]),
                                 DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                                Status = Convert.ToInt32(reader["Status"])
+                                Status = Convert.ToInt32(reader["Status"]),
+                                NumOrder = reader["NumOrder"].ToString()
                             },
                             UserName = reader["UserName"].ToString(),
                             Direction = reader["NumDirection"].ToString(),
@@ -438,8 +439,8 @@ namespace BMT_backend.Infrastructure.Data
         {
             var query = @"
                 SELECT SUM(op.ProductsCost) AS Earnings
-                FROM Order_Product op
-                JOIN Orders o ON op.OrderId = o.OrderId
+                FROM Order_Product op with(nolock)
+                JOIN Orders o with(nolock) ON op.OrderId = o.OrderId
                 WHERE op.ProductId = @ProductId AND MONTH(o.OrderDate) = @Month AND YEAR(o.OrderDate) = YEAR(GETDATE()) AND o.Status = 4;";
             var parameters = new List<SqlParameter>
             {
@@ -593,6 +594,8 @@ namespace BMT_backend.Infrastructure.Data
             }
             return orders;
         }
+
+
         public async Task<bool> IsProductUsedInOrdersAsync(string productId)
         {
             var query = "SELECT COUNT(*) FROM Order_Product WHERE ProductId = @ProductId";
