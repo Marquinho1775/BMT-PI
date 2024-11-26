@@ -169,6 +169,7 @@
         <v-row class="d-flex justify-space-between mt-4">
           <v-btn color="secondary" @click="goBack">Volver</v-btn>
           <v-btn color="primary" @click="handleEditInfo">Editar Perfil</v-btn>
+          <v-btn color="red" @click="handleDeleteAccount">Eliminar Cuenta</v-btn>
         </v-row>
       </v-card>
     </v-container>
@@ -248,6 +249,9 @@ export default {
     },
     redirectToAddCreditCard() {
       this.$router.push('/card-form');
+    },
+    handleDeleteAccount() {
+      this.$router.push('/userDeleteConfirmation'); // Ruta de la vista
     },
     handleEditInfo() {
       this.$router.push('/profile/edit'); // Ruta corregida
