@@ -35,9 +35,9 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpGet("getProducts")]
-        public async Task<List<Product>> GetProducts()
+        public async Task<List<ProductDevDto>> GetProducts()
         {
-            List<Product> devProducts = await _productService.GetProductsAsync();
+            List<ProductDevDto> devProducts = await _productService.GetProducsDetailsDevAsync();
             return devProducts;
         }
 

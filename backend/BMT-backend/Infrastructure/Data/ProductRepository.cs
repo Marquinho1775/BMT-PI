@@ -66,7 +66,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<List<Product>> GetProductsAsync()
         {
-            var query = "SELECT Id, EnterpriseId, Name, Description, Price, Weight FROM Products AND SoftDeleted = 0;";
+            var query = "SELECT Id, EnterpriseId, Name, Description, Price, Weight FROM Products WHERE SoftDeleted = 0;";
             var products = new List<Product>();
             using (var connection = new SqlConnection(_connectionString))
             using (var command = new SqlCommand(query, connection))

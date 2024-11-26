@@ -153,7 +153,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<int> GetProductsQuantityAsync(string id)
         {
-            var query = "SELECT COUNT(*) FROM Products p WHERE p.EnterpriseId = e.@Id AND SoftDeleted = 0) AS ProductQuantity";
+            var query = "SELECT COUNT(*) AS ProductQuantity FROM Products p WHERE p.EnterpriseId = @Id AND SoftDeleted = 0;";
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@Id", id);
