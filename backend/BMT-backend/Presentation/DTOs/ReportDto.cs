@@ -8,11 +8,11 @@
         public DateTime DateOfCreation { get; set; }
 
         // Columna cambiante
-        public string? DateOfDelivery { get; set; }
-        public string? DateOfCancelation { get; set; }
+        public DateTime? DateOfDelivery { get; set; }
+        public DateTime? DateOfCancelation { get; set; }
 
         // Columna cambiante
-        public string? DateReceived { get; set; }
+        public DateTime? DateReceived { get; set; }
         public string? CancelBy { get; set; }
         public string? Status { get; set; }
 

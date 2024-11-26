@@ -5,16 +5,16 @@
             <h2 class="report-title" v-else-if="Type === 2">Reporte de Pedidos Entregados</h2>
             <h2 class="report-title" v-else-if="Type === 3">Reporte de Pedidos Cancelados</h2>
         </v-row>
-        <!-- Botones y dropdown alineados a la derecha y más juntos -->
+
         <v-row align="center" justify="flex-start">
             <v-col cols="auto" class="mr-4">
-                <!-- Botón para seleccionar fecha de inicio -->
-                <v-btn color="success" text @click="startDateDialog = true" class="date-button">
-                    <v-icon left>mdi-calendar</v-icon>
-                    {{ startDate ? formattedStartDate : 'Seleccionar Fecha de Inicio' }}
-                </v-btn>
+                <v-card-actions>
+                    <v-btn color="success" text @click="startDateDialog = true" class="date-button" variant="tonal">
+                        <v-icon left>mdi-calendar</v-icon>
+                        {{ startDate ? formattedStartDate : 'Seleccionar Fecha de Inicio' }}
+                    </v-btn>
+                </v-card-actions>
 
-                <!-- Diálogo para la fecha de inicio -->
                 <v-dialog v-model="startDateDialog" max-width="380px">
                     <v-card>
                         <v-card-title>
@@ -36,13 +36,13 @@
             </v-col>
 
             <v-col cols="auto" class="mr-4">
-                <!-- Botón para seleccionar fecha final -->
-                <v-btn color="success" text @click="endDateDialog = true" class="date-button">
-                    <v-icon left>mdi-calendar</v-icon>
-                    {{ endDate ? formattedEndDate : 'Seleccionar Fecha Final' }}
-                </v-btn>
+                <v-card-actions>
+                    <v-btn color="success" text @click="endDateDialog = true" class="date-button" variant="tonal">
+                        <v-icon left>mdi-calendar</v-icon>
+                        {{ endDate ? formattedEndDate : 'Seleccionar Fecha Final' }}
+                    </v-btn>
+                </v-card-actions>
 
-                <!-- Diálogo para la fecha final -->
                 <v-dialog v-model="endDateDialog" max-width="380px">
                     <v-card>
                         <v-card-title>
@@ -63,25 +63,31 @@
             </v-col>
 
             <v-col cols="auto">
-                <!-- Dropdown con opciones según el rol del usuario -->
-                <v-select v-model="selectedOption" :items="dropdownOptions" label="Seleccione una opción"
-                    class="ml-4"></v-select>
+                <v-card-actions>
+                    <v-select v-model="selectedOption" :items="dropdownOptions" label="Seleccione una opción"
+                        class="ml-4"></v-select>
+                </v-card-actions>
             </v-col>
         </v-row>
 
         <!-- Botón para generar reporte -->
-        <v-row justify="center" class="mt-4 mb-6">
-            <v-btn color="success" @click="generateReport">
-                Generar Reporte
-            </v-btn>
-            <v-btn color="secondary" @click="exportToPDF" :disabled="!reportData.length">
-                Exportar a PDF
-            </v-btn>
+        <v-row justify="flex-start" class="mt-4 mb-6">
+            <v-col cols="auto">
+                <v-btn color="success" @click="generateReport">
+                    Generar Reporte
+                </v-btn>
+            </v-col>
+            <v-col cols="auto">
+                <v-btn color="secondary" @click="exportToPDF" :disabled="!reportData.length">
+                    Exportar a PDF
+                </v-btn>
+            </v-col>
         </v-row>
 
         <!-- Tabla con los datos del reporte -->
         <reports-table v-if="reportData.length"
-            :titles="Type === 1 ? tableTitles1 : Type === 2 ? tableTitles2 : tableTitles3" :reports="reportData" />
+            :titles="Type === 1 ? tableTitles1 : Type === 2 ? tableTitles2 : tableTitles3"
+            :keys="Type === 1 ? tableKeys1 : Type === 2 ? tableKeys2 : tableKeys3" :reports="reportData" />
     </v-card>
     <v-divider></v-divider>
 </template>
@@ -139,6 +145,17 @@ export default {
                 'Costo de envío',
                 'Costo total de la compra',
             ],
+            tableKeys1: [
+                'numOrder',
+                'enterprises',
+                'itemsCount',
+                'dateOfCreation',
+                'dateOfDelivery',
+                'status',
+                'productCost',
+                'feeCost',
+                'totalCost',
+            ],
 
             tableTitles2: [
                 'Número de orden',
@@ -151,6 +168,17 @@ export default {
                 'Costo de envío',
                 'Costo total de la compra',
             ],
+            tableKeys2: [
+                'numOrder',
+                'enterprises',
+                'itemsCount',
+                'dateOfCreation',
+                'dateOfDelivery',
+                'dateReceived',
+                'productCost',
+                'feeCost',
+                'totalCost',
+            ],
 
             tableTitles3: [
                 'Número de orden',
@@ -162,6 +190,17 @@ export default {
                 'Costo total de los ítems',
                 'Costo de envío',
                 'Costo total de la compra',
+            ],
+            tableKeys3: [
+                'numOrder',
+                'enterprises',
+                'itemsCount',
+                'dateOfCreation',
+                'dateOfCancelation',
+                'canceledBy',
+                'productCost',
+                'feeCost',
+                'totalCost',
             ],
         };
     },
@@ -320,6 +359,7 @@ export default {
                         totalCost: item.totalCost,
                     }));
                 }
+                console.log('Datos del reporte procesados:', this.reportData);
             } catch (error) {
                 console.error('Error al generar el reporte:', error);
             }

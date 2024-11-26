@@ -85,7 +85,7 @@ export default {
       this.sidebarDrawer = false;
     },
     handleDeleteAccount() {
-    this.$router.push('/userDeleteConfirmation'); // Ruta de la vista
+      this.$router.push('/userDeleteConfirmation'); // Ruta de la vista
     },
   },
 };

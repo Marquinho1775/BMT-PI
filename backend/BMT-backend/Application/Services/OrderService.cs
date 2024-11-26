@@ -137,7 +137,7 @@ namespace BMT_backend.Application.Services
                 report.Enterprises = getEnterprise(order);
                 report.ItemsCount = order.Products.Count;
                 report.DateOfCreation = (DateTime)order.Order.OrderDate;
-                report.DateOfDelivery = order.Order.DeliveryDate;
+                report.DateOfDelivery = DateTime.TryParse(order.Order.DeliveryDate, out DateTime deliveryDate) ? (DateTime?)deliveryDate : null;
                 report.Status = StatusToString(order.Order.Status);
                 report.ProductCost = (double)order.Order.OrderCost;
                 report.FeeCost = (double)order.Order.DeliveryFee;
@@ -154,15 +154,15 @@ namespace BMT_backend.Application.Services
             foreach (var order in orders)
             {
                 ReportDto report = new ReportDto();
-                report.NumOrder = order.Order.NumOrder;
+                report.NumOrder = order.Order.NumOrder ?? throw new InvalidOperationException("Order number cannot be null.");
                 report.Enterprises = getEnterprise(order);
                 report.ItemsCount = order.Products.Count;
-                report.DateOfCreation = (DateTime)order.Order.OrderDate;
-                report.DateOfDelivery = order.Order.DeliveryDate;
-                report.DateReceived = order.Order.DeliveryDate;
-                report.ProductCost = (double)order.Order.OrderCost;
-                report.FeeCost = (double)order.Order.DeliveryFee;
-                report.TotalCost = (double)order.Order.OrderCost + report.FeeCost;
+                report.DateOfCreation = order.Order.OrderDate ?? throw new InvalidOperationException("Order date cannot be null.");
+                report.DateOfDelivery = DateTime.TryParse(order.Order.DeliveryDate, out DateTime deliveryDate) ? (DateTime?)deliveryDate : null;
+                report.DateReceived = DateTime.TryParse(order.Order.DeliveryDate, out DateTime dateReceived) ? (DateTime?)dateReceived : null;
+                report.ProductCost = order.Order.OrderCost ?? throw new InvalidOperationException("Order cost cannot be null.");
+                report.FeeCost = order.Order.DeliveryFee ?? throw new InvalidOperationException("Delivery fee cannot be null.");
+                report.TotalCost = report.ProductCost + report.FeeCost;
                 reportList.Add(report);
             }
             return reportList;
@@ -179,7 +179,7 @@ namespace BMT_backend.Application.Services
                 report.Enterprises = getEnterprise(order);
                 report.ItemsCount = order.Products.Count;
                 report.DateOfCreation = (DateTime)order.Order.OrderDate;
-                report.DateOfCancelation = order.Order.DeliveryDate;
+                report.DateOfCancelation = DateTime.TryParse(order.Order.DeliveryDate, out DateTime deliveryDate) ? (DateTime?)deliveryDate : null;
                 if (order.Order.Status == 5)
                 {
                     report.CancelBy = "Cliente";

@@ -52,6 +52,9 @@
 
 
 <script>
+import axios from 'axios';
+import { API_URL } from '@/main.js';
+
 export default {
   data() {
     return {
@@ -91,8 +94,43 @@ export default {
   methods: {
     async registerUser() {
       if (!this.passwordMismatch) {
-        // Registro de usuario
+        await axios.post(API_URL + '/User', {
+          Id: this.formData.Id,
+          Name: this.formData.Name,
+          LastName: this.formData.LastName,
+          Username: this.formData.Username,
+          Email: this.formData.Email,
+          isVerified: this.formData.isVerified,
+          Password: this.formData.Password,
+        })
+          .then((response) => {
+            this.$swal.fire({
+              title: 'Registro exitoso',
+              text: '¡El usuario ha sido registrado correctamente!',
+              icon: 'success',
+              confirmButtonText: 'Ok'
+            }).then(() => {
+              console.log(response);
+              window.history.back();
+            });
+          })
+          .catch((error) => {
+            this.$swal.fire({
+              title: 'Error',
+              text: 'Hubo un error al registrar el usuario. Inténtalo de nuevo.',
+              icon: 'error',
+              confirmButtonText: 'Ok'
+            });
+            console.log(error);
+          });
       }
+      await axios.post(API_URL + '/ShoppingCart?userName=' + this.formData.Username, null)
+        .then((response) => {
+          console.log("Shopping cart created: ", response);
+        })
+        .catch((error) => {
+          console.error("Error creating shopping cart: ", error);
+        });
     },
     onReset(event) {
       event.preventDefault();
@@ -143,22 +181,13 @@ export default {
 <style scoped>
 .title-background {
   background-color: #39517B;
-  /* Fondo del encabezado */
   color: white;
-  /* Texto blanco */
   padding: 16px;
-  /* Espaciado interno */
   margin: 0;
-  /* Elimina márgenes */
   border-radius: 4px 4px 0 0;
-  /* Redondea las esquinas superiores */
   width: 100%;
-  /* Abarca todo el ancho */
   display: block;
-  /* Comportamiento de bloque */
   text-align: center;
-  /* Centra el texto */
   box-sizing: border-box;
-  /* Incluye el padding dentro del ancho total */
 }
 </style>

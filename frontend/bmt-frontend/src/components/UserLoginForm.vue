@@ -20,10 +20,11 @@
               placeholder="Ingresar contraseña" outlined required></v-text-field>
 
             <!-- Botones de acción -->
-            <div class="d-flex justify-end mt-4">
+            <v-card-actions class="d-flex justify-end mt-4">
               <v-btn color="secondary" class="mr-2" outlined @click="Volver">Volver</v-btn>
+              <v-spacer />
               <v-btn type="submit" color="primary">Iniciar sesión</v-btn>
-            </div>
+            </v-card-actions>
           </v-form>
         </v-card-text>
       </v-card>
@@ -109,25 +110,15 @@ export default {
 </script>
 
 <style scoped>
-/* Estilo para el encabezado */
 .title-background {
   background-color: #39517B;
-  /* Fondo del encabezado */
   color: white;
-  /* Texto blanco */
   padding: 16px;
-  /* Espaciado interno */
   margin: 0;
-  /* Elimina márgenes */
   border-radius: 4px 4px 0 0;
-  /* Redondea las esquinas superiores */
   width: 100%;
-  /* Abarca todo el ancho */
   display: block;
-  /* Comportamiento de bloque */
   text-align: center;
-  /* Centra el texto */
   box-sizing: border-box;
-  /* Incluye el padding dentro del ancho total */
 }
 </style>
