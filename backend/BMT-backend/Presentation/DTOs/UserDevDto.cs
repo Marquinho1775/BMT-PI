@@ -4,7 +4,10 @@ namespace BMT_backend.Presentation.DTOs
 {
     public class UserDevDto
     {
-        public User User { get; set; }
-        public List<Enterprise> AssociatedCompanies { get; set; }
+        public string Name { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
+        public List<string> AssociatedCompanies { get; set; }
     }
 }
