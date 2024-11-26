@@ -128,19 +128,18 @@ namespace BMT_backend.Infrastructure.Data
             List<Enterprise> enterprises = new List<Enterprise>();
             var query = "EXEC GetEnterprisesByUser @UserId";
             using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(
-            query, connection))
+            using (var command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@UserId", user.Id);
                 await connection.OpenAsync();
                 using (var reader = await command.ExecuteReaderAsync())
                 {
-                    if (await reader.ReadAsync())
+                    while (await reader.ReadAsync())
                     {
                         enterprises.Add(new Enterprise
                         {
                             Id = reader["Id"].ToString(),
-                            IdentificationType = (int)reader["IdentificationType"],
+                            IdentificationType = Convert.ToInt32(reader["IdentificationType"]),
                             IdentificationNumber = reader["IdentificationNumber"].ToString(),
                             Name = reader["Name"].ToString(),
                             Description = reader["Description"].ToString(),
@@ -149,8 +148,8 @@ namespace BMT_backend.Infrastructure.Data
                         });
                     }
                 }
-                return enterprises;
             }
+            return enterprises;
         }
 
         public async Task<bool> UpdateUserAsync(UpdateUserRequest request)

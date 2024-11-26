@@ -53,10 +53,14 @@ namespace BMT_backend.Application.Services
             List<User> users = await _userRepository.GetUsersAsync();
             foreach (User user in users)
             {
+                List<Enterprise> userAssociatedCompanies = await GetUserEnterprises(user);
                 UserDevDto userDevDto = new()
                 {
-                    User = user,
-                    AssociatedCompanies = await GetUserEnterprises(user)
+                    Name = user.Name + " " + user.LastName,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Role = user.Role,
+                    AssociatedCompanies = userAssociatedCompanies.Select(e => e.Name).ToList()
                 };
                 userDevDtos.Add(userDevDto);
             }
