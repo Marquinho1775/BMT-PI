@@ -23,18 +23,18 @@ namespace BMT_backend.Application.Queries
             {
                 List<EarningsDatasetDto> earnings = new List<EarningsDatasetDto>();
                 List<Product> products = await _enterpriseService.GetEnterpriseProducts(enterpriseId);
-                for (int day = 0; day < 7; day++)
+                foreach (var product in products)
                 {
                     EarningsDatasetDto dailyEarnings = new EarningsDatasetDto
                     {
-                        Label = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName(DateTime.Now.AddDays(-day).DayOfWeek),
-                        EarningsPerMonth = new List<double> { 0 } // Solo un valor por día
+                        Label = product.Name,
+                        EarningsPerMonth = new List<double>(new double[7])
                     };
-                    foreach (var product in products)
+                    for (int day = 0; day < 7; day++)
                     {
                         double productEarnings = await _orderRepository.GetProductEarningsByDay(product.Id, DateTime.Now.AddDays(-day));
-                        dailyEarnings.EarningsPerMonth[0] += productEarnings;
-                    }
+                        dailyEarnings.EarningsPerMonth[day] = productEarnings;
+                    };
                     earnings.Add(dailyEarnings);
                 }
                 return earnings;
@@ -46,29 +46,30 @@ namespace BMT_backend.Application.Queries
             }
         }
 
-        public async Task<List<EarningsDatasetDto>> GetSystemWeeklyEarningsAsync()
-        {
+            public async Task<List<EarningsDatasetDto>> GetSystemWeeklyEarningsAsync()
+            {
             try
             {
                 List<EarningsDatasetDto> earnings = new List<EarningsDatasetDto>();
                 List<Enterprise> enterprises = await _enterpriseService.GetAllEnterprisesAsync();
-                for (int day = 0; day < 7; day++)
+                foreach (Enterprise enterprise in enterprises)
                 {
-                    EarningsDatasetDto dailyEarnings = new EarningsDatasetDto
+                    List<EarningsDatasetDto> enterpriseProductEarnings = await GetEnterpriseWeeklyEarningsAsync(enterprise.Id);
+                    EarningsDatasetDto enterpriseEarnings = new()
                     {
-                        Label = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedDayName(DateTime.Now.AddDays(-day).DayOfWeek),
-                        EarningsPerMonth = new List<double> { 0 }
+                        Label = enterprise.Name,
+                        EarningsPerMonth = new List<double>(new double[7])
                     };
-                    foreach (var enterprise in enterprises)
+                    for (int i = 0; i < 7; i++)
                     {
-                        List<Product> products = await _enterpriseService.GetEnterpriseProducts(enterprise.Id);
-                        foreach (var product in products)
+                        double EnterpriseMonthEarnings = 0;
+                        foreach (var productsEarnings in enterpriseProductEarnings)
                         {
-                            double productEarnings = await _orderRepository.GetProductEarningsByDay(product.Id, DateTime.Now.AddDays(-day));
-                            dailyEarnings.EarningsPerMonth[0] += productEarnings;
+                            EnterpriseMonthEarnings += productsEarnings.EarningsPerMonth[i];
                         }
+                        enterpriseEarnings.EarningsPerMonth[i] = EnterpriseMonthEarnings;
                     }
-                    earnings.Add(dailyEarnings);
+                    earnings.Add(enterpriseEarnings);
                 }
                 return earnings;
             }

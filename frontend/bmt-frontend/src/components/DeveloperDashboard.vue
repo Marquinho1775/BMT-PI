@@ -60,8 +60,8 @@
           </v-col>
         </v-row>
 
-        <!-- Gráfico LineChart (Opcional: Si también quieres aplicar selección y transición) -->
-        <v-row v-if="showLineChart">
+        <!-- Gráfico LineChart  -->
+        <v-row>
           <v-col cols="12" md="7">
             <LineChart :dataset="LineDataset"/>
           </v-col>

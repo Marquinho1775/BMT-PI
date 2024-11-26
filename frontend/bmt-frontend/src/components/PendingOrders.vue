@@ -110,15 +110,20 @@ export default {
         };
     },
     async created() {
-        this.userId = getUser().id;
-        this.userRole = getUser().role;
-        if (this.$route.params.id) {
-            this.enterpriseId = this.$route.params.id;
-            await this.getEnterpriseOrders();
-        } else if (this.userRole === 'dev') {
-            await this.getAllOrders();
+        const user = getUser();
+        if (!user) {
+            this.$router.push('/login');
         } else {
-            await this.getUserOrders();
+            this.userId = user.id;
+            this.userRole = getUser().role;
+            if (this.$route.params.id) {
+                this.enterpriseId = this.$route.params.id;
+                await this.getEnterpriseOrders();
+            } else if (this.userRole === 'dev') {
+                await this.getAllOrders();
+            } else {
+                await this.getUserOrders();
+            }
         }
     },
     methods: {
