@@ -266,6 +266,7 @@ namespace BMT_backend.Infrastructure.Data
                         INNER JOIN Enterprises e ON p.EnterpriseId = e.Id
                         WHERE e.Id IN (SELECT value FROM STRING_SPLIT(@EnterpriseIds, ','))
                           AND YEAR(o.OrderDate) = @Year
+                          AND o.Status = 4
                         GROUP BY e.Name, MONTH(o.OrderDate)
                     )
                     -- Consulta final para mostrar los resultados
