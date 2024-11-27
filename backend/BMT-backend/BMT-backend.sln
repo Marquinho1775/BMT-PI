@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BMT-backend", "BMT-backend.csproj", "{5A2AE99B-85B3-428B-9023-461BB979132D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BMT-Unit-Tests", "..\BMT-Unit-Tests\BMT-Unit-Tests.csproj", "{75F9187B-CCB5-4858-9D08-D324309B36F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BMT-Unit-Tests", "..\BMT-Unit-Tests\BMT-Unit-Tests.csproj", "{75F9187B-CCB5-4858-9D08-D324309B36F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BMTUITesting", "..\BMT-UITesting\BMTUITesting.csproj", "{FAB05DB0-8389-4AA4-A888-B67741BA5FC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{75F9187B-CCB5-4858-9D08-D324309B36F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75F9187B-CCB5-4858-9D08-D324309B36F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75F9187B-CCB5-4858-9D08-D324309B36F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAB05DB0-8389-4AA4-A888-B67741BA5FC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAB05DB0-8389-4AA4-A888-B67741BA5FC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAB05DB0-8389-4AA4-A888-B67741BA5FC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAB05DB0-8389-4AA4-A888-B67741BA5FC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

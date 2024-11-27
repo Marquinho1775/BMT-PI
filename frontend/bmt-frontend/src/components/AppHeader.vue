@@ -13,8 +13,9 @@
     <v-btn v-if="role !== dev" icon color="primary" @click="goToCart">
       <v-icon>mdi-cart</v-icon>
     </v-btn>
-
+    <a href = "/login" >
     <v-btn v-if="!isLoggedIn" color="primary" @click="handleLogin">Iniciar Sesión</v-btn>
+    </a>
     <v-btn v-if="!isLoggedIn" color="secondary" @click="handleRegister">Registrarse</v-btn>
     <v-btn v-if="isLoggedIn" color="primary" @click="handleLogout">Cerrar Sesión</v-btn>
 
