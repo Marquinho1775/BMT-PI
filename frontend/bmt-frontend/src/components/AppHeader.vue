@@ -1,30 +1,17 @@
 <template>
-  <v-app-bar 
-    app color="#9FC9FC" 
-    scroll-behavior="hide"
-    elevation="0">
+  <v-app-bar app color="#9FC9FC" scroll-behavior="hide" elevation="0">
 
     <v-app-bar-title>
       <v-btn variant="text" @click="handleHome">Business Tracker</v-btn>
     </v-app-bar-title>
 
-    <v-text-field
-      v-model="searchText"
-      bg-color="white"
-      color="black"
-      :loading="loading"
-      placeholder="Buscar productos o empresas"
-      hide-details
-      density="compact"
-      variant="outlined"
-      style="max-width: 300px;"
-      append-inner-icon="mdi-magnify"
-      @click:append-inner="search"
-      @keyup.enter="search">
+    <v-text-field v-model="searchText" bg-color="white" color="black" :loading="loading"
+      placeholder="Buscar productos o empresas" hide-details density="compact" variant="outlined"
+      style="max-width: 300px;" append-inner-icon="mdi-magnify" @click:append-inner="search" @keyup.enter="search">
     </v-text-field>
 
     <v-btn v-if="role !== dev" icon color="primary" @click="goToCart">
-          <v-icon>mdi-cart</v-icon>
+      <v-icon>mdi-cart</v-icon>
     </v-btn>
     <a href = "/login" >
     <v-btn v-if="!isLoggedIn" color="primary" @click="handleLogin">Iniciar Sesión</v-btn>
@@ -79,6 +66,7 @@ export default {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       this.isLoggedIn = false;
+      location.reload();
       this.$router.push('/');
     },
     handleRegister() {
@@ -86,6 +74,7 @@ export default {
     },
     handleHome() {
       this.$router.push('/');
+      location.reload();
     },
   },
 };

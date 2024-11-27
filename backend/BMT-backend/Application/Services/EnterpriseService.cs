@@ -3,6 +3,7 @@ using BMT_backend.Domain.Entities;
 using System.Text.RegularExpressions;
 using BMT_backend.Presentation.DTOs;
 using BMT_backend.Presentation.Requests;
+using BMT_backend.Infrastructure.Data;
 
 namespace BMT_backend.Application.Services
 {
@@ -59,22 +60,39 @@ namespace BMT_backend.Application.Services
             {
                 EnterpriseDevDto enterpriseDevDto = new()
                 {
-                    Enterprise = enterprise,
+                    Administrator = enterprise.Administrator.Name + " " + enterprise.Administrator.LastName,
+                    Description = enterprise.Description,
+                    Email = enterprise.Email,
                     EmployeeQuantity = enterprise.Staff.Count,
-                    ProductQuantity = await _enterpriseRepository.GetProductsQuantityAsync(enterprise.Id)
+                    Name = enterprise.Name,
+                    PhoneNumber = enterprise.PhoneNumber,
+                    ProductQuantity = await _enterpriseRepository.GetProductsQuantityAsync(enterprise.Id),
+
                 };
                 enterpriseDevDtos.Add(enterpriseDevDto);
             }
             return enterpriseDevDtos;
         }
 
-        public async Task<List<Product>> GetEnterpriseProducts(string enterpriseId)
+        public async Task<List<Product>> GetEnterpriseProductsDetails(string enterpriseId)
         {
             List<string> productsId =  await _enterpriseRepository.GetEnterpriseProductsIdAsync(enterpriseId);
             List<Product> products = [];
             foreach (string productId in productsId)
             {
                 Product product = await _productService.GetProductDetailsByIdAsync(productId);
+                products.Add(product);
+            }
+            return products;
+        }
+
+        public async Task<List<Product>> GetEnterpriseProducts(string enterpriseId)
+        {
+            List<string> productsId = await _enterpriseRepository.GetEnterpriseProductsIdAsync(enterpriseId);
+            List<Product> products = [];
+            foreach (string productId in productsId)
+            {
+                Product product = await _productService.GetProductByIdAsync(productId);
                 products.Add(product);
             }
             return products;
@@ -193,6 +211,16 @@ namespace BMT_backend.Application.Services
                 return false;
 
             return true;
+        }
+
+        public async Task<bool> DeleteEnterpriseAsync(string enterpriseId)
+        {
+            if (string.IsNullOrEmpty(enterpriseId))
+            {
+                throw new ArgumentException("El ID de la empresa no puede ser nulo o vacío.");
+            }
+
+            return await _enterpriseRepository.DeleteEnterpriseAsync(enterpriseId);
         }
     }
 }

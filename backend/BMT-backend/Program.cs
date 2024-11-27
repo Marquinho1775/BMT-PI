@@ -6,7 +6,6 @@ using BMT_backend.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using BMT_backend.Presentation.Controllers;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -98,7 +97,11 @@ builder.Services.AddScoped<MailService>();
 builder.Services.AddScoped<EnterpriseService>();
 builder.Services.AddScoped<ShoppingCartService>();
 builder.Services.AddScoped<OrderService>();
-builder.Services.AddScoped<SearchProductsAndEnterprisesQuerie>();
+builder.Services.AddScoped<SearchProductsAndEnterprisesQuery>();
+builder.Services.AddScoped<GetEnterpriseEarningsQuery>();
+builder.Services.AddScoped<GetAllEnterprisesEarningsQuery>();
+builder.Services.AddScoped<GetSystemTotalDeliveryFeeQuery>();
+builder.Services.AddScoped<GetEnterpriseWeeklyEarningsQuery>();
 
 
 var app = builder.Build();

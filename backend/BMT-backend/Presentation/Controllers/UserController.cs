@@ -179,7 +179,7 @@ namespace BMT_backend.Presentation.Controllers
                 return BadRequest(new { Message = "El ID de la orden es obligatorio." });
             try
             {
-                var denyResult = await Task.Run(() => _orderService.DenyOrder(orderID));
+                var denyResult = await Task.Run(() => _orderService.DenyOrder(orderID, 0));
                 if (denyResult)
                 {
                     var order = await Task.Run(() => _orderService.GetOrderDetailsById(orderID));
@@ -250,5 +250,23 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, $"Error al verificar cuenta: {ex.Message}");
             }
         }
+        [HttpDelete("Delete/{userId}")]
+        public async Task<ActionResult> DeleteUser(string userId)
+        {
+            try
+            {
+                var result = await _userService.DeleteUserAsync(userId);
+                if (result)
+                {
+                    return Ok(new { Success = true });
+                }
+                return BadRequest("El usuario tiene dependencias y no se puede eliminar.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Error eliminando el usuario: {ex.Message}");
+            }
+        }
+
     }
 }

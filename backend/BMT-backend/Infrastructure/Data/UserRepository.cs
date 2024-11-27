@@ -128,19 +128,18 @@ namespace BMT_backend.Infrastructure.Data
             List<Enterprise> enterprises = new List<Enterprise>();
             var query = "EXEC GetEnterprisesByUser @UserId";
             using (var connection = new SqlConnection(_connectionString))
-            using (var command = new SqlCommand(
-            query, connection))
+            using (var command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@UserId", user.Id);
                 await connection.OpenAsync();
                 using (var reader = await command.ExecuteReaderAsync())
                 {
-                    if (await reader.ReadAsync())
+                    while (await reader.ReadAsync())
                     {
                         enterprises.Add(new Enterprise
                         {
                             Id = reader["Id"].ToString(),
-                            IdentificationType = (int)reader["IdentificationType"],
+                            IdentificationType = Convert.ToInt32(reader["IdentificationType"]),
                             IdentificationNumber = reader["IdentificationNumber"].ToString(),
                             Name = reader["Name"].ToString(),
                             Description = reader["Description"].ToString(),
@@ -149,8 +148,8 @@ namespace BMT_backend.Infrastructure.Data
                         });
                     }
                 }
-                return enterprises;
             }
+            return enterprises;
         }
 
         public async Task<bool> UpdateUserAsync(UpdateUserRequest request)
@@ -248,6 +247,119 @@ namespace BMT_backend.Infrastructure.Data
                 }
             }
             return user;
+        }
+
+        public async Task<bool> DeleteUserAsync(string userId)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Borrar direcciones asociadas al usuario
+                        var directionsQuery = @"
+                    SELECT Id FROM Directions WHERE UserId = @UserId AND SoftDeleted = 0;";
+                        var directionsToDelete = new List<string>();
+                        using (var command = new SqlCommand(directionsQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@UserId", userId);
+                            using (var reader = await command.ExecuteReaderAsync())
+                            {
+                                while (await reader.ReadAsync())
+                                {
+                                    directionsToDelete.Add(reader.GetString(0)); // Obtener los Ids de direcciones
+                                }
+                            }
+                        }
+
+                        foreach (var directionId in directionsToDelete)
+                        {
+                            var directionRepo = new DirectionRepository();
+                            bool directionDeleted = await directionRepo.DeleteDirectionAsync(directionId);
+                            if (!directionDeleted)
+                            {
+                                transaction.Rollback();
+                                return false;
+                            }
+                        }
+
+                        // Borrar productos asociados al usuario a través de su relación con las empresas
+                        var productsQuery = @"
+                    SELECT p.Id FROM Products p
+                    JOIN Entrepreneurs_Enterprises ee ON ee.EnterpriseId = p.EnterpriseId
+                    WHERE ee.EntrepreneurId = @UserId;";
+                        var productsToDelete = new List<string>();
+                        using (var command = new SqlCommand(productsQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@UserId", userId);
+                            using (var reader = await command.ExecuteReaderAsync())
+                            {
+                                while (await reader.ReadAsync())
+                                {
+                                    productsToDelete.Add(reader.GetString(0)); // Obtener los Ids de productos
+                                }
+                            }
+                        }
+
+                        foreach (var productId in productsToDelete)
+                        {
+                            var productRepo = new ProductRepository();
+                            bool productDeleted = await productRepo.DeleteProductAsync(productId);
+                            if (!productDeleted)
+                            {
+                                transaction.Rollback();
+                                return false;
+                            }
+                        }
+
+                        // Borrar las relaciones con las empresas (si el usuario es un emprendedor)
+                        var entrepreneurQuery = @"
+                    SELECT EnterpriseId FROM Entrepreneurs_Enterprises WHERE EntrepreneurId = @UserId;";
+                        var enterpriseIds = new List<string>();
+                        using (var command = new SqlCommand(entrepreneurQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@UserId", userId);
+                            using (var reader = await command.ExecuteReaderAsync())
+                            {
+                                while (await reader.ReadAsync())
+                                {
+                                    enterpriseIds.Add(reader.GetString(0)); // Obtener los Ids de las empresas
+                                }
+                            }
+                        }
+
+                        foreach (var enterpriseId in enterpriseIds)
+                        {
+                            var enterpriseRepo = new EnterpriseRepository();
+                            bool enterpriseDeleted = await enterpriseRepo.DeleteEnterpriseAsync(enterpriseId);
+                            if (!enterpriseDeleted)
+                            {
+                                transaction.Rollback();
+                                return false;
+                            }
+                        }
+
+                        // Borrar el usuario
+                        string deleteUserQuery = "DELETE FROM Users WHERE Id = @UserId;";
+                        using (var command = new SqlCommand(deleteUserQuery, connection, transaction))
+                        {
+                            command.Parameters.AddWithValue("@UserId", userId);
+                            await command.ExecuteNonQueryAsync();
+                        }
+
+                        // Confirmar la transacción
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
         }
     }
 }

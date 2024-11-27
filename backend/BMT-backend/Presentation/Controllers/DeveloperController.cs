@@ -4,6 +4,7 @@ using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.DTOs;
 using BMT_backend.Application.Services;
 using BMT_backend.Application.Interfaces;
+using BMT_backend.Application.Queries;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -17,14 +18,21 @@ namespace BMT_backend.Presentation.Controllers
         private readonly ICodeRepository _codeRepository;
         private readonly MailService _mailManager;
         private readonly OrderService _orderService;
+        private readonly GetAllEnterprisesEarningsQuery _getAllEnterprisesEarningsQuery;
+        private readonly GetSystemTotalDeliveryFeeQuery _GetSystemTotalDeliveryFeeQuery;
+        private readonly GetEnterpriseWeeklyEarningsQuery _getEnterpriseWeeklyEarningsQuery;
 
-        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService)
+
+        public DeveloperController(UserService userService, IConfiguration configuration, ProductService productService, ICodeRepository codeRepository, EnterpriseService enterpriseService, OrderService orderService, GetAllEnterprisesEarningsQuery getAllEnterprisesEarningsQuery, GetSystemTotalDeliveryFeeQuery getSystemTotalDeliveryFeeQuery, GetEnterpriseWeeklyEarningsQuery getEnterpriseWeeklyEarningsQuery)
         {
             _userService = userService;
             _productService = productService;
             _orderService = orderService;
             _mailManager = new MailService(configuration, codeRepository);
             _enterpriseService = enterpriseService;
+            _getAllEnterprisesEarningsQuery = getAllEnterprisesEarningsQuery;
+            _GetSystemTotalDeliveryFeeQuery = getSystemTotalDeliveryFeeQuery;
+            _getEnterpriseWeeklyEarningsQuery = getEnterpriseWeeklyEarningsQuery;
         }
 
         [HttpGet("getEnterprises")]
@@ -35,9 +43,9 @@ namespace BMT_backend.Presentation.Controllers
         }
 
         [HttpGet("getProducts")]
-        public async Task<List<Product>> GetProducts()
+        public async Task<List<ProductDevDto>> GetProducts()
         {
-            List<Product> devProducts = await _productService.GetProductsAsync();
+            List<ProductDevDto> devProducts = await _productService.GetProducsDetailsDevAsync();
             return devProducts;
         }
 
@@ -54,6 +62,48 @@ namespace BMT_backend.Presentation.Controllers
         {
             List<OrderDetails> toConfirmOrders = await _orderService.GetToConfirmOrders();
             return toConfirmOrders;
+        }
+
+        [HttpGet("GetAllEnterprisesEarnings")]
+        public async Task<IActionResult> GetAllEnterprisesEarnings()
+        {
+            try
+            {
+                var earnings = await _getAllEnterprisesEarningsQuery.GetAllEnterprisesEarningsAsync();
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias de la empresa." });
+            }
+        }
+
+        [HttpGet("GetSystemWeeklyEarnings")]
+        public async Task<IActionResult> GetSystemWeeklyEarnings()
+        {
+            try
+            {
+                var earnings = await _getEnterpriseWeeklyEarningsQuery.GetSystemWeeklyEarningsAsync();
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias semanales del sistema." });
+            }
+        }
+
+        [HttpGet("GetSystemTotalDeliverysFee")]
+        public async Task<IActionResult> GetSystemDeliverysFee()
+        {
+            try
+            {
+                var deliverysFee = await _GetSystemTotalDeliveryFeeQuery.GetSystemTotalDeliverysFee();
+                return Ok(new { Success = true, Data = deliverysFee });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las tarifas de envío del sistema." });
+            }
         }
 
         [HttpPut("ConfirmOrder")]
@@ -82,7 +132,7 @@ namespace BMT_backend.Presentation.Controllers
         [HttpPut("DenyOrder")]
         public async Task<IActionResult> DenyOrder(string orderID)
         {
-            if (await _orderService.DenyOrder(orderID))
+            if (await _orderService.DenyOrder(orderID, 1))
             {
                 try
                 {

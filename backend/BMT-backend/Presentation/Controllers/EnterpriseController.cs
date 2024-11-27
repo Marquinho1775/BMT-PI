@@ -2,8 +2,7 @@
 using BMT_backend.Application.Services;
 using BMT_backend.Domain.Entities;
 using BMT_backend.Presentation.Requests;
-using System;
-using System.Threading.Tasks;
+using BMT_backend.Application.Queries;
 
 namespace BMT_backend.Presentation.Controllers
 {
@@ -12,10 +11,14 @@ namespace BMT_backend.Presentation.Controllers
     public class EnterpriseController : ControllerBase
     {
         private readonly EnterpriseService _enterpriseService;
+        private readonly GetEnterpriseEarningsQuery _getEnrerpriseEarningsQuery;
+        private readonly GetEnterpriseWeeklyEarningsQuery _getEnterpriseWeeklyEarningsQuery;
 
-        public EnterpriseController(EnterpriseService enterpriseService)
+        public EnterpriseController(EnterpriseService enterpriseService, GetEnterpriseEarningsQuery getEnrerpriseEarningsQuery, GetEnterpriseWeeklyEarningsQuery getEnterpriseWeeklyEarningsQuery)
         {
             _enterpriseService = enterpriseService;
+            _getEnrerpriseEarningsQuery = getEnrerpriseEarningsQuery;
+            _getEnterpriseWeeklyEarningsQuery = getEnterpriseWeeklyEarningsQuery;
         }
 
         [HttpPost]
@@ -82,7 +85,7 @@ namespace BMT_backend.Presentation.Controllers
                 return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
             try
             {
-                var products = await _enterpriseService.GetEnterpriseProducts(enterpriseId);
+                var products = await _enterpriseService.GetEnterpriseProductsDetails(enterpriseId);
                 return Ok(new { Success = true, Data = products });
             }
             catch (Exception ex)
@@ -90,6 +93,39 @@ namespace BMT_backend.Presentation.Controllers
                 return StatusCode(500, new { Success = false, Message = "Error al obtener los productos de la empresa." });
             }
         }
+
+        [HttpGet("GetEnterpriseEarnings")]
+        public async Task<IActionResult> GetEnterpriseEarnings(string enterpriseId)
+        {
+            if (string.IsNullOrWhiteSpace(enterpriseId))
+                return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
+            try
+            {
+                var earnings = await _getEnrerpriseEarningsQuery.GetEnterpriseEarningsAsync(enterpriseId);
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias de la empresa." });
+            }
+        }
+
+        [HttpGet("GetEnterpriseWeeklyEarnings")]
+        public async Task<IActionResult> GetEnterpriseWeeklyEarnings(string enterpriseId)
+        {
+            if (string.IsNullOrWhiteSpace(enterpriseId))
+                return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
+            try
+            {
+                var earnings = await _getEnterpriseWeeklyEarningsQuery.GetEnterpriseWeeklyEarningsAsync(enterpriseId);
+                return Ok(new { Success = true, Data = earnings });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = "Error al obtener las ganancias semanales de la empresa." });
+            }
+        }
+
 
         [HttpPut("UpdateEnterprise")]
         public async Task<IActionResult> UpdateEnterprise([FromBody] UpdateEnterpriseRequest updatedEnterprise)
@@ -123,6 +159,32 @@ namespace BMT_backend.Presentation.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { Success = false, Message = "Error interno del servidor.", Details = ex.Message });
+            }
+        }
+
+        [HttpDelete("Delete/{enterpriseId}")]
+        public async Task<IActionResult> DeleteEnterprise([FromRoute] string enterpriseId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(enterpriseId))
+                    return BadRequest(new { Message = "El ID de la empresa es obligatorio." });
+
+                var result = await _enterpriseService.DeleteEnterpriseAsync(enterpriseId);
+
+                if (result)
+                    return Ok(new { Success = true, Message = "Empresa eliminada correctamente." });
+
+                return NotFound(new { Success = false, Message = "Empresa no encontrada." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Success = false,
+                    Message = "Error interno del servidor.",
+                    Details = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ? ex.Message : null
+                });
             }
         }
     }

@@ -1,32 +1,26 @@
 <template>
-	<v-card class="mx-auto" max-width="344" elevation="4">
+	<v-card class="mx-auto" max-width="344" elevation="0">
 		<v-carousel show-arrows="hover" height="200px" hide-delimiters>
 			<v-carousel-item v-for="(image, index) in product.imagesURLs" :key="index">
 				<v-img :src="imagesURLBase + image" height="200px" aspect-ratio="16/9" cover></v-img>
 			</v-carousel-item>
 		</v-carousel>
 		<v-card-title>{{ product.name }}</v-card-title>
-		<v-row>
-			<v-col>
-				<v-card-subtitle>₡ {{ product.price }}</v-card-subtitle>
-			</v-col>
-			<v-col class="text-right">
-				<div v-if="product.type === 'Perishable'">
-					<v-chip v-for="(day, index) in formatWeekDays(product.weekDaysAvailable)" :key="index"
-						color="info" size="small" class="white--text">
-						{{ day }}
-					</v-chip>
-				</div>
-				<div v-else>
-					<div v-if="product.stock > 0">
-						<v-chip color="success" class="white--text">Disponible</v-chip>
-					</div>
-					<div v-else>
-						<v-chip color="error" class="white--text">Agotado</v-chip>
-					</div>
-				</div>
-			</v-col>
-		</v-row>
+		<v-card-subtitle>₡ {{ product.price }}</v-card-subtitle>
+		<div v-if="product.type === 'Perishable'">
+			<v-chip v-for="(day, index) in formatWeekDays(product.weekDaysAvailable)" :key="index" color="info"
+				size="small" class="white--text">
+				{{ day }}
+			</v-chip>
+		</div>
+		<div v-else>
+			<div v-if="product.stock > 0">
+				<v-chip color="success" class="white--text">Disponible</v-chip>
+			</div>
+			<div v-else>
+				<v-chip color="error" class="white--text">Agotado</v-chip>
+			</div>
+		</div>
 
 		<v-card-actions>
 			<v-btn prepend-icon="mdi-plus" color="primary" @click="addToCart" text>Añadir al carrito</v-btn>

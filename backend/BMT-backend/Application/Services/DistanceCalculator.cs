@@ -26,4 +26,3 @@ public static class DistanceCalculator
         return grados * (Math.PI / 180);
     }
 }
-

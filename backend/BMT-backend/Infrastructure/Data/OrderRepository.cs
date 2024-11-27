@@ -43,7 +43,7 @@ namespace BMT_backend.Infrastructure.Data
         public async Task<Order> GetOrderByIdAsync(string orderId)
         {
             var query = @"
-            SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+            SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, o.NumOrder,
                    u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                    d.Coordinates, o.Status, o.OrderPaymentMethod, o.OrderDeliveryDate, o.DirectionId
             FROM Orders o
@@ -72,7 +72,8 @@ namespace BMT_backend.Infrastructure.Data
                             OrderCost = Convert.ToDouble(reader["OrderCost"]),
                             Weight = Convert.ToDouble(reader["Weight"]),
                             DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                            Status = Convert.ToInt32(reader["Status"])
+                            Status = Convert.ToInt32(reader["Status"]),
+                            NumOrder = reader["NumOrder"].ToString()
                         };
                     }
                 }
@@ -84,7 +85,7 @@ namespace BMT_backend.Infrastructure.Data
         {
             var orders = new List<OrderDetails>();
             const string query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, o.NumOrder,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                        d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
@@ -94,7 +95,8 @@ namespace BMT_backend.Infrastructure.Data
             using var command = new SqlCommand(query, connection);
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            while (reader.Read()) {
+            while (reader.Read())
+            {
                 var order = new OrderDetails
                 {
                     Order = new Order
@@ -108,7 +110,8 @@ namespace BMT_backend.Infrastructure.Data
                         OrderCost = Convert.ToDouble(reader["OrderCost"]),
                         Weight = Convert.ToDouble(reader["Weight"]),
                         DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                        Status = Convert.ToInt32(reader["Status"])
+                        Status = Convert.ToInt32(reader["Status"]),
+                        NumOrder = reader["NumOrder"].ToString()
                     },
                     UserName = reader["UserName"].ToString(),
                     Direction = reader["NumDirection"].ToString(),
@@ -125,7 +128,7 @@ namespace BMT_backend.Infrastructure.Data
         public async Task<OrderDetails> GetOrderDetailsByIdAsync(string orderId)
         {
             var query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, o.NumOrder,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                        d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
@@ -155,7 +158,8 @@ namespace BMT_backend.Infrastructure.Data
                                 OrderCost = Convert.ToDouble(reader["OrderCost"]),
                                 Weight = Convert.ToDouble(reader["Weight"]),
                                 DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                                Status = Convert.ToInt32(reader["Status"])
+                                Status = Convert.ToInt32(reader["Status"]),
+                                NumOrder = reader["NumOrder"].ToString()
                             },
                             UserName = reader["UserName"].ToString(),
                             Direction = reader["NumDirection"].ToString(),
@@ -173,7 +177,7 @@ namespace BMT_backend.Infrastructure.Data
         public async Task<List<OrderDetails>> GetToConfirmOrdersAsync()
         {
             var query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, o.NumOrder,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                        d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
@@ -202,7 +206,8 @@ namespace BMT_backend.Infrastructure.Data
                                 OrderCost = Convert.ToDouble(reader["OrderCost"]),
                                 Weight = Convert.ToDouble(reader["Weight"]),
                                 DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                                Status = Convert.ToInt32(reader["Status"])
+                                Status = Convert.ToInt32(reader["Status"]),
+                                NumOrder = reader["NumOrder"].ToString()
                             },
                             UserName = reader["UserName"].ToString(),
                             Direction = reader["NumDirection"].ToString(),
@@ -228,7 +233,7 @@ namespace BMT_backend.Infrastructure.Data
         {
             //Ocupo que me regrese los pedidos que estén en estado 0, 1, 2 o 3
             var query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, o.NumOrder,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                        d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
@@ -258,7 +263,8 @@ namespace BMT_backend.Infrastructure.Data
                                 OrderCost = Convert.ToDouble(reader["OrderCost"]),
                                 Weight = Convert.ToDouble(reader["Weight"]),
                                 DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                                Status = Convert.ToInt32(reader["Status"])
+                                Status = Convert.ToInt32(reader["Status"]),
+                                NumOrder = reader["NumOrder"].ToString()
                             },
                             UserName = reader["UserName"].ToString(),
                             Direction = reader["NumDirection"].ToString(),
@@ -278,7 +284,7 @@ namespace BMT_backend.Infrastructure.Data
         {
             var orders = new List<OrderDetails>();
             const string query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
+                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId, o.NumOrder,
                        u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
                        d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
                 FROM Orders o
@@ -305,7 +311,8 @@ namespace BMT_backend.Infrastructure.Data
                         OrderCost = Convert.ToDouble(reader["OrderCost"]),
                         Weight = Convert.ToDouble(reader["Weight"]),
                         DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                        Status = Convert.ToInt32(reader["Status"])
+                        Status = Convert.ToInt32(reader["Status"]),
+                        NumOrder = reader["NumOrder"].ToString()
                     },
                     UserName = reader["UserName"].ToString(),
                     Direction = reader["NumDirection"].ToString(),
@@ -330,9 +337,17 @@ namespace BMT_backend.Infrastructure.Data
             return await command.ExecuteNonQueryAsync() > 0;
         }
 
-        public async Task<bool> DenyOrderAsync(string orderId)
+        public async Task<bool> DenyOrderAsync(string orderId, int roleId)
         {
-            var query = "UPDATE Orders SET Status = 5 WHERE OrderId = @OrderId";
+            var query = "";
+            if (roleId == 0)
+            {
+                query = "UPDATE Orders SET Status = 5, OrderDeliveryDate = GETDATE() WHERE OrderId = @OrderId";
+            }
+            else
+            {
+                query = "UPDATE Orders SET Status = 6, OrderDeliveryDate = GETDATE() WHERE OrderId = @OrderId";
+            }
             var parameters = new List<SqlParameter> { new("@OrderId", orderId) };
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
@@ -376,7 +391,7 @@ namespace BMT_backend.Infrastructure.Data
 
         public async Task<bool> UpdateDeliveryFeeAsync(string orderId, double deliveryFee)
         {
-            var query = "UPDATE Orders SET DeliveryFee = @DeliveryFee WHERE OrderId = @OrderId";
+            var query = "UPDATE Orders SET DeliveryFee = DeliveryFee + @DeliveryFee WHERE OrderId = @OrderId";
             var parameters = new List<SqlParameter>
             {
                 new("@DeliveryFee", deliveryFee),
@@ -420,6 +435,49 @@ namespace BMT_backend.Infrastructure.Data
             return products;
         }
 
+        public async Task<double> GetProductEarningsByMonth(string productId, int month)
+        {
+            var query = @"
+                SELECT SUM(op.ProductsCost) AS Earnings
+                FROM Order_Product op with(nolock)
+                JOIN Orders o with(nolock) ON op.OrderId = o.OrderId
+                WHERE op.ProductId = @ProductId AND MONTH(o.OrderDate) = @Month AND YEAR(o.OrderDate) = YEAR(GETDATE()) AND o.Status = 4;";
+            var parameters = new List<SqlParameter>
+            {
+                new("@ProductId", productId),
+                new("@Month", month)
+            };
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+            await connection.OpenAsync();
+            var earnings = await command.ExecuteScalarAsync();
+            return earnings is DBNull ? 0 : Convert.ToDouble(earnings);
+        }
+
+        public async Task<double> GetProductEarningsByDay(string productId, DateTime date)
+        {
+            var query = @"
+            SELECT SUM(op.ProductsCost) AS Earnings
+            FROM Order_Product op WITH (NOLOCK)
+            JOIN Orders o WITH (NOLOCK) ON op.OrderId = o.OrderId
+            WHERE op.ProductId = @ProductId 
+              AND CAST(o.OrderDate AS DATE) = @Date 
+              AND o.Status = 4;";
+            var parameters = new List<SqlParameter>
+            {
+                new SqlParameter("@ProductId", productId),
+                new SqlParameter("@Date", date.Date)
+            };
+            using var connection = new SqlConnection(_connectionString);
+            using var command = new SqlCommand(query, connection);
+            command.Parameters.AddRange(parameters.ToArray());
+            await connection.OpenAsync();
+            var earnings = await command.ExecuteScalarAsync();
+            return earnings is DBNull ? 0 : Convert.ToDouble(earnings);
+        }
+
+
         public async Task<List<Product>> GetOrderProductsAsync(string userId)
         {
             var query = @"
@@ -435,21 +493,36 @@ namespace BMT_backend.Infrastructure.Data
             command.Parameters.AddRange(parameters.ToArray());
             await connection.OpenAsync();
             using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync()) {
+            while (await reader.ReadAsync())
+            {
                 var product = await _productRepository.GetProductDetailsByIdAsync(reader["Id"].ToString());
-                if (!products.Exists(p => p.Id == product.Id)){
+                if (!products.Exists(p => p.Id == product.Id))
+                {
                     products.Add(product);
                 }
             }
             return products;
         }
 
+        public async Task<bool> IsDirectionUsedInOrdersAsync(string directionId)
+        {
+            var query = "SELECT COUNT(*) FROM Orders WHERE DirectionId = @DirectionId";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@DirectionId", directionId);
+                    var count = (int)await command.ExecuteScalarAsync();
+                    return count > 0;
+                }
+            }
+        }
+
         public async Task<List<OrderDetails>> GetOrderReportsByUserIdAsync(ReportRequest report)
         {
             var query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
-                       u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
-                       d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
+                SELECT o.OrderId
                 FROM Orders o
                 JOIN Users u ON o.UserId = u.Id
                 JOIN Directions d ON o.DirectionId = d.Id
@@ -470,29 +543,11 @@ namespace BMT_backend.Infrastructure.Data
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                var order = new OrderDetails
+                var order = await GetOrderDetailsByIdAsync(reader["OrderId"].ToString());
+                if (!orders.Exists(o => o.Order.OrderId == order.Order.OrderId))
                 {
-                    Order = new Order
-                    {
-                        OrderId = reader["OrderId"].ToString(),
-                        UserId = reader["UserId"].ToString(),
-                        DirectionId = reader["DirectionId"].ToString(),
-                        PaymentMethod = reader["OrderPaymentMethod"].ToString(),
-                        OrderDate = Convert.ToDateTime(reader["OrderDate"]),
-                        DeliveryDate = reader["OrderDeliveryDate"].ToString(),
-                        OrderCost = Convert.ToDouble(reader["OrderCost"]),
-                        Weight = Convert.ToDouble(reader["Weight"]),
-                        DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                        Status = Convert.ToInt32(reader["Status"])
-                    },
-                    UserName = reader["UserName"].ToString(),
-                    Direction = reader["NumDirection"].ToString(),
-                    UserEmail = reader["UserEmail"].ToString(),
-                    OtherSigns = reader["OtherSigns"] as string,
-                    Coordinates = reader["Coordinates"].ToString(),
-                    Products = await GetProductsByOrderIdAsync(reader["OrderId"].ToString())
-                };
-                orders.Add(order);
+                    orders.Add(order);
+                }
             }
             return orders;
         }
@@ -534,9 +589,7 @@ namespace BMT_backend.Infrastructure.Data
         public async Task<List<OrderDetails>> GetOrderReportsAsync(ReportRequest report)
         {
             var query = @"
-                SELECT o.OrderId, o.OrderDate, o.OrderCost, o.DeliveryFee, o.Weight, o.UserId,
-                       u.UserName, d.NumDirection, d.OtherSigns, u.Email AS UserEmail, 
-                       d.Coordinates, o.Status, d.Id AS DirectionId, o.OrderPaymentMethod, o.OrderDeliveryDate
+                SELECT o.OrderId
                 FROM Orders o
                 JOIN Users u ON o.UserId = u.Id
                 JOIN Directions d ON o.DirectionId = d.Id
@@ -556,32 +609,48 @@ namespace BMT_backend.Infrastructure.Data
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                var order = new OrderDetails
+                var order = await GetOrderDetailsByIdAsync(reader["OrderId"].ToString());
+                if (!orders.Exists(o => o.Order.OrderId == order.Order.OrderId))
                 {
-                    Order = new Order
-                    {
-                        OrderId = reader["OrderId"].ToString(),
-                        UserId = reader["UserId"].ToString(),
-                        DirectionId = reader["DirectionId"].ToString(),
-                        PaymentMethod = reader["OrderPaymentMethod"].ToString(),
-                        OrderDate = Convert.ToDateTime(reader["OrderDate"]),
-                        DeliveryDate = reader["OrderDeliveryDate"].ToString(),
-                        OrderCost = Convert.ToDouble(reader["OrderCost"]),
-                        Weight = Convert.ToDouble(reader["Weight"]),
-                        DeliveryFee = Convert.ToDouble(reader["DeliveryFee"]),
-                        Status = Convert.ToInt32(reader["Status"])
-                    },
-                    UserName = reader["UserName"].ToString(),
-                    Direction = reader["NumDirection"].ToString(),
-                    UserEmail = reader["UserEmail"].ToString(),
-                    OtherSigns = reader["OtherSigns"] as string,
-                    Coordinates = reader["Coordinates"].ToString(),
-                    Products = await GetProductsByOrderIdAsync(reader["OrderId"].ToString())
-                };
-                orders.Add(order);
+                    orders.Add(order);
+                }
             }
             return orders;
         }
+
+
+        public async Task<bool> IsProductUsedInOrdersAsync(string productId)
+        {
+            var query = "SELECT COUNT(*) FROM Order_Product WHERE ProductId = @ProductId";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@ProductId", productId);
+                    var count = (int)await command.ExecuteScalarAsync();
+                    return count > 0;
+                }
+            }
+        }
+
+        public async Task<bool> AreEnterpriseProductsInOrders(string enterpriseId)
+        {
+            var query = @"
+            SELECT COUNT(*)
+            FROM Products p
+            JOIN Order_Product op ON p.Id = op.ProductId
+            WHERE p.EnterpriseId = @EnterpriseId";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@EnterpriseId", enterpriseId);
+                    var count = (int)await command.ExecuteScalarAsync();
+                    return count > 0; // Devuelve true si hay productos asociados a órdenes
+                }
+            }
+        }
     }
 }
-

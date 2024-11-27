@@ -2,6 +2,7 @@
 using BMT_backend.Application.Interfaces;
 using BMT_backend.Infrastructure.Data;
 using BMT_backend.Presentation.Requests;
+using BMT_backend.Presentation.DTOs;
 using static System.Net.Mime.MediaTypeNames;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -61,6 +62,30 @@ namespace BMT_backend.Application.Services
         public async Task<List<Product>> GetProducsDetailsAsync()
         {
             return await _productRepository.GetProductsDetailsAsync();
+        }
+
+        public async Task<List<ProductDevDto>> GetProducsDetailsDevAsync()
+        {
+            List<Product> products = await GetProducsDetailsAsync();
+            List<ProductDevDto> productsDto = new List<ProductDevDto>();
+            foreach (Product product in products) {
+                ProductDevDto devDto = new ProductDevDto()
+                {
+                    Name = product.Name,
+                    EnterpriseName = product.EnterpriseName,
+                    Description = product.Description,
+                    Weight = product.Weight,
+                    Price = product.Price,
+                    Type = product.Type,
+                    Tags = product.Tags,
+                    ImagesURLs = product.ImagesURLs,
+                    Stock = product.Stock,
+                    Limit = product.Limit,
+                    WeekDaysAvailable = product.WeekDaysAvailable
+                };
+                productsDto.Add(devDto);
+            }
+            return productsDto;
         }
 
         public async Task<Product> GetProductDetailsByIdAsync(string id)
@@ -147,6 +172,14 @@ namespace BMT_backend.Application.Services
                 throw new ArgumentException("El tipo del producto no puede estar vacío.");
             if (product.Type == "Perishable" && product.Limit <= 0)
                 throw new ArgumentException("El límite de stock no puede ser menor o igual a 0.");
+        }
+
+        public async Task<bool> DeleteProductAsync(string productId)
+        {
+            if (string.IsNullOrEmpty(productId))
+                throw new ArgumentException("El identificador del producto no puede estar vacío.");
+
+            return await _productRepository.DeleteProductAsync(productId);
         }
     }
 }

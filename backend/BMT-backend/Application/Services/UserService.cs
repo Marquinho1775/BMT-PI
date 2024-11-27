@@ -53,10 +53,14 @@ namespace BMT_backend.Application.Services
             List<User> users = await _userRepository.GetUsersAsync();
             foreach (User user in users)
             {
+                List<Enterprise> userAssociatedCompanies = await GetUserEnterprises(user);
                 UserDevDto userDevDto = new()
                 {
-                    User = user,
-                    AssociatedCompanies = await GetUserEnterprises(user)
+                    Name = user.Name + " " + user.LastName,
+                    Username = user.Username,
+                    Email = user.Email,
+                    Role = user.Role,
+                    AssociatedCompanies = userAssociatedCompanies.Select(e => e.Name).ToList()
                 };
                 userDevDtos.Add(userDevDto);
             }
@@ -192,6 +196,13 @@ namespace BMT_backend.Application.Services
             if (string.IsNullOrEmpty(trimmedRequest.Password))
                 trimmedRequest.Password = null;
             return trimmedRequest;
+        }
+
+        public async Task<bool> DeleteUserAsync(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                throw new ArgumentException("El identificador del usuario no puede estar vacío.");
+            return await _userRepository.DeleteUserAsync(userId);
         }
     }
 }

@@ -4,45 +4,38 @@
       <h2 class="report-title">Reporte de ganancias anuales</h2>
     </v-row>
 
-    <v-row align="center" justify="space-between">
+    <v-row align="center" justify="flex-start">
       <v-col cols="12" sm="4">
-        <v-text-field
-          v-model="year"
-          label="Año"
-          type="number"
-          min="1900"
-          max="2100"
-          placeholder="Ingrese el año"
-          outlined
-        ></v-text-field>
-      </v-col>
-
-      <v-col cols="12" sm="4">
-        <v-btn color="primary" @click="openDialog" outlined>
+        <v-btn color="success" @click="openDialog" outlined variant="tonal">
           Seleccionar emprendimientos
         </v-btn>
       </v-col>
+
+      <v-col cols="12" sm="4">
+        <v-text-field v-model="year" label="Año" type="number" min="1900" max="2100" placeholder="Ingrese el año"
+          outlined></v-text-field>
+      </v-col>
     </v-row>
 
-    <v-row justify="center" class="mt-4 mb-6">
-      <v-btn color="success" @click="generateReport" :disabled="!isValid">
-        Generar Reporte
-      </v-btn>
-      <v-btn color="secondary" @click="exportToPDF" :disabled="!reportData.length">
-        Exportar a PDF
-      </v-btn>
+    <v-row justify="flex-start" class="mt-4 mb-6">
+      <v-col cols="auto">
+        <v-btn color="success" @click="generateReport" :disabled="!isValid">
+          Generar Reporte
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn color="secondary" @click="exportToPDF" :disabled="!reportData.length">
+          Exportar a PDF
+        </v-btn>
+      </v-col>
     </v-row>
 
     <v-row>
       <div v-if="reportError" class="error-message">
         No se pudo generar un reporte con estos datos.
       </div>
-      <reports-table
-        v-else-if="reportData.length"
-        :titles="tableTitles"
-        :reports="reportData"
-        :header-style="headerStyle"
-      ></reports-table>
+      <reports-table v-else-if="reportData.length" :titles="tableTitles" :keys="tableKeys" :reports="reportData"
+        :header-style="headerStyle"></reports-table>
     </v-row>
 
     <v-dialog v-model="dialog" max-width="500">
@@ -50,18 +43,9 @@
         <v-card-title>Seleccione los emprendimientos</v-card-title>
         <v-card-text>
           <p class="font-weight-medium">Por favor seleccione los emprendimientos:</p>
-          <v-checkbox
-            v-model="selectAll"
-            label="Seleccionar todos"
-            @change="toggleSelectAll"
-          ></v-checkbox>
-          <v-checkbox
-            v-for="enterprise in enterpriseOptions"
-            :key="enterprise.value"
-            v-model="selectedEnterprises"
-            :value="enterprise.value"
-            :label="enterprise.text"
-          ></v-checkbox>
+          <v-checkbox v-model="selectAll" label="Seleccionar todos" @change="toggleSelectAll"></v-checkbox>
+          <v-checkbox v-for="enterprise in enterpriseOptions" :key="enterprise.value" v-model="selectedEnterprises"
+            :value="enterprise.value" :label="enterprise.text"></v-checkbox>
         </v-card-text>
         <v-card-actions>
           <v-btn color="primary" @click="closeDialog">Aceptar</v-btn>
@@ -81,16 +65,16 @@ export default {
   name: "YearlyEarnings",
   data() {
     return {
-      year: new Date().getFullYear(), 
-      enterprises: [], 
-      enterpriseOptions: [], 
-      selectedEnterprises: [], 
-      selectAll: false, 
-      reportData: [], 
-      reportError: false, 
-      dialog: false, 
+      year: new Date().getFullYear(),
+      enterprises: [],
+      enterpriseOptions: [],
+      selectedEnterprises: [],
+      selectAll: false,
+      reportData: [],
+      reportError: false,
+      dialog: false,
       headerStyle: {
-        backgroundColor: "#A9C5FF", 
+        backgroundColor: "#A9C5FF",
         color: "white",
       },
       tableTitles: [
@@ -99,6 +83,13 @@ export default {
         "Total de compra",
         "Total de envío",
         "Costo total de compra",
+      ],
+      tableKeys: [
+        'Emprendimiento',
+        'Mes',
+        'Total de compra',
+        'Total de envío',
+        'Costo total de compra',
       ],
     };
   },
@@ -160,6 +151,23 @@ export default {
     closeDialog() {
       this.dialog = false;
     },
+    translateMonth(englishMonth) {
+      const months = {
+        January: "Enero",
+        February: "Febrero",
+        March: "Marzo",
+        April: "Abril",
+        May: "Mayo",
+        June: "Junio",
+        July: "Julio",
+        August: "Agosto",
+        September: "Septiembre",
+        October: "Octubre",
+        November: "Noviembre",
+        December: "Diciembre",
+      };
+      return months[englishMonth] || englishMonth; // Devuelve el nombre traducido o el original si no coincide
+    },
     async generateReport() {
       const selectedEnterpriseIds = this.selectedEnterprises.join(",");
       const requestData = {
@@ -183,7 +191,7 @@ export default {
         this.reportError = false;
         this.reportData = response.data.data.map((item) => ({
           Emprendimiento: item.enterpriseName,
-          Mes: item.monthName,
+          Mes: this.translateMonth(item.monthName),
           "Total de compra": item.totalPurchase,
           "Total de envío": item.totalDelivery,
           "Costo total de compra": item.totalCost,
@@ -224,10 +232,12 @@ export default {
 .v-card {
   padding: 20px;
 }
+
 .report-title {
   font-size: 24px;
   font-weight: bold;
 }
+
 .error-message {
   color: red;
   font-size: 18px;
