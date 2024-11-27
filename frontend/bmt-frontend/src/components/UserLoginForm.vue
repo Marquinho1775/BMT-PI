@@ -12,13 +12,15 @@
         <v-card-text>
           <v-form @submit.prevent="loginUser">
             <!-- Campo de correo -->
-            <v-text-field label="Correo electrónico" v-model="loginForm.Email" type="email"
-              placeholder="Ingresar correo electrónico" outlined required></v-text-field>
-
+            <a href="/inputCorreo">
+              <v-text-field label="Correo electrónico" v-model="loginForm.Email" type="email"
+                placeholder="Ingresar correo electrónico" outlined required></v-text-field>
+            </a>
             <!-- Campo de contraseña -->
-            <v-text-field label="Contraseña" v-model="loginForm.Password" type="password"
-              placeholder="Ingresar contraseña" outlined required></v-text-field>
-
+            <a href="/inputContrasena">
+              <v-text-field label="Contraseña" v-model="loginForm.Password" type="password"
+                placeholder="Ingresar contraseña" outlined required></v-text-field>
+            </a>
             <!-- Botones de acción -->
             <v-card-actions class="d-flex justify-end mt-4">
               <v-btn color="secondary" class="mr-2" outlined @click="Volver">Volver</v-btn>
