@@ -1,0 +1,159 @@
+{
+  "id": "201d8a27-0002-40b4-852f-1da7aa41c0f7",
+  "version": "2.0",
+  "name": "SeleniumIDETest",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "b1c018dd-a40a-4806-b657-20083c1067b5",
+    "name": "Generar Reporte de ganancias anuales",
+    "commands": [{
+      "id": "311e691e-f9e3-4119-bb22-ecc32d744306",
+      "comment": "",
+      "command": "open",
+      "target": "/enterprises",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f1e759d8-7d58-4085-995d-a6bf17bd291e",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1936x1056",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "071a6652-0afb-4a18-8933-62f0cade3b05",
+      "comment": "",
+      "command": "click",
+      "target": "css=v-list-item-group:nth-child(3) > .v-list-item:nth-child(1) .v-list-item-title",
+      "targets": [
+        ["css=v-list-item-group:nth-child(3) > .v-list-item:nth-child(1) .v-list-item-title", "css:finder"],
+        ["xpath=//div[@id='app']/div/div/nav/div/div[2]/v-list-item-group/v-list-item-group/div/div[2]/div", "xpath:idRelative"],
+        ["xpath=//v-list-item-group/v-list-item-group/div/div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "075fa875-e5eb-4f80-83f9-ffa152e8762e",
+      "comment": "",
+      "command": "click",
+      "target": "css=v-list-item-group:nth-child(2) > .v-list-item:nth-child(2) .v-list-item-title",
+      "targets": [
+        ["css=v-list-item-group:nth-child(2) > .v-list-item:nth-child(2) .v-list-item-title", "css:finder"],
+        ["xpath=//div[@id='app']/div/div/nav/div/div[2]/v-list-item-group/div[2]/div[2]/div", "xpath:idRelative"],
+        ["xpath=//v-list-item-group/div[2]/div[2]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "0e47ac05-67f1-4958-89ea-623b4afb421b",
+      "comment": "",
+      "command": "click",
+      "target": "css=.v-col-sm-4 .v-btn__content",
+      "targets": [
+        ["css=.v-col-sm-4 .v-btn__content", "css:finder"],
+        ["xpath=//div[@id='app']/div/div/main/main/div/div[4]/div[3]/div/button/span[3]", "xpath:idRelative"],
+        ["xpath=//div[3]/div/button/span[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "6b24cf57-b3ef-44c9-9202-c8b1363e1927",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "id=checkbox-51",
+      "targets": [
+        ["id=checkbox-51", "id"],
+        ["css=#checkbox-51", "css:finder"],
+        ["xpath=//input[@id='checkbox-51']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div[3]/div/div/div/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "e388cd7f-e2a1-466a-b460-12f2d0ad1649",
+      "comment": "",
+      "command": "click",
+      "target": "id=checkbox-51",
+      "targets": [
+        ["id=checkbox-51", "id"],
+        ["css=#checkbox-51", "css:finder"],
+        ["xpath=//input[@id='checkbox-51']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div[3]/div/div/div/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "598afe25-730a-4426-9233-c7e7353eb118",
+      "comment": "",
+      "command": "mouseOut",
+      "target": "id=checkbox-51",
+      "targets": [
+        ["id=checkbox-51", "id"],
+        ["css=#checkbox-51", "css:finder"],
+        ["xpath=//input[@id='checkbox-51']", "xpath:attributes"],
+        ["xpath=//div[2]/div/div[3]/div/div/div/div/div/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "817dcb5b-45f0-4b77-9e0f-694d0820f6f4",
+      "comment": "",
+      "command": "click",
+      "target": "css=.text-primary:nth-child(1) > .v-btn__content",
+      "targets": [
+        ["css=.text-primary:nth-child(1) > .v-btn__content", "css:finder"],
+        ["xpath=//div[4]/button/span[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "eaee0be9-6cb1-4178-97ac-0b7cadc99e50",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=.v-card:nth-child(8) .v-col:nth-child(1) .v-btn__content",
+      "targets": [
+        ["css=.v-card:nth-child(8) .v-col:nth-child(1) .v-btn__content", "css:finder"],
+        ["xpath=//div[@id='app']/div/div/main/main/div/div[4]/div[4]/div/button/span[3]", "xpath:idRelative"],
+        ["xpath=//div[4]/div[4]/div/button/span[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "cddbb2db-54dc-4b60-be33-ed3bc05e0506",
+      "comment": "",
+      "command": "click",
+      "target": "css=.v-card:nth-child(8) .v-col:nth-child(1) .v-btn__content",
+      "targets": [
+        ["css=.v-card:nth-child(8) .v-col:nth-child(1) .v-btn__content", "css:finder"],
+        ["xpath=//div[@id='app']/div/div/main/main/div/div[4]/div[4]/div/button/span[3]", "xpath:idRelative"],
+        ["xpath=//div[4]/div[4]/div/button/span[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "878a16a1-8373-44d2-95a5-af87997d663d",
+      "comment": "",
+      "command": "mouseOut",
+      "target": "css=.v-card:nth-child(8) .v-col:nth-child(1) .v-btn__content",
+      "targets": [
+        ["css=.v-card:nth-child(8) .v-col:nth-child(1) .v-btn__content", "css:finder"],
+        ["xpath=//div[@id='app']/div/div/main/main/div/div[4]/div[4]/div/button/span[3]", "xpath:idRelative"],
+        ["xpath=//div[4]/div[4]/div/button/span[3]", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "8f8ea5cc-b065-47f4-96d0-7e438869e4a6",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "css=.header1:nth-child(1) > strong",
+      "targets": [
+        ["css=.header1:nth-child(1) > strong", "css:finder"],
+        ["xpath=//div[@id='app']/div/div/main/main/div/div[4]/div[5]/div/div/table/thead/tr/th/strong", "xpath:idRelative"],
+        ["xpath=//strong", "xpath:position"],
+        ["xpath=//strong[contains(.,'Emprendimiento')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "4a0eade9-c2e4-493b-9ae3-a78f765c0216",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": []
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}
