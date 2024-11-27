@@ -52,7 +52,7 @@
           </tr>
         </tbody>
       </table>
-    </div>
+        </div>
   </v-main>
 </template>
 
@@ -96,7 +96,7 @@ export default {
         const response = await axios.get(`${API_URL}/Developer/getProducts`);
         console.log("Respuesta del API:", response.data);
         if (Array.isArray(response.data)) {
-            this.products = response.data;
+        this.products = response.data;
             this.formatProductImages();
         } else {
             console.warn("La respuesta no es un arreglo.");
@@ -115,7 +115,7 @@ export default {
             image.startsWith("http") ? image : `${URL}${image}`
           );
         }
-      });
+            });
     },
 
     formatWeekDays(weekDaysString) {

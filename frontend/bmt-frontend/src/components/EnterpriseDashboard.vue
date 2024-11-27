@@ -8,7 +8,7 @@
           </v-col>
         </v-row>
         <v-divider></v-divider>
-
+  
         <v-card-text>
           <v-row>
             <!-- Sección izquierda: Información del emprendimiento -->
@@ -24,14 +24,14 @@
                     </v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
-
+  
                 <v-list-item>
                   <v-list-item-content>
                     <v-list-item-title class="font-weight-bold">Correo empresarial:</v-list-item-title>
                     <v-list-item-subtitle>{{ enterprise.email || 'N/A' }}</v-list-item-subtitle>
                   </v-list-item-content>
                 </v-list-item>
-
+  
                 <v-list-item>
                   <v-list-item-content>
                     <v-list-item-title class="font-weight-bold">Número de teléfono:</v-list-item-title>
@@ -66,7 +66,7 @@
                       <v-list-item-subtitle>{{ item.email }}</v-list-item-subtitle>
                     </v-list-item-content>
                   </v-list-item>
-                </template>
+  </template>
               </v-virtual-scroll>
               <v-alert type="info" v-else>
                 No hay colaboradores asociados.
@@ -74,7 +74,7 @@
             </v-col>
           </v-row>
         </v-card-text>
-
+  
         <v-divider class="my-4"></v-divider>
 
         <v-card-subtitle class="text-h6">Productos</v-card-subtitle>
@@ -142,20 +142,20 @@
   </v-main>
 </template>
 
-<script>
-import axios from 'axios';
+  <script>
+  import axios from 'axios';
 import { API_URL } from '@/main.js';
-import { getToken } from '@/helpers/auth';
+  import { getToken } from '@/helpers/auth';
 import StackedBarChart from './StackedBarChart.vue';
 import PendingOrders from './PendingOrders.vue';
-
-export default {
+  
+  export default {
   components: {
     StackedBarChart,
     PendingOrders,
   },
-  data() {
-    return {
+    data() {
+      return {
       enterprise: {},
       barChartDatasets: [],
       weeklyBarChartDatasets: [],
@@ -164,12 +164,12 @@ export default {
         'Ganancias Mensuales',
         'Ganancias Semanales',
       ],
-    };
-  },
-  async created() {
-    const enterpriseId = this.$route.params.id;
-    try {
-      const token = getToken();
+      };
+    },
+    async created() {
+      const enterpriseId = this.$route.params.id;
+      try {
+        const token = getToken();
       const enterpriseResponse = await axios.get(
         `${API_URL}/Enterprise/GetEnterpriseById?enterpriseId=${enterpriseId}`,
         {
@@ -177,12 +177,12 @@ export default {
         }
       );
       this.enterprise = enterpriseResponse.data.data;
-    } catch (error) {
-      console.error('Error al cargar la empresa:', error);
-      if (error.response) {
-        console.error('Detalles del error:', error.response.data);
+      } catch (error) {
+        console.error('Error al cargar la empresa:', error);
+        if (error.response) {
+          console.error('Detalles del error:', error.response.data);
+        }
       }
-    }
 
     try {
       const datasetResponse = await axios.get(
@@ -209,8 +209,8 @@ export default {
         console.error('Detalles del error:', error.response.data);
       }
     }
-  },
-  methods: {
+    },
+    methods: {
 
     processDatasetResponse(data) {
       const predefinedColors = [
@@ -255,12 +255,12 @@ export default {
       return datasets;
     },
 
-    formatIdentification(identification) {
-      if (identification && identification.length === 9) {
-        return `${identification.slice(0, 1)}-${identification.slice(1, 5)}-${identification.slice(5)}`;
-      }
-      return identification || 'N/A';
-    },
+      formatIdentification(identification) {
+        if (identification && identification.length === 9) {
+          return `${identification.slice(0, 1)}-${identification.slice(1, 5)}-${identification.slice(5)}`;
+        }
+        return identification || 'N/A';
+      },
     handleInviteEntrepreneur() {
       this.$router.push(`/enterprise/${this.enterprise.id}/invite`);
     },
@@ -280,30 +280,31 @@ export default {
         return this.barChartDatasets.length > 0;
       } else if (this.selectedChart === 'Ganancias Semanales') {
         return this.weeklyBarChartDatasets.length > 0;
-      }
+    }
       return false;
     },
   },
-};
-</script>
-
-<style scoped>
+  };
+  </script>
+  
+  <style scoped>
 .v-card {
   border-radius: 12px;
-}
+  }
 .v-btn {
   text-transform: none;
-}
+  }
 .v-list-item-title {
   font-weight: 500;
-}
+  }
 .v-divider {
   margin: 16px 0;
-}
+  }
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.5s;
-}
+  }
 .fade-enter, .fade-leave-to /* .fade-leave-active en versiones anteriores de Vue */ {
   opacity: 0;
-}
-</style>
+  }
+  </style>
+  

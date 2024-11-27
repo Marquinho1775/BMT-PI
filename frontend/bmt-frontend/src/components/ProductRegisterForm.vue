@@ -9,7 +9,7 @@
             </v-card-title>
             <v-card-text>
               <v-form ref="form" @submit.prevent="addNewProduct">
-                <!-- Nombre del producto -->
+          <!-- Nombre del producto -->
                 <v-text-field
                   id="name"
                   v-model="productData.name"
@@ -18,7 +18,7 @@
                   required
                 ></v-text-field>
 
-                <!-- Descripción -->
+          <!-- Descripción -->
                 <v-text-field
                   id="description"
                   v-model="productData.description"
@@ -27,7 +27,7 @@
                   required
                 ></v-text-field>
 
-                <!-- Tags -->
+          <!-- Tags -->
                 <v-autocomplete
                   v-model="value"
                   :items="availableOptions"
@@ -38,7 +38,7 @@
                   deletable-chips
                 ></v-autocomplete>
 
-                <!-- Peso -->
+          <!-- Peso -->
                 <v-text-field
                   id="weight"
                   v-model="productData.weight"
@@ -50,7 +50,7 @@
                   @input="validateWeight"
                 ></v-text-field>
 
-                <!-- Precio -->
+          <!-- Precio -->
                 <v-text-field
                   id="price"
                   v-model="productData.price"
@@ -62,7 +62,7 @@
                   @input="validatePrice"
                 ></v-text-field>
 
-                <!-- Tipo de Producto -->
+          <!-- Tipo de Producto -->
                 <v-radio-group
                   v-model="productData.type"
                   label="Tipo de producto:"
@@ -72,7 +72,8 @@
                   <v-radio label="No perecedero" value="No perecedero"></v-radio>
                 </v-radio-group>
 
-                <div v-if="productData.type === 'No perecedero'">
+          <!-- Campos adicionales según el tipo de producto -->
+          <div v-if="productData.type === 'No perecedero'">
                   <!-- Stock -->
                   <v-text-field
                     id="stock"
@@ -87,10 +88,10 @@
                     :error-messages="stockValid === false ? ['Por favor, ingrese una cantidad de stock válida.'] : []"
                     @input="validateStock"
                   ></v-text-field>
-                </div>
+          </div>
 
-                <div v-if="productData.type === 'Perecedero'">
-                  <!-- Días de la semana -->
+          <div v-if="productData.type === 'Perecedero'">
+            <!-- Días de la semana -->
                   <div>
                   <span>Días de disponibilidad:</span>
                   <v-row>
@@ -109,7 +110,7 @@
                   </v-row>
                   </div>
 
-                  <!-- Límite por día -->
+            <!-- Límite por día -->
                   <v-text-field
                     id="limit"
                     v-model.number="productData.limit"
@@ -123,13 +124,13 @@
                     :error-messages="limitValid === false ? ['Por favor, ingrese un límite por día válido.'] : []"
                     @input="validateLimit"
                   ></v-text-field>
-                </div>
-                
+          </div>
+
                 <!-- Imágenes -->
                 <v-file-input
                   v-model="productData.images"
                   label="Añada imágenes:"
-                  multiple
+              multiple
                 ></v-file-input>
 
                 <!-- Botones -->
@@ -209,30 +210,30 @@ export default {
             let days = '';
             this.productData.weekDaysAvailable.forEach(day => {
               days += day;
-            });
+        });
             formData.append('WeekDaysAvailable', days);
           }
         }
 
         if (this.productData.images && this.productData.images.length > 0) {
-          for (const file of this.productData.images) {
+        for (const file of this.productData.images) {
             formData.append('ImagesFiles', file);
           }
         }
 
         const response = await axios.post(API_URL + '/Product', formData, {
-          headers: {
+            headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
 
         if (response.data.success) {
-          this.$swal.fire({
-            title: 'Éxito',
-            text: 'Producto agregado exitosamente.',
-            icon: 'success',
-            confirmButtonText: 'Ok'
-          }).then(() => {
+        this.$swal.fire({
+          title: 'Éxito',
+          text: 'Producto agregado exitosamente.',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        }).then(() => {
             this.$router.push('/');
           });
         } else {
@@ -241,7 +242,7 @@ export default {
             text: 'Hubo un error al agregar el producto.',
             icon: 'error',
             confirmButtonText: 'Ok'
-          });
+        });
         }
       } catch (error) {
         this.$swal.fire({
@@ -299,4 +300,5 @@ export default {
   padding: 20px;
   background-color: #f5f5f5;
 }
+
 </style>

@@ -2,6 +2,9 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import VueGoogleMaps from '@fawmi/vue-google-maps';
 import { createRouter, createWebHistory } from 'vue-router';
+import HomePage from './components/HomePage.vue';
+import HomePageUserClient from './components/HomePageUserClient.vue';
+import HomePageEntrepeneur from './components/HomePageEntrepeneur.vue';
 
 // Importar todos tus componentes aquí
 import HomePage from './components/HomePage.vue';
@@ -48,6 +51,7 @@ import ChatGPT from './components/ChatGPT.vue';
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue-3/dist/bootstrap-vue-3.css';
+
 import BootstrapVue3 from 'bootstrap-vue-3';
 import Swal from 'sweetalert2';
 
@@ -66,7 +70,7 @@ axios.interceptors.request.use(
   (config) => {
     const token = getToken();
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+        config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -76,8 +80,8 @@ axios.interceptors.request.use(
 );
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes: [
+    history: createWebHistory(),
+    routes: [
     { path: '/', name: "RedirectionerPage", component: RedirectionerPage },
     { path: '/home', name: "Home", component: HomePage },
     { path: '/register', name: "Register", component: UserRegisterForm },
@@ -87,9 +91,10 @@ const router = createRouter({
     { path: '/register-address', name: "RegisterAddress", component: UserRegisterAddress },
     { path: '/card-form', name: "CardForm", component: UserCardForm },
     { path: '/shopping-cart', name: "ShoppingCart", component: UserShoppingCart },
-    { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
-    { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
-    { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
+        { path: '/enterprise-register', name: 'EnterpriseRegisterForm', component: EnterpriseRegisterForm },
+        { path: '/enterprises', name: 'EntrepreneurRegisteredEnterprises', component: EntrepreneurRegisteredEnterprises },
+        { path: '/collaborator', name: "CollaboratorProfile", component: CollaboratorProfilePage },
+        { path: '/enterprise/:id', name: "EnterpriseDashboard", component: EnterpriseDashboard },
     { path: '/enterprise/:id/inventory', name: "EnterpriseInventory", component: EnterpriseInventory },
     { path: '/enterprise/:id/edit', name: "EditEnterpriseInfo", component: EditEnterpriseInfo },
     { path: '/enterprise/:id/invite', name: "CollaboratorRegisterForm", component: CollaboratorRegisterForm },
@@ -100,23 +105,24 @@ const router = createRouter({
     { path: '/search/:searchText', name: "SearchResultPage", component: SearchResultPage },
     { path: '/reports', name: "ReportsDashboard", component: ReportsDashboard },
     { path: '/developer-dashboard', name: "DeveloperDashboard", component: DeveloperDashboard },
-    { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
-    { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
-    { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
+        { path: '/developer-products', name: "DeveloperProducts", component: DeveloperProducts },
+        { path: '/developer-home', name: "DeveloperHome", component: HomePageDeveloper },
+        { path: '/developer-users', name: "DeveloperUsers", component: DeveloperUsers },
+        { path: '/developer-enterprises', name: "DeveloperEnterprises", component: DeveloperEnterprises },
     { path: '/products-confirmation', name: "ProductsConfirmation", component: DeveloperOrderConfirmation },
     { path: '/profile/edit', name: "EditProfile", component: EditProfileInfo },
     { path: '/UserDeleteConfirmation', name: "DeleteUserConfirmation", component: UserDelete },
-  ]
+    ]
 });
 
 router.beforeEach((to, from, next) => {
-  const token = getToken();
+    const token = getToken();
 
-  if (to.meta.requiresAuth && !token) {
-    next('/login');
-  } else {
-    next();
-  }
+    if (to.meta.requiresAuth && !token) {
+        next('/login');
+    } else {
+        next();
+    }
 });
 
 loadFonts();

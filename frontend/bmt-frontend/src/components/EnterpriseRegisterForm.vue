@@ -68,7 +68,7 @@
             <div class="d-flex justify-end mt-4">
               <v-btn color="secondary" class="mr-2" outlined @click="goBack">Volver</v-btn>
               <v-btn type="submit" color="primary">Registrar</v-btn>
-            </div>
+        </div>
           </v-form>
         </v-card-text>
       </v-card>
@@ -87,9 +87,11 @@ export default {
       idTypeOptions: [
         { value: 1, text: 'Persona física' },
         { value: 2, text: 'Persona jurídica' },
+        { value: null, text: 'Seleccione una de las anteriores', disabled: true }
       ],
       entrepreneurData: {
         identification: '',
+        username: '',
       },
       enterpriseData: {
         identificationType: null,
@@ -194,6 +196,14 @@ export default {
           enterpriseIdentification: enterpriseId.trim(),
           isAdmin: true,
         });
+        console.log(entrepreneurResponse, enterpriseResponse, addToEnterpriseResponse);
+        await this.$swal.fire({
+          title: 'Registro exitoso',
+          text: '¡Su empresa ha sido registrada correctamente!',
+          icon: 'success',
+          confirmButtonText: 'Ok'
+        });
+        this.$router.push('/entrepeneur-home');
       } catch (error) {
         this.generateSweetAlert('Error', 'error', 'Hubo un error al agregar el emprendedor a la empresa.');
         console.error(error);
@@ -207,7 +217,7 @@ export default {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      });
+        });
       return response.data.identification;
     },
 
@@ -245,6 +255,10 @@ export default {
         phoneNumber: '',
       };
     },
+
+    goBack() {
+      this.$router.push('/client-home');
+    }
   },
 };
 </script>
@@ -252,6 +266,17 @@ export default {
 <style scoped>
 .title-background {
   background-color: #39517B;
+}
+
+.button:hover {
+  background-color: #02174B;
+}
+
+#form {
+  background-color: #9FC9FC;
+}
+
+#title {
   color: white;
   padding: 16px;
   margin: 0;

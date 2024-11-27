@@ -4,29 +4,29 @@
       <h2 class="text-center">Emprendimientos asociados</h2>
       <v-card class="mb-4">
         <v-data-table height="600px" fixed header>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Cédula</th>
-              <th>Administrador</th>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Administrador</th>
               <th>Correo</th>
               <th>Número de teléfono</th>
-              <th>Descripción</th>
+                <th>Descripción</th>
               <th>Acciones</th> <!-- Nueva columna -->
-            </tr>
-          </thead>
-          <tbody>
+              </tr>
+            </thead>
+            <tbody>
             <tr 
               v-for="enterprise in enterprises" 
               :key="enterprise.identificationNumber"
               @click="goToEnterprise(enterprise.id)"
             >
               <td>{{ enterprise.name }}</td>
-              <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
+                <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
               <td>{{ enterprise.administrator.name }} {{ enterprise.administrator.lastname }}</td>
               <td>{{ enterprise.email }}</td>
               <td>{{ enterprise.phoneNumber }}</td>
-              <td>{{ enterprise.description }}</td>
+                <td>{{ enterprise.description }}</td>
               <td>
                 <v-icon
                   color="red"
@@ -36,8 +36,8 @@
                   mdi-delete
                 </v-icon>
               </td>
-            </tr>
-          </tbody>
+              </tr>
+            </tbody>
         </v-data-table>
       </v-card>
     </v-container>
@@ -153,11 +153,13 @@ export default {
     goBack() {
       window.location.href = "/";
     },
+
     goToEnterprise(enterpriseId) {
       if (!enterpriseId) {
         console.error("El ID de la empresa es undefined");
         return;
       }
+      console.log(enterpriseId); // Asegúrate de que el ID no sea undefined
       this.$router.push(`/enterprise/${enterpriseId}`);
     },
   },
@@ -180,10 +182,32 @@ export default {
 
 .v-card {
   background-color: #A9C5FF;
+  padding: 20px;
+  border-radius: 15px;
+  width: 100%;
+  min-height: 60vh;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.enterprise-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+.enterprise-table th,
+.enterprise-table td {
+  padding: 10px;
+  text-align: left;
 }
 
 .v-data-table th {
   background-color: #39517B;
+  font-weight: bold;
   color: white;
 }
 
@@ -203,5 +227,14 @@ export default {
 
 .v-navigation-drawer {
   background-color: #39517B;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: #2d3f5a;
 }
 </style>

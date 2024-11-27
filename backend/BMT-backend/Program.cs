@@ -105,6 +105,7 @@ builder.Services.AddScoped<GetEnterpriseWeeklyEarningsQuery>();
 
 
 var app = builder.Build();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -117,5 +118,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();

@@ -3,7 +3,7 @@
     <h1>Sumario de los usuarios del sistema</h1>
     <div class="reports-container">
       <reports-table v-if="enterprises.length" :titles="tableTitles" :keys="tableKeys" :reports="enterprises" />
-    </div>
+        </div>
   </v-main>
 </template>
 
@@ -46,6 +46,9 @@ export default {
       } catch (error) {
         console.error('Error fetching enterprises:', error);
       }
+    },
+    goToMainPage() {
+      this.$router.push('/developer-home');
     },
   },
   mounted() {
