@@ -6,16 +6,8 @@
           <v-icon icon="mdi-warehouse"></v-icon> &nbsp;
           Inventario de Productos
           <v-spacer></v-spacer>
-          <v-text-field
-            v-model="search"
-            density="compact"
-            label="Buscar"
-            prepend-inner-icon="mdi-magnify"
-            variant="solo-filled"
-            flat
-            hide-details
-            single-line
-          ></v-text-field>
+          <v-text-field v-model="search" density="compact" label="Buscar" prepend-inner-icon="mdi-magnify"
+            variant="solo-filled" flat hide-details single-line></v-text-field>
         </v-card-title>
         <v-divider></v-divider>
 
@@ -79,63 +71,28 @@
           <v-card-text>
             <!-- Formulario de edición de producto -->
             <v-form ref="editForm" @submit.prevent="updateProduct">
-              <v-text-field
-                label="Nombre del producto"
-                v-model="editProductData.name"
-              ></v-text-field>
+              <v-text-field label="Nombre del producto" v-model="editProductData.name"></v-text-field>
 
-              <v-textarea
-                label="Descripción"
-                v-model="editProductData.description"
-              ></v-textarea>
+              <v-textarea label="Descripción" v-model="editProductData.description"></v-textarea>
 
-              <v-text-field
-                label="Tipo de producto"
-                v-model="editProductData.type"
-                readonly
-              ></v-text-field>
+              <v-text-field label="Tipo de producto" v-model="editProductData.type" readonly></v-text-field>
 
-              <v-text-field
-                label="Precio"
-                v-model="editProductData.price"
-                type="number"
-                prefix="₡"
-              ></v-text-field>
+              <v-text-field label="Precio" v-model="editProductData.price" type="number" prefix="₡"></v-text-field>
 
               <!-- Condicional para Cantidad en Inventario -->
-              <v-text-field
-                label="Cantidad en Inventario"
-                v-model="editProductData.stock"
-                type="number"
-                :disabled="editProductData.type === 'Perishable'"
-              ></v-text-field>
+              <v-text-field label="Cantidad en Inventario" v-model="editProductData.stock" type="number"
+                :disabled="editProductData.type === 'Perishable'"></v-text-field>
 
               <!-- Condicional para Límite de Inventario -->
-              <v-text-field
-                label="Límite de inventario"
-                v-model="editProductData.limit"
-                type="number"
-                :disabled="editProductData.type === 'NonPerishable'"
-              ></v-text-field>
+              <v-text-field label="Límite de inventario" v-model="editProductData.limit" type="number"
+                :disabled="editProductData.type === 'NonPerishable'"></v-text-field>
 
-              <v-combobox
-                label="Tags"
-                v-model="editProductData.tags"
-                multiple
-                chips
-                outlined
-              ></v-combobox>
+              <v-combobox label="Tags" v-model="editProductData.tags" multiple chips outlined></v-combobox>
 
               <!-- Campo de URLs de Imágenes -->
-              <v-file-input
-                label="Actualizar Imágenes"
-                v-model="editProductData.newImages"
-                prepend-icon="mdi-image"
-                multiple
-                accept="image/*"
-                hint="Seleccione una o más imágenes para cargar"
-                @change="onImageChange"
-              ></v-file-input>
+              <v-file-input label="Actualizar Imágenes" v-model="editProductData.newImages" prepend-icon="mdi-image"
+                multiple accept="image/*" hint="Seleccione una o más imágenes para cargar"
+                @change="onImageChange"></v-file-input>
             </v-form>
           </v-card-text>
           <v-card-actions>
@@ -150,31 +107,31 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { API_URL, URL } from '@/main.js';
-import { getToken } from '@/helpers/auth';
+import axios from "axios";
+import { API_URL, URL } from "@/main.js";
+import { getToken } from "@/helpers/auth";
 
 export default {
   data() {
     return {
-      search: '',
+      search: "",
       products: [],
       isEditDialogOpen: false,
 
       weekdays: [
-        { text: 'Lunes', value: '1' },
-        { text: 'Martes', value: '2' },
-        { text: 'Miércoles', value: '3' },
-        { text: 'Jueves', value: '4' },
-        { text: 'Viernes', value: '5' },
-        { text: 'Sábado', value: '6' },
-        { text: 'Domingo', value: '0' },
+        { text: "Lunes", value: "1" },
+        { text: "Martes", value: "2" },
+        { text: "Miércoles", value: "3" },
+        { text: "Jueves", value: "4" },
+        { text: "Viernes", value: "5" },
+        { text: "Sábado", value: "6" },
+        { text: "Domingo", value: "0" },
       ],
 
       editProductData: {
-        name: '',
-        description: '',
-        type: '',
+        name: "",
+        description: "",
+        type: "",
         price: 0,
         stock: 0,
         limit: null,
@@ -202,47 +159,61 @@ export default {
   methods: {
     async getProducts() {
       try {
-        const response = await axios.get(`${API_URL}/Enterprise/GetEnterpriseProducts?enterpriseId=${this.enterpriseId}`);
+        const response = await axios.get(
+          `${API_URL}/Enterprise/GetEnterpriseProducts?enterpriseId=${this.enterpriseId}`
+        );
         this.products = response.data.data;
         this.URLImage();
       } catch (error) {
-        console.error('Error al obtener productos:', error);
+        console.error("Error al obtener productos:", error);
       }
     },
     URLImage() {
-      this.products.forEach(product => {
+      this.products.forEach((product) => {
         if (Array.isArray(product.imagesURLs)) {
-          product.imagesURLs = product.imagesURLs.map(image => 
+          product.imagesURLs = product.imagesURLs.map((image) =>
             image.startsWith("http") ? image : `${URL}${image}`
           );
         }
       });
     },
-    
+
     formatWeekDays(weekDaysString) {
       if (!weekDaysString) {
         return "Disponible todos los días";
       }
-      const daysMap = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      const daysMap = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+      ];
       return weekDaysString
         .split("")
-        .map(day => daysMap[Number(day.trim())])
+        .map((day) => daysMap[Number(day.trim())])
         .filter(Boolean)
         .join(", ");
     },
-    
+
     formatProductType(type) {
-      return type === "NonPerishable" ? "No perecedero" : type === "Perishable" ? "Perecedero" : "Desconocido";
+      return type === "NonPerishable"
+        ? "No perecedero"
+        : type === "Perishable"
+          ? "Perecedero"
+          : "Desconocido";
     },
-    
+
     openEditDialog(product) {
       this.editProductData = { ...product };
       this.isEditDialogOpen = true;
     },
-    
+
     closeEditDialog() {
       this.isEditDialogOpen = false;
-      this.editProductData = {}; 
+      this.editProductData = {};
     },
 
     async uploadImages() {
@@ -255,16 +226,12 @@ export default {
           formData.append("images", file);
         });
 
-        await axios.post(
-          `${API_URL}/ImageFile/upload`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: `Bearer ${getToken()}`,
-            },
-          }
-        );
+        await axios.post(`${API_URL}/ImageFile/upload`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${getToken()}`,
+          },
+        });
       } catch (error) {
         console.error("Error al subir imágenes:", error);
       }
@@ -274,88 +241,99 @@ export default {
       // Puedes manejar cambios de imagen aquí si es necesario
     },
 
-    
     async updateProduct() {
       try {
         const formData = new FormData();
-        formData.append('id', this.editProductData.id);
-        formData.append('enterpriseId', this.enterpriseId);
-        formData.append('name', this.editProductData.name);
-        formData.append('description', this.editProductData.description);
-        formData.append('weight', this.editProductData.weight);
-        formData.append('price', this.editProductData.price);
-        formData.append('type', this.editProductData.type);
-        
-        if (this.editProductData.tags && this.editProductData.tags.length > 0) {
-          this.editProductData.tags.forEach(tag => {
-            formData.append('Tags', tag);
+        formData.append("id", this.editProductData.id);
+        formData.append("enterpriseId", this.enterpriseId);
+        formData.append("name", this.editProductData.name);
+        formData.append("description", this.editProductData.description);
+        formData.append("weight", this.editProductData.weight);
+        formData.append("price", this.editProductData.price);
+        formData.append("type", this.editProductData.type);
+
+        if (
+          this.editProductData.tags &&
+          this.editProductData.tags.length > 0
+        ) {
+          this.editProductData.tags.forEach((tag) => {
+            formData.append("Tags", tag);
           });
         }
-        
+
         if (this.editProductData.type === "NonPerishable") {
-          formData.append('stock', this.editProductData.stock != null ? this.editProductData.stock : 0);
-        } 
-        
+          formData.append(
+            "stock",
+            this.editProductData.stock != null
+              ? this.editProductData.stock
+              : 0
+          );
+        }
+
         if (this.editProductData.type === "Perishable") {
-          formData.append('limit', this.editProductData.limit != null ? this.editProductData.limit : 0);
+          formData.append(
+            "limit",
+            this.editProductData.limit != null
+              ? this.editProductData.limit
+              : 0
+          );
         }
-        
-        if (this.editProductData.newImages && this.editProductData.newImages.length > 0) {
+
+        if (
+          this.editProductData.newImages &&
+          this.editProductData.newImages.length > 0
+        ) {
           for (const file of this.editProductData.newImages) {
-            formData.append('ImagesFiles', file);
+            formData.append("ImagesFiles", file);
           }
         }
-        
+
         const token = getToken();
-        const response = await axios.put(
-          `${API_URL}/Product`,
-          formData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );        
-        
-        console.log('Response:', response.data);
+        const response = await axios.put(`${API_URL}/Product`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Response:", response.data);
         if (response.data.success) {
           this.$swal.fire({
-            title: 'Producto actualizado',
-            text: '¡Su producto ha sido actualizado correctamente!',
-            icon: 'success',
-            confirmButtonText: 'Ok',
+            title: "Producto actualizado",
+            text: "¡Su producto ha sido actualizado correctamente!",
+            icon: "success",
+            confirmButtonText: "Ok",
             backdrop: true,
             customClass: {
-              popup: 'swal-overlay',
-            }
+              popup: "swal-overlay",
+            },
           });
         } else {
-            this.$swal.fire({
-              title: 'Error',
-              text: 'Hubo un error al actualizar el producto.',
-              icon: 'error',
-              confirmButtonText: 'Ok'
-            });
-          }
-        } catch (error) {
-          console.error('Error al actualizar producto:', error);
           this.$swal.fire({
-            title: 'Error',
-            text: 'Hubo un error al actualizar su producto. Inténtelo de nuevo.',
-            icon: 'error',
-            confirmButtonText: 'Ok',
-            backdrop: true,
-            customClass: {
-              popup: 'swal-overlay',
-            }
+            title: "Error",
+            text: "Hubo un error al actualizar el producto.",
+            icon: "error",
+            confirmButtonText: "Ok",
           });
         }
-        await this.getProducts();
-        this.closeEditDialog();
+      } catch (error) {
+        console.error("Error al actualizar producto:", error);
+        this.$swal.fire({
+          title: "Error",
+          text: "Hubo un error al actualizar su producto. Inténtelo de nuevo.",
+          icon: "error",
+          confirmButtonText: "Ok",
+          backdrop: true,
+          customClass: {
+            popup: "swal-overlay",
+          },
+        });
       }
+      await this.getProducts();
+      this.closeEditDialog();
     },
 
+    // **Mover confirmDelete y deleteProduct dentro de methods**
     async confirmDelete(product) {
       const result = await this.$swal.fire({
         title: "¿Estás seguro?",
@@ -376,8 +354,10 @@ export default {
     async deleteProduct(product) {
       try {
         // Llamada al backend
-        const response = await axios.delete(`${API_URL}/Product/Delete/${product.id}`);
-        
+        const response = await axios.delete(
+          `${API_URL}/Product/Delete/${product.id}`
+        );
+
         // Si el borrado fue exitoso
         if (response.status === 200) {
           // Elimina el producto del array local
@@ -400,8 +380,9 @@ export default {
           icon: "error",
         });
       }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -409,13 +390,11 @@ export default {
   width: 100%;
   border-collapse: collapse;
 }
-.custom-table th, .custom-table td {
+
+.custom-table th,
+.custom-table td {
   padding: 16px;
   border-bottom: 1px solid #e0e0e0;
   text-align: left;
-}
-
-.swal-overlay {
-  z-index: 2050 !important;
 }
 </style>

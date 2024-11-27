@@ -2,13 +2,9 @@
   <v-main class="flex-grow-1">
     <!-- Pantalla de Carga -->
     <div v-if="isLoading" class="d-flex justify-center align-center" style="height: 100vh">
-      <v-progress-circular
-        indeterminate
-        color="primary"
-        size="64"
-      ></v-progress-circular>
+      <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
     </div>
-    
+
     <!-- Dashboard Principal -->
     <div v-else>
       <h1 class="text-h4 py-4 px-4 mb-4">Dashboard de Desarrollador</h1>
@@ -18,14 +14,8 @@
         <!-- Sección de Selección de Gráfico -->
         <v-row class="mb-6">
           <v-col cols="12" md="4">
-            <v-select
-              :items="chartOptionsList"
-              item-text="text"
-              item-value="value"
-              label="Selecciona el gráfico"
-              v-model="selectedChart"
-              outlined
-            ></v-select>
+            <v-select :items="chartOptionsList" item-text="text" item-value="value" label="Selecciona el gráfico"
+              v-model="selectedChart" outlined></v-select>
           </v-col>
         </v-row>
 
@@ -34,23 +24,14 @@
           <!-- Columna para el Gráfico -->
           <v-col cols="12" md="7">
             <transition name="fade" mode="out-in">
-              <StackedBarChart
-                v-if="selectedChart === 'Ganancias Mensuales'"
-                key="Ganancias Mensuales"
-                :datasets="barChartDatasets"
-                :type="0"
-                :labels="[
+              <StackedBarChart v-if="selectedChart === 'Ganancias Mensuales'" key="Ganancias Mensuales"
+                :datasets="barChartDatasets" :type="0" :labels="[
                   'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
                   'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
-                ]"
-              />
-              <StackedBarChart
-                v-else-if="selectedChart === 'Ganancias Semanales'"
-                key="Ganancias Semanales"
-                :datasets="weeklyBarChartDatasets"
-                :type="1"
-                :labels="['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
-              />
+                ]" />
+              <StackedBarChart v-else-if="selectedChart === 'Ganancias Semanales'" key="Ganancias Semanales"
+                :datasets="weeklyBarChartDatasets" :type="1"
+                :labels="['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" />
             </transition>
           </v-col>
 
@@ -63,7 +44,7 @@
         <!-- Gráfico LineChart  -->
         <v-row>
           <v-col cols="12" md="7">
-            <LineChart :dataset="LineDataset"/>
+            <LineChart :dataset="LineDataset" />
           </v-col>
         </v-row>
       </v-container>
@@ -99,6 +80,9 @@ export default {
   },
   async created() {
     try {
+      if (!localStorage.getItem("token")) {
+        this.$router.push('/login');
+      }
       // Realizar todas las solicitudes de datos en paralelo
       const [datasetResponse1, datasetResponse2, weeklyDatasetResponse] = await Promise.all([
         axios.get(`${API_URL}/Developer/GetAllEnterprisesEarnings`),
@@ -188,21 +172,29 @@ export default {
 .v-card {
   border-radius: 12px;
 }
+
 .v-btn {
   text-transform: none;
 }
+
 .v-list-item-title {
   font-weight: 500;
 }
+
 .v-divider {
   margin: 16px 0;
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
 }
+
 .fade-enter,
-.fade-leave-to /* .fade-leave-active en versiones anteriores de Vue */ {
+.fade-leave-to
+
+/* .fade-leave-active en versiones anteriores de Vue */
+  {
   opacity: 0;
 }
 </style>

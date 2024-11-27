@@ -19,18 +19,13 @@
                             <v-icon class="mr-2">mdi-dolly</v-icon>
                             Compras recientes
                         </v-card-title>
-                        <v-virtual-scroll class="component-scroller"
-                            :items="orderProducts"
-                            v-if="orderProducts && orderProducts.length"
-                            :item-height="70">
+                        <v-virtual-scroll class="component-scroller" :items="orderProducts"
+                            v-if="orderProducts && orderProducts.length" :item-height="70">
                             <template v-slot:default="{ item }">
-                                <v-list-item :key="item.id"
-                                    @click="openProductDialog(item)">
+                                <v-list-item :key="item.id" @click="openProductDialog(item)">
                                     <v-list-item-content>
-                                        <v-img
-                                            v-if="item.imagesURLs && item.imagesURLs.length"
-                                            :src="imagesURLBase + item.imagesURLs[0]"
-                                            height="100" width="50"></v-img>
+                                        <v-img v-if="item.imagesURLs && item.imagesURLs.length"
+                                            :src="imagesURLBase + item.imagesURLs[0]" height="100" width="50"></v-img>
                                         <v-list-item-title>{{ item.name
                                             }}</v-list-item-title>
                                         <v-list-item-subtitle>₡{{ item.price
@@ -51,11 +46,8 @@
                         <v-card-text>
                             <div v-if="selectedProduct">
                                 <v-carousel show-arrows="hover" hide-delimiters>
-                                    <v-carousel-item
-                                        v-for="(image, index) in selectedProduct.imagesURLs"
-                                        :key="index">
-                                        <v-img :src="imagesURLBase + image"
-                                            aspect-ratio="16/9" cover></v-img>
+                                    <v-carousel-item v-for="(image, index) in selectedProduct.imagesURLs" :key="index">
+                                        <v-img :src="imagesURLBase + image" aspect-ratio="16/9" cover></v-img>
                                     </v-carousel-item>
                                 </v-carousel>
                                 <p><strong>Nombre: </strong>{{
@@ -67,17 +59,14 @@
                                 <p><strong>Precio:</strong> ₡{{
                                     selectedProduct.price }}</p>
                                 <v-chip-group>
-                                    <v-chip
-                                        v-for="(tag, index) in selectedProduct.tags"
-                                        :key="index" class="mr-4">{{
-                                            tag
-                                        }}</v-chip>
+                                    <v-chip v-for="(tag, index) in selectedProduct.tags" :key="index" class="mr-4">{{
+                                        tag
+                                    }}</v-chip>
                                 </v-chip-group>
                             </div>
                         </v-card-text>
                         <v-card-actions>
-                            <v-btn prepend-icon="mdi-plus" color="primary"
-                                @click="addToCart" text>Añadir al
+                            <v-btn prepend-icon="mdi-plus" color="primary" @click="addToCart" text>Añadir al
                                 carrito</v-btn>
                             <v-spacer></v-spacer>
                             <v-btn text @click="productDialog = false">
@@ -114,6 +103,9 @@ export default {
         };
     },
     created() {
+        if (!localStorage.getItem("token")) {
+            this.$router.push('/login');
+        }
         this.userId = getUser().id;
         this.getProducts();
         this.getOrders();

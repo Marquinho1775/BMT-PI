@@ -22,6 +22,9 @@ export default {
         };
     },
     created() {
+        if (!localStorage.getItem("token")) {
+            this.$router.push('/login');
+        }
         this.userRole = JSON.parse(localStorage.getItem("user")).role;
     },
 }

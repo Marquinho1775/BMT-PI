@@ -65,8 +65,8 @@ export default {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       this.isLoggedIn = false;
-      this.$router.push('/');
       location.reload();
+      this.$router.push('/');
     },
     handleRegister() {
       this.$router.push('/register');
