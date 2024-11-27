@@ -1,235 +1,178 @@
 <template>
-
-  <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-      crossorigin="anonymous" referrerpolicy="no-referrer" />
-  </head>
-
-  <body>
-    <div>
-      <div class="d-flex justify-content-end"></div>
-      <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel"
-        style="height: 100vh;">
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Opciones</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  <v-main>
+    <h1>Sumario de los productos registrados en el sistema</h1>
+    <div class="reports-container">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Empresa</th>
+            <th>Descripción</th>
+            <th>Tipo</th>
+            <th>Peso</th>
+            <th>Precio</th>
+            <th>Cantidad en Inventario</th>
+            <th>Límite</th>
+            <th>Días Disponibles</th>
+            <th>Tags</th>
+            <th>Imágenes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(product, index) in filteredProducts" :key="index">
+            <td>{{ product.name }}</td>
+            <td>{{ product.enterpriseName }}</td>
+            <td>{{ product.description }}</td>
+            <td>{{ formatProductType(product.type) }}</td>
+            <td>{{ product.weight }} kg</td>
+            <td>₡{{ product.price }}</td>
+            <td>{{ product.stock }}</td>
+            <td>{{ product.limit }}</td>
+            <td>{{ formatWeekDays(product.weekDaysAvailable) }}</td>
+            <td>
+              <v-chip-group>
+                <v-chip
+                  v-for="(tag, i) in product.tags"
+                  :key="i"
+                  class="ma-1"
+                  color="primary"
+                  outlined
+                >
+                  {{ tag }}
+                </v-chip>
+              </v-chip-group>
+            </td>
+            <td>
+              <v-carousel show-arrows="hover" height="100" width="200" hide-delimiters>
+                <v-carousel-item v-for="(image, i) in product.imagesURLs" :key="i">
+                  <v-img :src="image" height="200" width="100"></v-img>
+                </v-carousel-item>
+              </v-carousel>
+            </td>
+          </tr>
+        </tbody>
+      </table>
         </div>
-        <div class="offcanvas-body" style="background-color: #BCD6F3; margin: 0px; padding: 0px">
-          <ul class="navbar-nav justify-content-end">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#" style="padding: 10px;">Opciones de usuario</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" style="padding: 10px;" @click="goToMainPage">Página principal</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#" style="padding: 10px;">Cerrar sesión</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="user-icon-container">
-        <button class="user-icon-button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-          aria-controls="offcanvasNavbar">
-          <i class="menu">Menú</i>
-        </button>
-      </div>
-    </div>
-
-    <div class="main-table">
-      <h1 class="table-title">Productos</h1>
-      <div class="grid-container">
-        <div class="grid-item header">Nombre</div>
-        <div class="grid-item header">Empresa</div>
-        <div class="grid-item header">Precio</div>
-        <div class="grid-item header">Descripción</div>
-        <div v-for="product in products" :key="product.name" class="grid-row">
-          <div class="grid-item">{{ product.name }}</div>
-          <div class="grid-item">{{ product.enterprise }}</div>
-          <div class="grid-item">{{ product.price }}</div>
-          <div class="grid-item">
-            <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" data-bs-trigger="hover focus"
-              :data-bs-content="product.description">
-              <button class="btn custom-popover-btn" type="button">...</button>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+  </v-main>
 </template>
 
 <script>
-import axios from 'axios';
-import { Popover } from 'bootstrap';
+import axios from "axios";
+import { API_URL, URL } from "@/main.js";
 
 export default {
   data() {
     return {
-      products: []
+      search: "",
+      products: [],
+      isEditDialogOpen: false,
+      weekdays: [
+        { text: "Lunes", value: "1" },
+        { text: "Martes", value: "2" },
+        { text: "Miércoles", value: "3" },
+        { text: "Jueves", value: "4" },
+        { text: "Viernes", value: "5" },
+        { text: "Sábado", value: "6" },
+        { text: "Domingo", value: "0" },
+      ],
     };
   },
-  methods: {
-    async getEnterprises() {
-      try {
-        const response = await axios.get('https://localhost:7189/api/Developer/GetProducts/');
-        this.products = response.data;
-        this.products = response.data.sort((a, b) => a.enterprise.localeCompare(b.enterprise));
-        this.$nextTick(() => {
-          const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-          popoverTriggerList.map(function (popoverTriggerEl) {
-            return new Popover(popoverTriggerEl, {
-              customClass: 'custom-popover'
-            });
-          });
-        });
-      } catch (error) {
-        console.error('Error fetching enterprises:', error);
+  computed: {
+    filteredProducts() {
+      if (!this.products || !Array.isArray(this.products)) {
+        return [];
       }
-    },
-    goToMainPage() {
-      this.$router.push('/developer-home');
+      return this.products.filter((product) =>
+        product.name.toLowerCase().includes(this.search.toLowerCase())
+      );
     },
   },
-  mounted() {
-    this.getEnterprises();
-  }
-}
+  created() {
+    this.loadProducts();
+  },
+  methods: {
+    async loadProducts() {
+      try {
+        const response = await axios.get(`${API_URL}/Developer/getProducts`);
+        console.log("Respuesta del API:", response.data);
+        if (Array.isArray(response.data)) {
+        this.products = response.data;
+            this.formatProductImages();
+        } else {
+            console.warn("La respuesta no es un arreglo.");
+            this.products = [];
+        }
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        this.products = [];
+    }
+    },
+
+    formatProductImages() {
+      this.products.forEach(product => {
+        if (Array.isArray(product.imagesURLs)) {
+          product.imagesURLs = product.imagesURLs.map(image => 
+            image.startsWith("http") ? image : `${URL}${image}`
+          );
+        }
+            });
+    },
+
+    formatWeekDays(weekDaysString) {
+      if (!weekDaysString) {
+        return "Disponible todos los días";
+      }
+      const daysMap = [
+        "Domingo",
+        "Lunes",
+        "Martes",
+        "Miércoles",
+        "Jueves",
+        "Viernes",
+        "Sábado",
+      ];
+      return weekDaysString
+        .split("")
+        .map((day) => daysMap[Number(day.trim())])
+        .filter(Boolean)
+        .join(", ");
+    },
+    formatProductType(type) {
+      return type === "NonPerishable"
+        ? "No perecedero"
+        : type === "Perishable"
+        ? "Perecedero"
+        : "Desconocido";
+    },
+  },
+};
 </script>
 
 <style scoped>
-@import 'bootstrap/dist/css/bootstrap.min.css';
-
-body {
-  background-color: #D1E4FF;
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.main-table {
-  border-radius: 15px;
-  margin: 10%;
-  width: 80%;
-  background-color: #9FC9FC;
+.custom-table th,
+.custom-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
 }
 
-.menu {
-  font-style: normal;
-  font-weight: bold;
-  color: #BCD6F3;
+.swal-overlay {
+  z-index: 2050 !important;
 }
 
-.grid-row {
-  display: contents;
+h1 {
+  margin: 30px;
+  padding: 30px;
 }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  row-gap: 10px;
-  padding: 100px;
-  padding-top: 20px;
-  font-size: large;
-  color: #49454F;
-}
-
-.grid-item.header {
-  font-weight: bold;
-}
-
-.grid-item {
-  background-color: #8cb2e0;
-  border: 1px solid #8cb2e0;
-}
-
-.table-title {
-  padding: 50px;
-  padding-bottom: 0px;
-  color: #49454F;
-  font-size: 2.5rem;
-  font-weight: 500;
-  text-align: center;
-}
-
-.d-flex {
-  position: fixed;
-  top: 0;
-  right: 0;
-  padding: 10px;
-}
-
-.user-icon-container {
-  padding: 10px;
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-
-.offcanvas-header {
-  background-color: #02174B;
-}
-
-.offcanvas-title {
-  color: #D0EDA0;
-}
-
-.offcanvas-body {
-  background-color: #BCD6F3;
-  margin: 0px;
-  padding: 0px;
-}
-
-.user-icon-button {
-  background-color: #02174B;
-  border-radius: 50px;
-  padding: 10px;
-  cursor: pointer;
-}
-
-.btn-close {
-  background-color: #BCD6F3;
-}
-
-.popover.custom-popover {
-  --bs-popover-bg: #f8f9fa;
-  --bs-popover-color: #333;
-  border-radius: 10px;
-  max-width: 300px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.custom-popover .popover-header {
-  background-color: #02174B;
-  color: #D0EDA0;
-  font-size: 1.2rem;
-  padding: 10px;
-}
-
-.custom-popover .popover-body {
-  background-color: #D0EDA0;
-  color: #02174B;
-  font-size: 1rem;
-  padding: 10px;
-}
-
-.custom-popover-btn {
-  background-color: #49505700;
-  color: #fff;
-  border-radius: 20px;
-  padding: 5px 15px;
-  font-weight: bold;
-}
-
-.custom-popover-btn:hover {
-  background-color: #343a4000;
-}
-
-.nav-link:hover {
-  transition: none;
-  background-color: #9ab0c9;
-  border: none;
-  margin: none;
-  padding: none;
-  cursor: pointer;
-  font-weight: bold;
+.reports-container {
+  margin: 30px;
+  padding: 30px;
+  border-radius: 8px;
 }
 </style>

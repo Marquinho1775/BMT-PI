@@ -1,55 +1,64 @@
 <template>
-
-  <body>
-    <div class="entrepreneur-enterprises">
-      <div class="content">
-        <div class="container-fluid d-flex flex-column align-items-center justify-content-center" style="height: 10vh;">
-          <div>
-            <h2 class="title">Emprendimientos asociados</h2>
-          </div>
-        </div>
-        <div class="table-container">
-          <table class="enterprise-table">
+  <v-main class="flex-grow-1">
+    <v-container>
+      <h2 class="text-center">Emprendimientos asociados</h2>
+      <v-card class="mb-4">
+        <v-data-table height="600px" fixed header>
             <thead>
               <tr>
                 <th>Nombre</th>
                 <th>Cédula</th>
                 <th>Administrador</th>
+              <th>Correo</th>
+              <th>Número de teléfono</th>
                 <th>Descripción</th>
+              <th>Acciones</th> <!-- Nueva columna -->
               </tr>
             </thead>
             <tbody>
-              <tr v-for="enterprise in enterprises" :key="enterprise.identificationNumber"
-                @click="goToEnterprise(enterprise.id)">
-                <td>{{ enterprise.enterpriseName }}</td>
+            <tr 
+              v-for="enterprise in enterprises" 
+              :key="enterprise.identificationNumber"
+              @click="goToEnterprise(enterprise.id)"
+            >
+              <td>{{ enterprise.name }}</td>
                 <td>{{ formatIdentification(enterprise.identificationNumber) }}</td>
-                <td>{{ enterprise.adminName }} {{ enterprise.adminLastName }}</td>
+              <td>{{ enterprise.administrator.name }} {{ enterprise.administrator.lastname }}</td>
+              <td>{{ enterprise.email }}</td>
+              <td>{{ enterprise.phoneNumber }}</td>
                 <td>{{ enterprise.description }}</td>
+              <td>
+                <v-icon
+                  color="red"
+                  size="18"
+                  @click.stop="confirmDeleteEnterprise(enterprise)"
+                >
+                  mdi-delete
+                </v-icon>
+              </td>
               </tr>
             </tbody>
-          </table>
-          <div class="button-container">
-            <button class="button" @click="goBack">Volver</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </body>
+        </v-data-table>
+      </v-card>
+    </v-container>
+  </v-main>
 </template>
 
 <script>
 import axios from "axios";
-import { getToken } from '@/helpers/auth';
+import { getToken } from "@/helpers/auth";
+import { API_URL } from "@/main.js";
 
 export default {
   data() {
     return {
+      menuDrawer: false,
       enterprises: [],
       entrepreneur: {
-        Id: '',
-        Username: '',
-        Identification: '',
-      }
+        Id: "",
+        Username: "",
+        Identification: "",
+      },
     };
   },
   mounted() {
@@ -59,47 +68,31 @@ export default {
     async GetEnterprisesOfEntrepreneur() {
       try {
         const token = getToken();
-        const user = JSON.parse(localStorage.getItem('user'));
-
-        // Verificar si el usuario está presente y tiene todos los campos requeridos
-        if (!user || !user.id || !user.name || !user.lastName || !user.username || !user.email || !user.password || user.isVerified === undefined) {
-          console.error('Faltan datos del usuario');
-          return;
-        }
-        const obtainEntrepreneurResponse = await axios.post(
-          'https://localhost:7189/api/Entrepreneur/ObtainEntrepreneurBasedOnUser',
-          {
-            Id: user.id,
-            Name: user.name,
-            LastName: user.lastName,
-            Username: user.username,
-            Email: user.email,
-            Password: user.password,
-            IsVerified: user.isVerified
-          },
+        const user = JSON.parse(localStorage.getItem("user"));
+        const obtainEntrepreneurResponse = await axios.get(
+          API_URL + "/Entrepreneur/GetEntrepreneurByUserId?id=" + user.id,
           {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
-        const entrepreneur = obtainEntrepreneurResponse.data;
-        const enterprisesResponse = await axios.post(
-          'https://localhost:7189/api/Entrepreneur/my-registered-enterprises',
-          entrepreneur,
+        const entrepreneurId = obtainEntrepreneurResponse.data.identification;
+        const enterprisesResponse = await axios.get(
+          API_URL +
+            "/Entrepreneur/my-registered-enterprises?Identification=" +
+            entrepreneurId,
           {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
-        this.enterprises = enterprisesResponse.data;
-        console.log(this.enterprises);
-
+        this.enterprises = enterprisesResponse.data.success;
       } catch (error) {
-        console.error('Error al obtener las empresas:', error);
+        console.error("Error al obtener las empresas:", error);
         if (error.response) {
-          console.error('Datos de la respuesta del servidor:', error.response.data);
+          console.error("Datos de la respuesta del servidor:", error.response.data);
         }
       }
     },
@@ -109,52 +102,85 @@ export default {
       }
       return identification;
     },
+    async confirmDeleteEnterprise(enterprise) {
+      const result = await this.$swal.fire({
+        title: "¿Estás seguro?",
+        text: `Vas a borrar el emprendimiento: ${enterprise.name}`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Sí, borrar",
+        cancelButtonText: "Cancelar",
+      });
+
+      if (result.isConfirmed) {
+        this.deleteEnterprise(enterprise);
+      }
+    },
+    async deleteEnterprise(enterprise) {
+      try {
+        const token = getToken();
+        const response = await axios.delete(
+          `${API_URL}/Enterprise/Delete/${enterprise.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          this.enterprises = this.enterprises.filter((e) => e.id !== enterprise.id);
+
+          this.$swal.fire({
+            title: "¡Borrado!",
+            text: `El emprendimiento ${enterprise.name} ha sido eliminado.`,
+            icon: "success",
+          });
+        } else {
+          throw new Error("Error inesperado al borrar el emprendimiento.");
+        }
+      } catch (error) {
+        console.error(error);
+        this.$swal.fire({
+          title: "Error",
+          text: "No se pudo borrar el emprendimiento. Inténtalo nuevamente.",
+          icon: "error",
+        });
+      }
+    },
     goBack() {
-      this.$router.push('/entrepeneur-home');
+      window.location.href = "/";
     },
 
     goToEnterprise(enterpriseId) {
       if (!enterpriseId) {
-        console.error('El ID de la empresa es undefined');
+        console.error("El ID de la empresa es undefined");
         return;
       }
       console.log(enterpriseId); // Asegúrate de que el ID no sea undefined
       this.$router.push(`/enterprise/${enterpriseId}`);
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
-.entrepreneur-enterprises {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #D1E4FF;
-  justify-content: flex-start;
-  align-items: center;
-  padding-top: 20px;
+.v-app-bar {
+  background-color: #9FC9FC;
 }
 
-.content {
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.v-footer {
+  height: 50px;
+  background-color: #9FC9FC;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.text-center {
+  text-align: center;
 }
 
-h2 {
-  margin-bottom: 10px;
-  margin-top: 0;
-}
-
-.table-container {
+.v-card {
   background-color: #A9C5FF;
   padding: 20px;
   border-radius: 15px;
@@ -179,32 +205,27 @@ h2 {
   text-align: left;
 }
 
-.enterprise-table th {
+.v-data-table th {
   background-color: #39517B;
   font-weight: bold;
   color: white;
 }
 
-.enterprise-table td {
-  background-color: #D0EDA0;
-  border-bottom: 1px solid #ddd;
+.v-data-table tbody tr {
+  background-color: #FFF;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.title {
-  background-color: #D0EDA0;
-  color: #02174B;
-  padding: 15px;
-  border-radius: 100px;
-  text-align: center;
+.v-data-table tbody tr:hover {
+  background-color: #e0e0e0;
 }
 
-.button-container {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
+.v-main {
+  background-color: #FFF;
 }
 
-.button {
+.v-navigation-drawer {
   background-color: #39517B;
   color: white;
   padding: 10px 20px;
